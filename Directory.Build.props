@@ -1,0 +1,67 @@
+<!--
+  Directory.Build.props is imported very early in Microsoft.Common.props, and properties defined
+  later are unavailable to it. So, avoid referring to properties that are not yet defined (and
+  will evaluate to empty). In those cases, use the .targets files.
+-->
+<Project>
+
+  <PropertyGroup>
+    <RootNamespace>$(MSBuildProjectName)</RootNamespace>
+    <TargetPlatformVersion>10.0.18362.0</TargetPlatformVersion>
+    <TargetPlatformMinVersion>10.0.17134.0</TargetPlatformMinVersion>
+    <Platforms>x86;x64</Platforms>
+    <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
+    <RuntimeIdentifier>win-$(Platform)</RuntimeIdentifier>
+
+    <!-- Set the assembly name to the project name. -->
+    <AssemblyName>$(MSBuildProjectName)</AssemblyName>
+    <AssemblyTitle>$(MSBuildProjectName)</AssemblyTitle>
+    <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
+    <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
+
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <RepoRoot>$(MSBuildThisFileDirectory)\</RepoRoot>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!--
+      Keep the binary files out of the solution view
+      -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);artifacts\**;obj\**;bin\**;lib\**;pdb\**</DefaultItemExcludes>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)\.editorconfig" Link=".editorconfig" />
+    <None Include="$(MSBuildThisFileDirectory)\MIT.licenseheader" Link="MIT.licenseheader" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <!--I love Nullable.-->
+    <Nullable>enable</Nullable>
+
+    <!-- Warning level 4 displays all warnings. -->
+    <WarningLevel>4</WarningLevel>
+
+    <!--
+    CA131 do not catch general exception types.
+    -->
+    <NoWarn>$(NoWarn);CA1031</NoWarn>
+    <!--
+    CA1303 Put string resources into a table
+    -->
+    <NoWarn>$(NoWarn);CA1303</NoWarn>
+
+    <!--
+    CS8305 warns about using evaluation code such as CompositionShadow
+    -->
+    <NoWarn>$(NoWarn);CS8305</NoWarn>
+
+    <!--
+    Using nullable without #nullable being enabled will false alarm sometimes.
+    -->
+    <NoWarn>$(NoWarn);CS8632</NoWarn>
+  </PropertyGroup>
+
+</Project>

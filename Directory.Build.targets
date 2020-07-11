@@ -1,0 +1,36 @@
+<!--
+  *.targets files are imported from Microsoft.Common.targets after
+  importing .targets files from NuGet packages. So, it can override properties
+  and targets defined in most of the build logic.  They are also imported after
+  the csproj files are imported. -->
+<Project>
+
+  <PropertyGroup Condition=" '$(OutputType)' == 'WinExe' Or '$(OutputType)' == 'Exe' ">
+    <!-- Exes are not packed. -->
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <ApplicationIcon>$(MSBuildThisFileDirectory)\icon.ico</ApplicationIcon>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- Set icon location for nuget packages. -->
+    <None Include="$(MSBuildThisFileDirectory)\icon.ico" Visible="true" Pack="true" PackagePath=""/>
+  </ItemGroup>
+
+  <!-- If there is an Image dir -->
+  <ItemGroup Condition=" Exists('$(ProjectDir)\Image\')">
+    <Resource Include="Image\*.png" />
+    <Resource Include="Image\*.jpg" />
+  </ItemGroup >
+  <!-- If there is an Images dir -->
+  <ItemGroup Condition=" Exists('$(ProjectDir)\Images\')">
+    <Resource Include="Images\*.png" />
+    <Resource Include="Images\*.jpg" />
+  </ItemGroup >
+  <!-- If there is an Img dir -->
+  <ItemGroup Condition=" Exists('$(ProjectDir)\Img\')">
+    <Resource Include="Img\*.png" />
+    <Resource Include="Img\*.jpg" />
+  </ItemGroup >
+
+</Project>

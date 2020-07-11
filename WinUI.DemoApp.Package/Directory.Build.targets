@@ -1,0 +1,6 @@
+<!--
+     Since the packaging project is special, I prevent the inclusion of
+     the other special targets files by placing this blank one here.
+ -->
+<Project>
+</Project>

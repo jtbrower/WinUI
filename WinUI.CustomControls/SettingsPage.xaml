@@ -1,0 +1,95 @@
+﻿<Page
+    x:Class="WinUI.CustomControls.SettingsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:extensions="using:Microsoft.Toolkit.Uwp.UI.Extensions"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:media="using:Microsoft.Toolkit.Uwp.UI.Media"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <!--  Button style just so I can keep them the same width and apply a small margin.  -->
+        <Style TargetType="Button">
+            <Setter Property="MinWidth" Value="200" />
+            <Setter Property="Margin" Value="1" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+        </Style>
+        <!--
+            This is a brush that I use to paint the background of a Virtual Keyboard component that I wrote
+            for my point-of-sale application.
+        -->
+        <LinearGradientBrush
+            x:Key="KeyboardBackgroundBrush"
+            MappingMode="Absolute"
+            StartPoint="411,362"
+            EndPoint="411,93">
+            <LinearGradientBrush.GradientStops>
+                <GradientStopCollection>
+                    <GradientStop Offset="0.81" Color="#B9B7BB" />
+                    <GradientStop Offset="0.86" Color="#B9B7BB" />
+                    <GradientStop Offset="0.92" Color="#E2E7E9" />
+                    <GradientStop Offset="0.95" Color="#D9DFE1" />
+                    <GradientStop Offset="0.96" Color="#B2B5B8" />
+                    <GradientStop Offset="0.98" Color="#9C9C9D" />
+                </GradientStopCollection>
+            </LinearGradientBrush.GradientStops>
+            <LinearGradientBrush.Transform>
+                <TransformGroup>
+                    <RotateTransform Angle="-0.05" />
+                    <TranslateTransform X="-107.34" Y="-98.92" />
+                </TransformGroup>
+            </LinearGradientBrush.Transform>
+        </LinearGradientBrush>
+        <SolidColorBrush x:Key="KeyBoardBorderBrush" Color="DarkGray" />
+        <Style x:Key="KeyboardBorderStyle" TargetType="Border">
+            <Setter Property="Padding" Value="5,10,5,5" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="BorderBrush" Value="{StaticResource KeyBoardBorderBrush}" />
+            <Setter Property="Background" Value="{StaticResource KeyboardBackgroundBrush}" />
+        </Style>
+    </Page.Resources>
+    <Grid x:Name="MainGrid"  HorizontalAlignment="Center" VerticalAlignment="Center">
+        <!--
+            I filed an issue with the WindowsCommunityToolkit repo beause the DropShadowPanel will only stretch vertically.  I tried a lot of
+            different combos but could not achieve horizontal stretch without binding the width directly to the source.
+            https://github.com/windows-toolkit/WindowsCommunityToolkit/issues/3384
+        -->
+        <controls:DropShadowPanel
+            Margin="0"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            BlurRadius="4.0"
+            IsMasked="True"
+            OffsetX="5.0"
+            OffsetY="5.0"
+            ShadowOpacity="0.50"
+            Color="Black">
+            <Border Margin="0" Style="{StaticResource KeyboardBorderStyle}">
+                <StackPanel>
+                    <Button Click="RemoveWindowBorder_Click">Remove Window Border</Button>
+                    <Button Click="AddWindowBorder_Click">Add Window Border</Button>
+                    <Button Click="MaximizeWindow_Click">Maximize</Button>
+                    <Button Click="MinimizeWindow_Click">Minimize</Button>
+                    <Button Click="RestoreWindow_Click">Restore</Button>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Click="SetWindowTransparency_Click">Set Transparency</Button>
+                        <muxc:NumberBox
+                            Header="Window Transparency"
+                            LargeChange="20"
+                            Maximum="100"
+                            Minimum="0"
+                            SmallChange="5"
+                            SpinButtonPlacementMode="Inline"
+                            ValidationMode="InvalidInputOverwritten"
+                            Value="{x:Bind Path=Vm.NumberBoxValue, Mode=TwoWay}" />
+
+                    </StackPanel>
+                    <Button Click="RemoveWindowTransparency_Click">Remove Transparency</Button>
+                </StackPanel>
+            </Border>
+        </controls:DropShadowPanel>
+    </Grid>
+</Page>
