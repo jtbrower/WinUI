@@ -127,9 +127,12 @@ namespace WinUI.CustomControls
 
         public void RemoveWindowBorder_Click(object sender, RoutedEventArgs e)
         {
+            if (Window == null)
+                throw new InvalidOperationException($"{nameof(Window)} is not set.");
+
             if (!CheckHandleAsync()) return;
 
-            NativeMethods.RemoveWindowBorder(_windowHandle);
+            Window.RemoveWindowBorder(_windowHandle);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,10 +148,11 @@ namespace WinUI.CustomControls
         public void AddWindowBorder_Click(object sender, RoutedEventArgs e)
         {
             if (Window == null)
-                throw new InvalidOperationException();
+                throw new InvalidOperationException($"{nameof(Window)} is not set.");
+
             if (!CheckHandleAsync()) return;
 
-            NativeMethods.AddWindowBorder(Window, _windowHandle);
+            Window.AddWindowBorder(_windowHandle);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -162,7 +166,7 @@ namespace WinUI.CustomControls
         {
             if (!CheckHandleAsync()) return;
 
-            NativeMethods.MaximizeWindow(_windowHandle);
+            _windowHandle.MaximizeWindow();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -177,7 +181,7 @@ namespace WinUI.CustomControls
         {
             if (!CheckHandleAsync()) return;
 
-            NativeMethods.MinimizeWindow(_windowHandle);
+            _windowHandle.MinimizeWindow();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -191,7 +195,7 @@ namespace WinUI.CustomControls
         {
             if (!CheckHandleAsync()) return;
 
-            NativeMethods.RestoreWindow(_windowHandle);
+            _windowHandle.RestoreWindow();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -213,7 +217,7 @@ namespace WinUI.CustomControls
             }
             if (!CheckHandleAsync()) return;
 
-            NativeMethods.SetWindowTransparency(_windowHandle, Vm.NumberBoxValue);
+            _windowHandle.SetWindowTransparency(Vm.NumberBoxValue);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -227,7 +231,7 @@ namespace WinUI.CustomControls
         {
             if (!CheckHandleAsync()) return;
 
-            NativeMethods.RemoveWindowTransparency(_windowHandle);
+            _windowHandle.RemoveWindowTransparency();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////

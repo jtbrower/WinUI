@@ -22,6 +22,7 @@ namespace WinUI.Native
     using Microsoft.UI.Xaml;
     using System;
     using System.Diagnostics;
+    using System.ComponentModel;
     using System.Runtime.InteropServices;
     using WinRT;
 
@@ -208,18 +209,6 @@ namespace WinUI.Native
         private const int GWL_STYLE = -16;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   The top. </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private const int HWND_TOP = 0;
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   The swp showwindow. </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private const int SWP_SHOWWINDOW = 0x0040;
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Updates the window described by hWnd. </summary>
         ///
         /// <param name="hWnd"> The window. </param>
@@ -243,23 +232,6 @@ namespace WinUI.Native
 
         [DllImport("user32.dll")]
         private static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Sets window position. </summary>
-        ///
-        /// <param name="hWnd">             The window. </param>
-        /// <param name="hWndInsertAfter">  The window insert after. </param>
-        /// <param name="X">                The X coordinate. </param>
-        /// <param name="Y">                The Y coordinate. </param>
-        /// <param name="cx">               The cx. </param>
-        /// <param name="cy">               The cy. </param>
-        /// <param name="uFlags">           The flags. </param>
-        ///
-        /// <returns>   True if it succeeds, false if it fails. </returns>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        [DllImport("user32.dll", SetLastError = true)]
-        public static extern bool SetWindowPos(IntPtr hWnd, IntPtr hWndInsertAfter, int X, int Y, int cx, int cy, int uFlags);
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Move window. </summary>
@@ -290,26 +262,17 @@ namespace WinUI.Native
         private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Shows the window asynchronous. </summary>
-        ///
-        /// <param name="hWnd">     The window. </param>
-        /// <param name="nCmdShow"> The command show. </param>
-        ///
-        /// <returns>   True if it succeeds, false if it fails. </returns>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern bool ShowWindowAsync(IntPtr hWnd, int nCmdShow);
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Removes the window border described by windowHandle. </summary>
         ///
         /// <param name="windowHandle"> Handle of the window. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public static void RemoveWindowBorder(IntPtr windowHandle)
+        public static void RemoveWindowBorder(this Window window, IntPtr windowHandle)
         {
             SetWindowFlags(windowHandle, GWL_STYLE, WindowStyles.WS_VISIBLE | WindowStyles.WS_POPUP);
+
+            //Needed to force a repaint because other sain methods are not working.
+            window.HackForceRepaint(windowHandle);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -331,7 +294,7 @@ namespace WinUI.Native
 
         public static void MinimizeWindow(this IntPtr windowHandle)
         {
-            ShowWindow(windowHandle,(int)EnumWindowShowStates.Minimized);
+            ShowWindow(windowHandle, (int)EnumWindowShowStates.Minimized);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -342,7 +305,7 @@ namespace WinUI.Native
 
         public static void RestoreWindow(this IntPtr windowHandle)
         {
-            ShowWindow(windowHandle,(int)EnumWindowShowStates.Restore);
+            ShowWindow(windowHandle, (int)EnumWindowShowStates.Restore);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -359,9 +322,8 @@ namespace WinUI.Native
             var errorSet = error != 0;
 
             if (!errorSet) { msg = null; return false; }
-            msg = new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error()).Message;
+            msg = LastWin32ErrorMessage;
             return errorSet;
-
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -377,6 +339,14 @@ namespace WinUI.Native
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets a message describing the last window windows error. </summary>
+        ///
+        /// <value> A message describing the last window 32 error. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static string LastWin32ErrorMessage => new Win32Exception(Marshal.GetLastWin32Error()).Message;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Sets window flags. </summary>
         ///
         /// <param name="windowHandle"> Handle of the window. </param>
@@ -387,25 +357,44 @@ namespace WinUI.Native
         internal static void SetWindowFlags(IntPtr windowHandle, int index, WindowStyles styles)
         {
             var desiredStyle = new IntPtr(unchecked((int)styles));
-            var success = desiredStyle != PlatformSafe.SetWindow(windowHandle, index, desiredStyle);
-            Debug.WriteLineIf(!success, new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error()).Message);
+            var success = IntPtr.Zero != PlatformSafe.SetWindow(windowHandle, index, desiredStyle);
+            WriteLineIf(!success, LastWin32ErrorMessage);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Move window. </summary>
+        /// <summary>   Writes a line if. </summary>
         ///
-        /// <param name="windowHandle"> Handle of the window. </param>
-        /// <param name="window">       The window to act on. </param>
-        /// <param name="clientCordX">  The position x coordinate. </param>
-        /// <param name="clientCordY">  The position y coordinate. </param>
-        /// <param name="width">        The c x coordinate. </param>
-        /// <param name="height">       The c y coordinate. </param>
+        /// <param name="condition">    True to condition. </param>
+        /// <param name="msg">          [out] The message. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        public static void MoveWindow(IntPtr windowHandle, int clientCordX, int clientCordY, int width, int height)
+
+        private static void WriteLineIf(bool condition, string? msg)
         {
-            SetWindowPos(windowHandle, (IntPtr)HWND_TOP, clientCordX, clientCordY, width, height, SWP_SHOWWINDOW);
+            if(!condition || msg == null)return;
+            Debug.WriteLine(msg);
+#if DEBUG
+            //Note that this call is not removed automatically like Debug.WriteLine.  If hit in production
+            // it will throw an exception.  Lesson learned years ago!
+            Debugger.Break();
+#endif
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Writes the line if error set. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private static void WriteGlobalErrorMsgIfSet()
+        {
+            if (GetLastWin32ErrorMessage(out var msg))
+            {
+                Debug.WriteLine(msg);
+#if DEBUG
+                //Note that this call is not removed automatically like Debug.WriteLine.  If hit in production
+                // it will throw an exception.  Lesson learned years ago!
+                Debugger.Break();
+#endif
+            }
+        }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   A Window extension method that move by. </summary>
         ///
@@ -430,12 +419,54 @@ namespace WinUI.Native
         /// <param name="y">            The y coordinate. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+        public static void ResizeWindow(this IntPtr windowHandle, int x, int y)
+        {
+            //Using SWP_NOMOVE causes the location coordinates (0,0) to be ignored.
+            if(!PInvoke.User32.SetWindowPos(windowHandle, IntPtr.Zero, 0, 0, x, y, PInvoke.User32.SetWindowPosFlags.SWP_NOZORDER | PInvoke.User32.SetWindowPosFlags.SWP_NOMOVE))
+            {
+                WriteGlobalErrorMsgIfSet();
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// An ugly hack that will add one pixel to the Window height, then remove the added pixel to
+        /// force the Window to update itself and its contents.  See the function for more details on the
+        /// hack.
+        /// </summary>
+        ///
+        /// <param name="window">       The window to act on. </param>
+        /// <param name="windowHandle"> Handle of the window. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private static void HackForceRepaint(this Window window, IntPtr windowHandle)
+        {
+            var r = GetWindowRect(window, windowHandle);
+
+            var width = r.GetWidth();
+            var height = r.GetHeight();
+
+            //Here is the hack, add 1 pixel to either the width or the height and the redraw will happen.  The use case for this 'temporary' hack
+            // comes from the fact that when I remove the Window border and titlebar, I found that the bottom area of the window was not hit
+            // testable for my DragMove feature.  I tried to call various functions such as RedrawWindow but so far nothing would cause the
+            // update except changing the size of the window.  The side effect of this hack would be that when the window is in the maximized
+            // state, adding another pixel pushes it off screen.  So I decided to make the call twice, removing the added pixel.
+            // Fixing this is low priority in the big picture of work.
+            PInvoke.User32.SetWindowPos(windowHandle, IntPtr.Zero, 0, 0, width, height + 1, PInvoke.User32.SetWindowPosFlags.SWP_NOZORDER | PInvoke.User32.SetWindowPosFlags.SWP_NOMOVE);
+            PInvoke.User32.SetWindowPos(windowHandle, IntPtr.Zero, 0, 0, width, height - 1, PInvoke.User32.SetWindowPosFlags.SWP_NOZORDER | PInvoke.User32.SetWindowPosFlags.SWP_NOMOVE);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   A Window extension method that resize window. </summary>
+        ///
+        /// <param name="windowHandle"> Handle of the window. </param>
+        /// <param name="x">            The x coordinate. </param>
+        /// <param name="y">            The y coordinate. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
         public static void ResizeWindow(this Window window, int x, int y)
         {
-            var handle = window.GetHandle();
-            var r = GetWindowRect(window, handle);
-
-            PInvoke.User32.SetWindowPos(handle, IntPtr.Zero, r.Left,r.Top,x,y, PInvoke.User32.SetWindowPosFlags.SWP_NOZORDER | PInvoke.User32.SetWindowPosFlags.SWP_NOACTIVATE);
+            window.GetHandle().ResizeWindow(x, y);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -450,7 +481,7 @@ namespace WinUI.Native
         public static RECT GetWindowRect(this Window window, IntPtr windowHandle)
         {
             var success = GetWindowRect(new HandleRef(window, windowHandle), out var rct);
-            Debug.WriteLineIf(!success, new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error()).Message);
+            WriteLineIf(!success, LastWin32ErrorMessage);
             return rct;
         }
 
@@ -481,6 +512,32 @@ namespace WinUI.Native
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   A RECT extension method that gets a width. </summary>
+        ///
+        /// <param name="r">    The r to act on. </param>
+        ///
+        /// <returns>   The width. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        internal static int GetWidth(this RECT r)
+        {
+            return r.Right - r.Left;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   A RECT extension method that gets a height. </summary>
+        ///
+        /// <param name="r">    The r to act on. </param>
+        ///
+        /// <returns>   The height. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        internal static int GetHeight(this RECT r)
+        {
+            return r.Bottom - r.Top;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Clears the window flags. </summary>
         ///
         /// <param name="windowHandle"> Handle of the window. </param>
@@ -491,15 +548,15 @@ namespace WinUI.Native
         internal static void ClearWindowFlags(IntPtr windowHandle, int index, WindowStyles styles)
         {
             var desiredStyle = PlatformSafe.GetWindow(windowHandle, index);
-            Debug.WriteLineIf(GetLastWin32ErrorMessage(out var msg), msg);
+            WriteLineIf(GetLastWin32ErrorMessage(out var msg), msg);
 
             if (IntPtr.Size == 4)
                 desiredStyle = new IntPtr(unchecked(desiredStyle.ToInt32() & ~(int)styles));
             else
                 desiredStyle = new IntPtr(unchecked(desiredStyle.ToInt64() & ~(int)styles));
 
-            var success = desiredStyle == PlatformSafe.SetWindow(windowHandle, index, desiredStyle);
-            Debug.WriteLineIf(!success, new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error()).Message);
+            var success = IntPtr.Zero != PlatformSafe.SetWindow(windowHandle, index, desiredStyle);
+            WriteLineIf(!success, LastWin32ErrorMessage);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -526,7 +583,13 @@ namespace WinUI.Native
         public static void AddWindowBorder(this Window window, IntPtr windowHandle)
         {
             SetWindowFlags(windowHandle, GWL_STYLE, WindowStyles.WS_OVERLAPPEDWINDOW);
+
+            //If you do not call this then the window won't have any content showing and it will not be
+            // useable.
             window.Activate();
+
+            //Needed to force a repaint because other sain methods are not working.
+            window.HackForceRepaint(windowHandle);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -539,7 +602,7 @@ namespace WinUI.Native
         /// <param name="percentTransparent">   The percent transparent. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public static void SetWindowTransparency(IntPtr windowHandle, int percentTransparent)
+        public static void SetWindowTransparency(this IntPtr windowHandle, int percentTransparent)
         {
             //Sanity Check
             if (percentTransparent > 100 || percentTransparent < 0)
@@ -554,7 +617,7 @@ namespace WinUI.Native
             var failed = !SetLayeredWindowAttributes(windowHandle, 0, alpha, LWA_ALPHA);
 
             string? msg = null;
-            Debug.WriteLineIf(failed && GetLastWin32ErrorMessage(out msg), msg);
+            WriteLineIf(failed && GetLastWin32ErrorMessage(out msg), msg);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -563,7 +626,7 @@ namespace WinUI.Native
         /// <param name="windowHandle"> Handle of the window. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public static void RemoveWindowTransparency(IntPtr windowHandle)
+        public static void RemoveWindowTransparency(this IntPtr windowHandle)
         {
             ClearWindowFlags(windowHandle, GWL_EXSTYLE, WindowStyles.WS_EX_LAYERED);
         }
@@ -624,7 +687,7 @@ namespace WinUI.Native
                 /// <summary>   Zero-based index of the unknown vftbl. </summary>
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                internal global::WinRT.Interop.IUnknownVftbl IUnknownVftbl;
+                internal WinRT.Interop.IUnknownVftbl IUnknownVftbl;
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 /// <summary>   The get window handle 0. </summary>
@@ -654,7 +717,7 @@ namespace WinUI.Native
                 {
                     AbiToProjectionVftable = new Vftbl
                     {
-                        IUnknownVftbl = global::WinRT.Interop.IUnknownVftbl.AbiToProjectionVftbl,
+                        IUnknownVftbl = WinRT.Interop.IUnknownVftbl.AbiToProjectionVftbl,
                         get_WindowHandle_0 = Do_Abi_get_WindowHandle_0
                     };
                     AbiToProjectionVftablePtr = Marshal.AllocHGlobal(Marshal.SizeOf<Vftbl>());
