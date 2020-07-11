@@ -23,6 +23,14 @@
 * I need to figure out the cleanest way to set the Window icon
 * DropShadowPanel control stretches vertically, but not horizontally. See [this issue](https://github.com/windows-toolkit/WindowsCommunityToolkit/issues/3384) I filed for details.
 * When I resize the Window on startup, it is not a smooth transition because I currently have to call Window.Activate and then resize directly after.  
+* The Debug window shows 5 'WinRT transform error' exceptions that are swallowed on app start
+* Debug Window shows a 'mincore\com\oleaut32\dispatch\ups.cpp(2122)\OLEAUT32.dll' library not registered error.
+
+## Known Visual Studio or Project Issues
+* MSB4181 regarding CompileXaml task returned false but did not log and error warning keeps showing up.
+* I often see WMV1006, WMC1007 about not being able to resolve assemblies.
+* During the development of this project, Visual Studio has crashed several times.  This is nothing new though.
+* Two times in a row, when I double clicked on a Xaml file it crashed Visual Studio.  It works now though.
 
 # To Save you Time
 * You cannot create a DependencyProperty on the Window class because it is not a DependencyObject
