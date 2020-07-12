@@ -459,14 +459,18 @@ namespace WinUI.Native
             var width = r.GetWidth();
             var height = r.GetHeight();
 
-            //Here is the hack, add 1 pixel to either the width or the height and the redraw will happen.  The use case for this 'temporary' hack
-            // comes from the fact that when I remove the Window border and titlebar, I found that the bottom area of the window was not hit
-            // testable for my DragMove feature.  I tried to call various functions such as RedrawWindow but so far nothing would cause the
-            // update except changing the size of the window.  The side effect of this hack would be that when the window is in the maximized
-            // state, adding another pixel pushes it off screen.  So I decided to make the call twice, removing the added pixel.
-            // Fixing this is low priority in the big picture of work.
-            PInvoke.User32.SetWindowPos(windowHandle, IntPtr.Zero, 0, 0, width, height + 1, PInvoke.User32.SetWindowPosFlags.SWP_NOZORDER | PInvoke.User32.SetWindowPosFlags.SWP_NOMOVE);
-            PInvoke.User32.SetWindowPos(windowHandle, IntPtr.Zero, 0, 0, width, height - 1, PInvoke.User32.SetWindowPosFlags.SWP_NOZORDER | PInvoke.User32.SetWindowPosFlags.SWP_NOMOVE);
+            // Here is the hack, add 1 pixel to either the width or the height and the redraw will happen. 
+            // The use case for this 'temporary' hack comes from the fact that when I remove the Window
+            // border and titlebar, I found that the bottom area of the window was not hit testable for my
+            // DragMove feature.  I tried to call various functions such as RedrawWindow but so far nothing
+            // would cause the update except changing the size of the window.  The side effect of this hack
+            // would be that when the window is in the maximized state, adding another pixel pushes it off
+            // screen.  So I decided to make the call twice, removing the added pixel. Fixing this is low
+            // priority in the big picture of work.
+            PInvoke.User32.SetWindowPos(windowHandle, IntPtr.Zero, 0, 0, width, height + 1,
+                PInvoke.User32.SetWindowPosFlags.SWP_NOZORDER | PInvoke.User32.SetWindowPosFlags.SWP_NOMOVE);
+            PInvoke.User32.SetWindowPos(windowHandle, IntPtr.Zero, 0, 0, width, height - 1,
+                PInvoke.User32.SetWindowPosFlags.SWP_NOZORDER | PInvoke.User32.SetWindowPosFlags.SWP_NOMOVE);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
