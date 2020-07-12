@@ -29,6 +29,17 @@ namespace WinUI.Native
     public static class NativeMethods
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// If you want the debugger to break when a PInvoke error has been detected, set this to true.
+        /// Note that I am currently seeing a false error detected when the Window border has been
+        /// removed and an attempt to set the transparency is made.  The command seems to work fine but
+        /// the return value is not as expected.
+        /// </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private static bool S_BreakOnError = false;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   A bit-field of flags for specifying window styles. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -372,6 +383,7 @@ namespace WinUI.Native
         {
             if(!condition || msg == null)return;
             Debug.WriteLine(msg);
+            if(!S_BreakOnError)return;
 #if DEBUG
             //Note that this call is not removed automatically like Debug.WriteLine.  If hit in production
             // it will throw an exception.  Lesson learned years ago!
@@ -388,6 +400,7 @@ namespace WinUI.Native
             if (GetLastWin32ErrorMessage(out var msg))
             {
                 Debug.WriteLine(msg);
+                if (!S_BreakOnError) return;
 #if DEBUG
                 //Note that this call is not removed automatically like Debug.WriteLine.  If hit in production
                 // it will throw an exception.  Lesson learned years ago!

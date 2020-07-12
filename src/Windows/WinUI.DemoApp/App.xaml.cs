@@ -26,7 +26,6 @@ namespace WinUI.DemoApp
     using WinUI.Native;
     using Microsoft.Extensions.DependencyInjection;
     using WinUI.CustomControls;
-    using WinUI.Vm;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>   An application. </content>
@@ -34,40 +33,44 @@ namespace WinUI.DemoApp
 
     public partial class App : Application
     {
-        private static ServiceProvider? s_ServiceProvider;
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The service provider. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private ServiceProvider _serviceProvider;
 
         //Hang on to the reference
 #pragma warning disable IDE0052 // Remove unread private members
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The drag move feature. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
         private DragMoveFeature? _dragMoveFeature;
 #pragma warning restore IDE0052 // Remove unread private members
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Initializes a new instance of the WinUI.DemoApp.App class. </summary>
+        ///
+        /// <param name="paramters">    A variable-length parameters list containing paramters. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public App()
+        public App(ServiceProvider serviceProvider)
         {
+            _serviceProvider = serviceProvider;
             InitializeComponent();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Initializes the services. </summary>
+        /// <summary>
+        /// Invoked when the application is launched. Override this method to perform application
+        /// initialization and to display initial content in the associated Window.
+        /// </summary>
         ///
-        /// <returns>   A ServiceProvider. </returns>
+        /// <param name="args"> Event data for the event. </param>
+        ///
+        /// <seealso cref="Microsoft.UI.Xaml.Application.OnLaunched(LaunchActivatedEventArgs)"/>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private static ServiceProvider InitializeServices()
-        {
-            var serviceCollection = new ServiceCollection();
-            serviceCollection.AddScoped<IDialogService, DialogService>();
-            serviceCollection.AddSingleton<MainWindow>();
-            serviceCollection.AddSingleton<Window>(s => s.GetRequiredService<MainWindow>());
-            serviceCollection.AddSingleton<IMainWindow>(s=>s.GetRequiredService<MainWindow>());
-            serviceCollection.AddSingleton<SettingsPage>();
-            serviceCollection.AddSingleton<SettingsPageVm>();
-            serviceCollection.AddSingleton<DragMoveFeature>();
-            return serviceCollection.BuildServiceProvider();
-        }
 
         protected override void OnLaunched(LaunchActivatedEventArgs args)
         {
@@ -78,19 +81,16 @@ namespace WinUI.DemoApp
             // call the base but the same example code that I spoke about above did.
             base.OnLaunched(args);
 
-            //Init the dependency injection container.
-            s_ServiceProvider = InitializeServices();
-
             //Create a window and set the page.
-            var window = s_ServiceProvider.GetRequiredService<MainWindow>();
-            window.SetPage(s_ServiceProvider.GetRequiredService<SettingsPage>());
+            var window = _serviceProvider.GetRequiredService<MainWindow>();
+            window.SetPage(_serviceProvider.GetRequiredService<SettingsPage>());
 
             //Merely requesting an instance of the drag feature is all it takes to attach it to the applications
             // main window.  It's probably more intuitive to have an initialize method.  Technically you wouldn't
             // need to hold onto this instance anymore because it attaches to the Window instance and is detached
             // when it is disposed.  Sinces it lasts the life of the application, the service container will dispose
             // of it when the application ends and the container is disposed.
-            _dragMoveFeature = s_ServiceProvider.GetRequiredService<DragMoveFeature>();
+            _dragMoveFeature = _serviceProvider.GetRequiredService<DragMoveFeature>();
             _dragMoveFeature.AttachDragMoveHandlers(window.Content);
 
             //Listen to close since we don't have the same application wide events that WPF offers for shutdown
@@ -102,6 +102,13 @@ namespace WinUI.DemoApp
             window.ResizeWindow(600, 500);
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Event handler. Called by Window for closed events. </summary>
+        ///
+        /// <param name="sender">   Source of the event. </param>
+        /// <param name="args">     Window event information. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
         private void Window_Closed(object sender, WindowEventArgs args)
         {
             //This could be a bit wonkey because the window has now closed, yet we will be accessing that instance
@@ -111,7 +118,7 @@ namespace WinUI.DemoApp
             // before they copy and paste this code to fit their own needs.
             _dragMoveFeature?.RemoveDragMoveHandlers();
 
-            s_ServiceProvider?.Dispose();
+            _serviceProvider?.Dispose();
         }
     }
 }

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>netcoreapp5.0</TargetFramework>
@@ -12,6 +12,9 @@
     <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
     <RuntimeIdentifier>win-$(Platform)</RuntimeIdentifier>
     <Nullable>enable</Nullable>
+
+    <!-- This is the trick needed to be able to create your own Main. -->
+    <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants> 
   </PropertyGroup>
 
   <ItemGroup>
