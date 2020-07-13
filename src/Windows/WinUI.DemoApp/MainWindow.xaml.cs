@@ -25,12 +25,28 @@ namespace WinUI.DemoApp
     using Microsoft.UI.Xaml.Controls;
     using WinUI.CustomControls;
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <content>   The application's main form. This class cannot be inherited. </content>
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public sealed partial class MainWindow : IMainWindow
     {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Initializes a new instance of the WinUI.DemoApp.MainWindow class. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
         public MainWindow()
         {
             InitializeComponent();
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets the XAML root. </summary>
+        ///
+        /// <value> The XAML root. </value>
+        ///
+        /// <seealso cref="WinUI.CustomControls.IMainWindow.XamlRoot"/>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public XamlRoot XamlRoot => Content.XamlRoot;
 
@@ -38,7 +54,7 @@ namespace WinUI.DemoApp
         /// <summary>
         /// The reason why I use a Grid is so that it will stretch out to fill the entire Window and the
         /// event handlers for drag move can be attached to that. If the end user blows away the
-        /// MainWindow content it will affect the drag move handlers.  So as a quick fix I provided this 
+        /// MainWindow content it will affect the drag move handlers.  So as a quick fix I provided this
         /// method.
         /// </summary>
         ///
