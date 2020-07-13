@@ -7,33 +7,12 @@
 //projects, I will know exactly where I left off.
         
 
-        using PInvoke;
-
-        public SettingsPage()
-        {
-            //This constructor is to please the designer when one works with WinUI
-            InitializeComponent();
-            DropShadowPanelInstance.LayoutUpdated += DropShadowPanelInstance_LayoutUpdated;
-        }
-
-        private void DropShadowPanelInstance_LayoutUpdated(object? sender, object e)
-        {
-            //Both the sender and the object e are null, I did not expect that.
-            // So use the instance itself.
-
-           ResizeWindowToContent(DropShadowPanelInstance);
-        }
-
-        unsafe private void ResizeWindowToContent(UIElement  elementToSizeTo)
-        {
-             User32.GetClientRect(_windowHandle, out var lprect);
-            var style = (User32.WindowStyles)User32.GetWindowLong(_windowHandle, User32.WindowLongIndexFlags.GWL_STYLE);
-            var styleEx = (User32.WindowStylesEx)User32.GetWindowLong(_windowHandle, User32.WindowLongIndexFlags.GWL_EXSTYLE);
-            var success = User32.AdjustWindowRectExForDpi(& lprect,style,false,styleEx,96);
-            System.Diagnostics.Debug.WriteLineIf(!success, $"{nameof(User32.AdjustWindowRectExForDpi)} failed in function {nameof(ResizeWindowToContent)}");
-           
-        }
-
+//In WPF this lets me have a completely transparent Window that is not hit testable and can have non-transparent 
+//content.  In WinUI, I have not been able to get it to work yet.  I know that WinUI does not support the acrylic
+//features but from what others stated, there are ways to have a transparent Window.  When I am done with the
+//SizeToContent feature, I might take another stab at it.  I moved over to SizeToContent, got it working perfectly
+//for downsizing but I am having a rough time calculating the required size of all controls such as StackPanels
+//and Grids. 
 using System;
 using System.Runtime.InteropServices;
 using PInvoke;
