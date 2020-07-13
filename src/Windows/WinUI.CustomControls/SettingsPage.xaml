@@ -2,12 +2,15 @@
     x:Class="WinUI.CustomControls.SettingsPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:extensions="using:Microsoft.Toolkit.Uwp.UI.Extensions"
+    xmlns:local="using:WinUI.CustomControls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:media="using:Microsoft.Toolkit.Uwp.UI.Media"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    Background="Transparent"
     mc:Ignorable="d">
     <Page.Resources>
         <!--  Button style just so I can keep them the same width and apply a small margin.  -->
@@ -44,52 +47,94 @@
         </LinearGradientBrush>
         <SolidColorBrush x:Key="KeyBoardBorderBrush" Color="DarkGray" />
         <Style x:Key="KeyboardBorderStyle" TargetType="Border">
-            <Setter Property="Padding" Value="5,10,5,5" />
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="10" />
             <Setter Property="BorderBrush" Value="{StaticResource KeyBoardBorderBrush}" />
             <Setter Property="Background" Value="{StaticResource KeyboardBackgroundBrush}" />
         </Style>
     </Page.Resources>
-    <Grid x:Name="MainGrid"  HorizontalAlignment="Center" VerticalAlignment="Center">
-        <!--
-            I filed an issue with the WindowsCommunityToolkit repo beause the DropShadowPanel will only stretch vertically.  I tried a lot of
-            different combos but could not achieve horizontal stretch without binding the width directly to the source.
-            https://github.com/windows-toolkit/WindowsCommunityToolkit/issues/3384
-        -->
-        <controls:DropShadowPanel
-            Margin="0"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            BlurRadius="4.0"
-            IsMasked="True"
-            OffsetX="5.0"
-            OffsetY="5.0"
-            ShadowOpacity="0.50"
-            Color="Black">
-            <Border Margin="0" Style="{StaticResource KeyboardBorderStyle}">
-                <StackPanel>
-                    <Button Click="RemoveWindowBorder_Click">Remove Window Border</Button>
-                    <Button Click="AddWindowBorder_Click">Add Window Border</Button>
-                    <Button Click="MaximizeWindow_Click">Maximize</Button>
-                    <Button Click="MinimizeWindow_Click">Minimize</Button>
-                    <Button Click="RestoreWindow_Click">Restore</Button>
-                    <StackPanel Orientation="Horizontal">
-                        <Button Click="SetWindowTransparency_Click">Set Transparency</Button>
-                        <muxc:NumberBox
-                            Header="Window Transparency"
-                            LargeChange="20"
-                            Maximum="100"
-                            Minimum="0"
-                            SmallChange="5"
-                            SpinButtonPlacementMode="Inline"
-                            ValidationMode="InvalidInputOverwritten"
-                            Value="{x:Bind Path=Vm.NumberBoxValue, Mode=TwoWay}" />
 
-                    </StackPanel>
-                    <Button Click="RemoveWindowTransparency_Click">Remove Transparency</Button>
+    <Grid
+        x:Name="MainGrid"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        Background="Transparent">
+
+        <Canvas Name="DropShadowCanvas" Margin="0,0,5,5" />
+
+        <Rectangle
+            x:Name="RectangleInstance"
+            Width="{Binding ElementName=MainContentBorder, Path=Width}"
+            Height="{Binding ElementName=MainContentBorder, Path=Height}"
+            Margin="0,0,5,5"
+            Fill="Black"
+            RadiusX="10"
+            RadiusY="10" />
+
+        <Border
+            x:Name="MainContentBorder"
+            Margin="0,0,5,5"
+            Style="{StaticResource KeyboardBorderStyle}">
+            <!--
+                Note that I attach a double tap handler to the Page to maximize the window.  However, I don't want a button double tap
+                to cause the window to maximize because it is confusing.  So I wrote an attached property to swallow the button double taps
+                but I don't yet know how to attach it to all buttons through a style without other hand waving tricks.  That said, its not
+                the main goal of the app which is to focus on replacing WPF Window features.
+            -->
+            <StackPanel VerticalAlignment="Center">
+                <Button Click="RemoveWindowBorder_Click" Content="Remove Window Border">
+                    <Interactivity:Interaction.Behaviors>
+                        <local:SwallowButtonDoubleTapBehavior />
+                    </Interactivity:Interaction.Behaviors>
+                </Button>
+                <Button Click="AddWindowBorder_Click" Content="Add Window Border">
+                    <Interactivity:Interaction.Behaviors>
+                        <local:SwallowButtonDoubleTapBehavior />
+                    </Interactivity:Interaction.Behaviors>
+                </Button>
+                <Button Click="MaximizeWindow_Click" Content="Maximize">
+                    <Interactivity:Interaction.Behaviors>
+                        <local:SwallowButtonDoubleTapBehavior />
+                    </Interactivity:Interaction.Behaviors>
+                </Button>
+                <Button Click="MinimizeWindow_Click" Content="Minimize">
+                    <Interactivity:Interaction.Behaviors>
+                        <local:SwallowButtonDoubleTapBehavior />
+                    </Interactivity:Interaction.Behaviors>
+                </Button>
+                <Button Click="RestoreWindow_Click" Content="Restore">
+                    <Interactivity:Interaction.Behaviors>
+                        <local:SwallowButtonDoubleTapBehavior />
+                    </Interactivity:Interaction.Behaviors>
+                </Button>
+                <StackPanel Orientation="Horizontal">
+                    <Button Click="SetWindowTransparency_Click" Content="Set Transparency">
+                        <Interactivity:Interaction.Behaviors>
+                            <local:SwallowButtonDoubleTapBehavior />
+                        </Interactivity:Interaction.Behaviors>
+                    </Button>
+                    <muxc:NumberBox
+                        Header="Window Transparency"
+                        LargeChange="20"
+                        Maximum="100"
+                        Minimum="0"
+                        SmallChange="5"
+                        SpinButtonPlacementMode="Inline"
+                        ValidationMode="InvalidInputOverwritten"
+                        Value="{x:Bind Path=Vm.NumberBoxValue, Mode=TwoWay}" />
+
                 </StackPanel>
-            </Border>
-        </controls:DropShadowPanel>
+                <Button Click="RemoveWindowTransparency_Click" Content="Remove Transparency">
+                    <Interactivity:Interaction.Behaviors>
+                        <local:SwallowButtonDoubleTapBehavior />
+                    </Interactivity:Interaction.Behaviors>
+                </Button>
+                <Button Click="ShrinkToContent_Click" Content="Shrink to Content">
+                    <Interactivity:Interaction.Behaviors>
+                        <local:SwallowButtonDoubleTapBehavior />
+                    </Interactivity:Interaction.Behaviors>
+                </Button>
+            </StackPanel>
+        </Border>
     </Grid>
 </Page>

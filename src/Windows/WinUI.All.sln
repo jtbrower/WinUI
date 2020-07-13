@@ -15,6 +15,7 @@ Project("{C7167F0D-BC9F-4E6E-AFE1-012C56B48DB5}") = "WinUI.DemoApp.Package", "Wi
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "etc", "etc", "{7C75DB20-6939-47D4-A90F-6F1AD054B641}"
 	ProjectSection(SolutionItems) = preProject
+		CopyPasteTemp.txt = CopyPasteTemp.txt
 		NuGet.Config = NuGet.Config
 		README.md = README.md
 	EndProjectSection

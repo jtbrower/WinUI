@@ -420,7 +420,22 @@ namespace WinUI.Native
         public static void MoveBy(this Window window, IntPtr windowHandle, int x, int y)
         {
             var r = GetWindowRect(window, windowHandle);
-            MoveWindow(windowHandle, r.Left + x, r.Top + y, r.Right - r.Left, r.Bottom - r.Top, true);
+            MoveWindow(windowHandle, r.Left + x, r.Top + y, r.GetWidth(), r.GetHeight(), true);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   A Window extension method that shrink by. </summary>
+        ///
+        /// <param name="window">       The window to act on. </param>
+        /// <param name="windowHandle"> Handle of the window. </param>
+        /// <param name="x">            The x coordinate. </param>
+        /// <param name="y">            The y coordinate. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static void ShrinkBy(this Window window, IntPtr windowHandle, int x, int y)
+        {
+            var r = GetWindowRect(window, windowHandle);
+            MoveWindow(windowHandle, r.Left, r.Top, r.GetWidth()-x, r.GetHeight()-y, true);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -536,7 +551,7 @@ namespace WinUI.Native
         /// <returns>   The width. </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        internal static int GetWidth(this RECT r)
+        public static int GetWidth(this RECT r)
         {
             return r.Right - r.Left;
         }
@@ -549,7 +564,7 @@ namespace WinUI.Native
         /// <returns>   The height. </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        internal static int GetHeight(this RECT r)
+        public static int GetHeight(this RECT r)
         {
             return r.Bottom - r.Top;
         }

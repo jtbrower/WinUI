@@ -1,0 +1,65 @@
+//When writing software I often find myself heading down a direction to solve one problem when I realize that
+//there is a better solution to try, or I see another problem that I must resolve first.  Since I am a one
+//person company, I often use the readme.md file as a temporary scratchpad where code can be placed aside.
+//With a public or shared repository like this one, the readme is not the best place for it.  I will use this
+//file as that scratchpad, checking it into the repository because it will sometimes contain content that I
+//want to keep persisted and associated with this project.  That way when I get pulled off to go work on other
+//projects, I will know exactly where I left off.
+        
+
+        using PInvoke;
+
+        public SettingsPage()
+        {
+            //This constructor is to please the designer when one works with WinUI
+            InitializeComponent();
+            DropShadowPanelInstance.LayoutUpdated += DropShadowPanelInstance_LayoutUpdated;
+        }
+
+        private void DropShadowPanelInstance_LayoutUpdated(object? sender, object e)
+        {
+            //Both the sender and the object e are null, I did not expect that.
+            // So use the instance itself.
+
+           ResizeWindowToContent(DropShadowPanelInstance);
+        }
+
+        unsafe private void ResizeWindowToContent(UIElement  elementToSizeTo)
+        {
+             User32.GetClientRect(_windowHandle, out var lprect);
+            var style = (User32.WindowStyles)User32.GetWindowLong(_windowHandle, User32.WindowLongIndexFlags.GWL_STYLE);
+            var styleEx = (User32.WindowStylesEx)User32.GetWindowLong(_windowHandle, User32.WindowLongIndexFlags.GWL_EXSTYLE);
+            var success = User32.AdjustWindowRectExForDpi(& lprect,style,false,styleEx,96);
+            System.Diagnostics.Debug.WriteLineIf(!success, $"{nameof(User32.AdjustWindowRectExForDpi)} failed in function {nameof(ResizeWindowToContent)}");
+           
+        }
+
+using System;
+using System.Runtime.InteropServices;
+using PInvoke;
+namespace WinUI.Native
+{
+    public static class Transparency
+    {
+        private const int GWL_EXSTYLE = -20;
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern int GetWindowLong(IntPtr hwnd, int index);
+
+        [DllImport("user32.dll", SetLastError = true)]
+        private static extern int SetWindowLong(IntPtr hwnd, int index, int newStyle);
+
+        public static void MakeTransparent(IntPtr hwnd)
+        {
+            var extendedStyle = (User32.WindowStylesEx)GetWindowLong(hwnd, GWL_EXSTYLE);
+            SetWindowLong(hwnd, GWL_EXSTYLE, (int)(extendedStyle| User32.WindowStylesEx.WS_EX_TRANSPARENT | User32.WindowStylesEx.WS_EX_LAYERED));
+        }
+
+        public static void RemoveTransparency(IntPtr hwnd)
+        {
+            var extendedStyle = (User32.WindowStylesEx)GetWindowLong(hwnd, GWL_EXSTYLE);
+            SetWindowLong(hwnd, GWL_EXSTYLE, (int)(extendedStyle & ~User32.WindowStylesEx.WS_EX_TRANSPARENT));
+        }
+
+    }
+}

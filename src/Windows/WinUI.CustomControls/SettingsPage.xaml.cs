@@ -21,9 +21,12 @@
 // SOFTWARE.
 namespace WinUI.CustomControls
 {
+    using Microsoft.UI;
     using Microsoft.UI.Xaml;
     using Microsoft.UI.Xaml.Controls;
+    using Microsoft.UI.Xaml.Hosting;
     using System;
+    using System.Numerics;
     using WinUI.Native;
     using WinUI.Vm;
 
@@ -99,6 +102,29 @@ namespace WinUI.CustomControls
         {
             //This constructor is to please the designer when one works with WinUI
             InitializeComponent();
+
+            MainGrid.Loaded+= MainGrid_Loaded;
+
+            //Note that I was surprised that Double Tapping on a button also causes this event to fire.
+            // I would liked to have seen the button eat the first tap and have it changed to a click.
+            DoubleTapped += SettingsPage_DoubleTapped;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Event handler. Called by SettingsPage for double tapped events. </summary>
+        ///
+        /// <param name="sender">   Source of the event. </param>
+        /// <param name="e">        Double tapped routed event information. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void SettingsPage_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
+        {
+            if (!CheckHandleAsync()) return;
+
+            //When double tapped we maximize the window.  However I was in for a surprise here as when you 
+            // double tap a button this same handler runs.  I would have liked to have seen the first
+            // tap 
+            _windowHandle.MaximizeWindow();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -132,6 +158,13 @@ namespace WinUI.CustomControls
 
             if (!CheckHandleAsync()) return;
 
+            //Note that I have some work to do on this one.  Right now if you go look at the method you
+            // will see a heavily commented hack.  In addition, after the border is removed I tried calling
+            // my Window.ShrinkToContent(MainGrid); to gobble up the extra white space and it didn't work
+            // from here.  So I then tried to put it on the dispatcher to give it time, that didn't help.
+            // I even tried to invalidate arrange and measure and still no-go but if you click on the 
+            // button I have tied to the ShrinkToContent_Click handler it works perfectly normal. WTF?
+            // If you have the fix let me know.
             Window.RemoveWindowBorder(_windowHandle);
         }
 
@@ -170,6 +203,54 @@ namespace WinUI.CustomControls
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Event handler. Called by MainGrid for loaded events. </summary>
+        ///
+        /// <param name="sender">   Source of the event. </param>
+        /// <param name="e">        Routed event information. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void MainGrid_Loaded(object sender, RoutedEventArgs e)
+        {
+            //What I am doing in this event handler is applying a drop shadow to the main content in a way
+            // that a DropPanelShadow would work.  With the DropPanelShadow I noticed that it would not
+            // Horizontally stretch (Vertical worked) and the shadow size does not properly report itself.
+            // I had hoped I could figure out how to properly measure such that the shadow was included,
+            // but it didn't work with this appraoch either.  I needed to know the total size of everything
+            // inside of the MainGrid so that I could make the SizeToContent work properly.  I decided
+            // to keep this code because it is good to know how to create a drop shadow without the use
+            // of the UWP ToolKit.
+            var compositor = ElementCompositionPreview.GetElementVisual(DropShadowCanvas).Compositor;
+            var dropShadow = compositor.CreateDropShadow();
+            dropShadow.Color = Colors.Black;
+            dropShadow.BlurRadius = 4;
+            dropShadow.Opacity = .5f;
+            dropShadow.Offset = new Vector3(5F, 5F, 0);
+
+            var mask = RectangleInstance.GetAlphaMask();
+            dropShadow.Mask = mask;
+
+            var spriteVisual = compositor.CreateSpriteVisual();
+            spriteVisual.Size = new Vector2((float)DropShadowCanvas.ActualWidth, (float)DropShadowCanvas.ActualHeight);
+
+            spriteVisual.Shadow = dropShadow;
+            ElementCompositionPreview.SetElementChildVisual(DropShadowCanvas, spriteVisual);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Event handler. Called by ShrinkToContent for click events./ </summary>
+        ///
+        /// <param name="sender">   Source of the event. </param>
+        /// <param name="e">        Routed event information. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void ShrinkToContent_Click(object sender, RoutedEventArgs e)
+        {
+            if (!CheckHandleAsync()) return;
+            if (Window == null) return;
+            Window.ShrinkToContent(MainGrid);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Event handler. Called by MinimizeWindow for click events. </summary>
         ///
         /// <param name="sender">   Source of the event. </param>
@@ -177,7 +258,6 @@ namespace WinUI.CustomControls
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public void MinimizeWindow_Click(object sender, RoutedEventArgs e)
-
         {
             if (!CheckHandleAsync()) return;
 

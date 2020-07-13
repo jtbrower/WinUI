@@ -21,9 +21,13 @@
 // SOFTWARE.
 namespace WinUI.CustomControls
 {
+
     using Microsoft.UI.Xaml;
+    using Microsoft.UI.Xaml.Media;
     using System;
+    using System.Collections.Generic;
     using Windows.Foundation;
+    using WinUI.Native;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>   The extensions user interface element. </summary>
@@ -58,7 +62,7 @@ namespace WinUI.CustomControls
         internal static int DipToDevice(this UIElement element, double length)
         {
             var scale = element.XamlRoot.RasterizationScale;
-            return (int)Math.Round(length*scale, MidpointRounding.AwayFromZero);
+            return (int)Math.Round(length * scale, MidpointRounding.AwayFromZero);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -74,6 +78,130 @@ namespace WinUI.CustomControls
         {
             var scale = (float)element.XamlRoot.RasterizationScale;
             return new Point(point.X / scale, point.Y / scale);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets the ancestors in this collection. </summary>
+        ///
+        /// <param name="dependencyObject"> The dependencyObject to act on. </param>
+        ///
+        /// <returns>
+        /// An enumerator that allows foreach to be used to process the ancestors in this collection.
+        /// </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static IEnumerable<DependencyObject> GetAncestors(this DependencyObject dependencyObject)
+        {
+            var parent = VisualTreeHelper.GetParent(dependencyObject);
+
+            while (parent != null)
+            {
+                yield return parent;
+                parent = VisualTreeHelper.GetParent(parent);
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   An UIElement extension method that query if 'child' is descendant of. </summary>
+        ///
+        /// <param name="child">    The child to act on. </param>
+        /// <param name="of">       The of. </param>
+        ///
+        /// <returns>   True if descendant of, false if not. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static bool IsDescendantOf(this UIElement child, UIElement of)
+        {
+            if (of == null || child == null) return false;
+
+            DependencyObject parent;
+            do
+            {
+                parent = VisualTreeHelper.GetParent(child);
+                if (of == parent) return true;
+            } while (parent != null);
+            return false;
+        }
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   A Rect extension method that gets a width. </summary>
+        ///
+        /// <param name="r">    The r to act on. </param>
+        ///
+        /// <returns>   The width. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static float GetWidth(this Rect r) => r.Right - r.Left;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   A Rect extension method that gets a height. </summary>
+        ///
+        /// <param name="r">    The r to act on. </param>
+        ///
+        /// <returns>   The height. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static float GetHeight(this Rect r) => r.Bottom - r.Top;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   An UIElement extension method that gets bounding rectangle. </summary>
+        ///
+        /// <exception cref="InvalidOperationException">    Thrown when the requested operation is
+        ///                                                 invalid. </exception>
+        ///
+        /// <param name="uiElement">    The uiElement to act on. </param>
+        /// <param name="window">       The window. </param>
+        ///
+        /// <returns>   The bounding rectangle. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static Rect GetBoundingRect(this UIElement uiElement, Window window)
+        {
+            //The rectangle will be relative to the Window's content because the Window itself is
+            // not a UIElement.
+            var windowContent = window.Content;
+
+            if (uiElement == windowContent)
+                return new Rect(0, 0, windowContent.ActualSize.X, windowContent.ActualSize.Y);
+
+            if (!uiElement.IsDescendantOf(windowContent))
+                throw new InvalidOperationException($"{nameof(window)} does not contain {nameof(uiElement)}.");
+
+            var windowContentPoint = uiElement.TransformToVisual(windowContent).TransformPoint(new Point());
+
+            var bottomRight = new Point(uiElement.ActualSize.X, uiElement.ActualSize.Y);
+            var uiElementPoint = uiElement.TransformToVisual(windowContent).TransformPoint(bottomRight);
+
+            return new Rect(windowContentPoint, uiElementPoint);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// This method will attempt to resize the Window by shrinking down to fit the size of the
+        /// UIElement content.  Note that if you provide content that is Horizontally or Vertically
+        /// Stretched then this function will probably not work as you expected.  Also, if your content
+        /// has a shadow attached to it then your content's margin needs to be big enough to account for
+        /// that shadow because it isn't accounted for when we check the ActualSize.  I wish it was!
+        /// </summary>
+        ///
+        /// <param name="window">   The window. </param>
+        /// <param name="content">  The content. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static void ShrinkToContent(this Window window, UIElement content)
+        {
+            var windowContent = window?.Content;
+            if (windowContent == null) return;
+            if (windowContent == null) return;
+            if (content == null) return;
+           
+            //It does not understand that we just checked window for null by checking window?.Content
+#pragma warning disable CS8602 // Dereference of a possibly null reference.
+
+            var yAxisPadding = windowContent.DipToDevice(window.Content.ActualSize.Y - content.ActualSize.Y);
+            var xAxisPadding = windowContent.DipToDevice(window.Content.ActualSize.X - content.ActualSize.X);
+            window.ShrinkBy(window.GetHandle(), xAxisPadding, yAxisPadding);
+
+#pragma warning restore CS8602 // Dereference of a possibly null reference.
         }
     }
 }
