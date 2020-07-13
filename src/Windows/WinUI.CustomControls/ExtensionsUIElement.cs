@@ -21,11 +21,11 @@
 // SOFTWARE.
 namespace WinUI.CustomControls
 {
-
     using Microsoft.UI.Xaml;
     using Microsoft.UI.Xaml.Media;
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using Windows.Foundation;
     using WinUI.Native;
 
@@ -33,7 +33,7 @@ namespace WinUI.CustomControls
     /// <summary>   The extensions user interface element. </summary>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    internal static class ExtensionsUIElement
+    public static class ExtensionsUIElement
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   An UIElement extension method that dip point to device point. </summary>
@@ -183,25 +183,67 @@ namespace WinUI.CustomControls
         /// that shadow because it isn't accounted for when we check the ActualSize.  I wish it was!
         /// </summary>
         ///
-        /// <param name="window">   The window. </param>
+        /// <param name="container">   The window. </param>
         /// <param name="content">  The content. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public static void ShrinkToContent(this Window window, UIElement content)
         {
-            var windowContent = window?.Content;
-            if (windowContent == null) return;
-            if (windowContent == null) return;
+            var rootContainer = window?.GetRootElement();
+            if (rootContainer == null) return;
             if (content == null) return;
-           
+
             //It does not understand that we just checked window for null by checking window?.Content
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
+#pragma warning disable CS8604 // Possible null reference argument.
 
-            var yAxisPadding = windowContent.DipToDevice(window.Content.ActualSize.Y - content.ActualSize.Y);
-            var xAxisPadding = windowContent.DipToDevice(window.Content.ActualSize.X - content.ActualSize.X);
+            //Determine if the content has enough room
+            var info = VisibilityInfo.GetVisibilityInfo(rootContainer,content);
+            Debug.WriteLine(info);
+
+            var actualContentSize = content.ActualSize;
+            var actualWindowContentSize = rootContainer.ActualSize;
+            var yPadDip = actualWindowContentSize.Y - actualContentSize.Y;
+            var xPadDip = actualWindowContentSize.X - actualContentSize.X;
+
+            //Convert to device units
+            var yAxisPadding = rootContainer.DipToDevice(yPadDip);
+            var xAxisPadding = rootContainer.DipToDevice(xPadDip);
+
+            //Its already sized perfectly.
+            if(yAxisPadding == 0 && xAxisPadding == 0)return;
+
+            rootContainer.Height-=yAxisPadding;
+            rootContainer.Width-=xAxisPadding;
+
             window.ShrinkBy(window.GetHandle(), xAxisPadding, yAxisPadding);
 
+#pragma warning restore CS8604 // Possible null reference argument.
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// If you keep walking up to the very first Framework elment attached to the Window you will
+        /// find that it is many layers above the Window.Content.  This function iterates starting at
+        /// Window.Content and keeps walking until it has found the topmost FrameworkElement in the XAML
+        /// tree.
+        /// </summary>
+        ///
+        /// <param name="window">   The window. </param>
+        ///
+        /// <returns>   The root element. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static FrameworkElement? GetRootElement(this Window window)
+        {
+            var parent = window.Content as FrameworkElement;
+            while (parent != null)
+            {
+                if (!(parent.Parent is FrameworkElement fe)) return parent;
+                parent = fe;
+            }
+            return null;
         }
     }
 }
