@@ -216,7 +216,7 @@ namespace WinUI.CustomControls
             // Horizontally stretch (Vertical worked) and the shadow size does not properly report itself.
             // I had hoped I could figure out how to properly measure such that the shadow was included,
             // but it didn't work with this appraoch either.  I needed to know the total size of everything
-            // inside of the MainGrid so that I could make the SizeToContent work properly.  I decided
+            // inside of the MainGrid so that I could make the ShrinkToContent work properly.  I decided
             // to keep this code because it is good to know how to create a drop shadow without the use
             // of the UWP ToolKit.
             var compositor = ElementCompositionPreview.GetElementVisual(DropShadowCanvas).Compositor;
