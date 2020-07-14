@@ -10,7 +10,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:media="using:Microsoft.Toolkit.Uwp.UI.Media"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
-    Background="Transparent"
     mc:Ignorable="d">
     <Page.Resources>
         <!--  Button style just so I can keep them the same width and apply a small margin.  -->
@@ -76,12 +75,13 @@
             Margin="0,0,5,5"
             Style="{StaticResource KeyboardBorderStyle}">
             <!--
-                Note that I attach a double tap handler to the Page to maximize the window.  However, I don't want a button double tap
+                Note that I attach a double tap handler to the MainWindow to maximize the window.  However, I don't want a button double tap
                 to cause the window to maximize because it is confusing.  So I wrote an attached property to swallow the button double taps
-                but I don't yet know how to attach it to all buttons through a style without other hand waving tricks.  That said, its not
-                the main goal of the app which is to focus on replacing WPF Window features.
+                but I don't yet know how to attach it to all buttons through a style without other hand waving tricks at this moment. Note
+                that there is a property IsDoubleTapEnabled on the buttons setting that to false does not prevent the handler from still
+                passing on to the Window.
             -->
-            <StackPanel VerticalAlignment="Center">
+            <StackPanel VerticalAlignment="Center" Margin="5">
                 <Button Click="RemoveWindowBorder_Click" Content="Remove Window Border">
                     <Interactivity:Interaction.Behaviors>
                         <local:SwallowButtonDoubleTapBehavior />
@@ -129,11 +129,16 @@
                         <local:SwallowButtonDoubleTapBehavior />
                     </Interactivity:Interaction.Behaviors>
                 </Button>
-                <Button Click="ShrinkToContent_Click" Content="Shrink to Content">
+                <Button Click="SizeToContent_Click" Content="Size to Content">
                     <Interactivity:Interaction.Behaviors>
                         <local:SwallowButtonDoubleTapBehavior />
                     </Interactivity:Interaction.Behaviors>
                 </Button>
+                <Button Click="CloseWindow_Click" Content="Close Window">
+                    <Interactivity:Interaction.Behaviors>
+                        <local:SwallowButtonDoubleTapBehavior />
+                    </Interactivity:Interaction.Behaviors>
+                </Button>                
             </StackPanel>
         </Border>
     </Grid>

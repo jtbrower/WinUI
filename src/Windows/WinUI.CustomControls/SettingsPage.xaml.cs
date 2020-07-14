@@ -27,7 +27,6 @@ namespace WinUI.CustomControls
     using Microsoft.UI.Xaml.Hosting;
     using System;
     using System.Numerics;
-    using WinUI.Native;
     using WinUI.Vm;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -36,19 +35,6 @@ namespace WinUI.CustomControls
 
     public sealed partial class SettingsPage : Page
     {
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>
-        /// I spent a rediculous amount of time making the mistake of trying to make the WindowHandle a
-        /// dependency property.  I made that change with a bunch of other updates such that when the
-        /// application started throwing exceptions I had no clue what it was having an issue with.  It
-        /// did not like the IntPtr as it is an unsupported type.
-        /// </summary>
-        ///
-        /// <value> The window handle. </value>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private readonly IntPtr _windowHandle = IntPtr.Zero;
-
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The view model property. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -64,67 +50,30 @@ namespace WinUI.CustomControls
         /// <value> The view model. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public SettingsPageVm? Vm
+        public SettingsPageVm Vm
         {
+            //The only reason this shows up is because I have to keep the constructor for the designer 
+            // so that when WinUI does work with a designer someday it will be there.
+#pragma warning disable CS8603 // Possible null reference return.
             get => GetValue(VmProperty) as SettingsPageVm;
-            set => SetValue(VmProperty, value);
+#pragma warning restore CS8603 // Possible null reference return.
+            private set => SetValue(VmProperty, value);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   The window property. </summary>
+        /// <summary>   The main window for the entire application. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public static readonly DependencyProperty WindowProperty = DependencyProperty.Register(nameof(Window),
-            typeof(Window),
-            typeof(SettingsPage),
-            new PropertyMetadata(null));
+        private readonly IWpfWindow _mainWindow;
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Gets or sets the window. </summary>
-        ///
-        /// <value> The window. </value>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public Window? Window
-        {
-            get => GetValue(WindowProperty) as Window;
-            set => SetValue(WindowProperty, value);
-        }
-
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>
-        /// Initializes a new instance of the WinUI.CustomControls.SettingsPage class.
-        /// </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public SettingsPage()
+        //Note that this is only needed for the Designer which always causes headaches with Nullable.  Since
+        // the designer doesn't work with WinUI right now I just make the Constructor private.
+#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+        private SettingsPage()
+#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         {
             //This constructor is to please the designer when one works with WinUI
             InitializeComponent();
-
-            MainGrid.Loaded+= MainGrid_Loaded;
-
-            //Note that I was surprised that Double Tapping on a button also causes this event to fire.
-            // I would liked to have seen the button eat the first tap and have it changed to a click.
-            DoubleTapped += SettingsPage_DoubleTapped;
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by SettingsPage for double tapped events. </summary>
-        ///
-        /// <param name="sender">   Source of the event. </param>
-        /// <param name="e">        Double tapped routed event information. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private void SettingsPage_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
-        {
-            if (!CheckHandleAsync()) return;
-
-            //When double tapped we maximize the window.  However I was in for a surprise here as when you 
-            // double tap a button this same handler runs.  I would have liked to have seen the first
-            // tap 
-            _windowHandle.MaximizeWindow();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -134,11 +83,12 @@ namespace WinUI.CustomControls
         /// <param name="window">   The window. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public SettingsPage(SettingsPageVm vm, Window window) : this()
+        public SettingsPage(SettingsPageVm vm, IWpfWindow window)
         {
+            InitializeComponent();
             Vm = vm;
-            Window = window;
-            _windowHandle = window.GetHandle();
+            _mainWindow = window;
+            MainGrid.Loaded += MainGrid_Loaded;
         }
 
         //It's annoying when this warning is applied to event handler parameters.
@@ -153,19 +103,7 @@ namespace WinUI.CustomControls
 
         public void RemoveWindowBorder_Click(object sender, RoutedEventArgs e)
         {
-            if (Window == null)
-                throw new InvalidOperationException($"{nameof(Window)} is not set.");
-
-            if (!CheckHandleAsync()) return;
-
-            //Note that I have some work to do on this one.  Right now if you go look at the method you
-            // will see a heavily commented hack.  In addition, after the border is removed I tried calling
-            // my Window.ShrinkToContent(MainGrid); to gobble up the extra white space and it didn't work
-            // from here.  So I then tried to put it on the dispatcher to give it time, that didn't help.
-            // I even tried to invalidate arrange and measure and still no-go but if you click on the 
-            // button I have tied to the ShrinkToContent_Click handler it works perfectly normal. WTF?
-            // If you have the fix let me know.
-            Window.RemoveWindowBorder(_windowHandle);
+            _mainWindow.RemoveBorder();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -180,12 +118,7 @@ namespace WinUI.CustomControls
 
         public void AddWindowBorder_Click(object sender, RoutedEventArgs e)
         {
-            if (Window == null)
-                throw new InvalidOperationException($"{nameof(Window)} is not set.");
-
-            if (!CheckHandleAsync()) return;
-
-            Window.AddWindowBorder(_windowHandle);
+            _mainWindow.AddBorder();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -197,9 +130,7 @@ namespace WinUI.CustomControls
 
         public void MaximizeWindow_Click(object sender, RoutedEventArgs e)
         {
-            if (!CheckHandleAsync()) return;
-
-            _windowHandle.MaximizeWindow();
+            _mainWindow.Maximize();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -243,11 +174,14 @@ namespace WinUI.CustomControls
         /// <param name="e">        Routed event information. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public void ShrinkToContent_Click(object sender, RoutedEventArgs e)
+        public void SizeToContent_Click(object sender, RoutedEventArgs e)
         {
-            if (!CheckHandleAsync()) return;
-            if (Window == null) return;
-            Window.ShrinkToContent(MainGrid);
+            //Note that for the time being, when I size to content I do not take into account 
+            // the Windows non-client area so if SizeToContent is called without removing the
+            // Non-Client space then it will be cramped.  For now, I just add this to 
+            // remove confusion.
+            _mainWindow.RemoveBorder();
+            _mainWindow.SizeToContent();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -259,9 +193,7 @@ namespace WinUI.CustomControls
 
         public void MinimizeWindow_Click(object sender, RoutedEventArgs e)
         {
-            if (!CheckHandleAsync()) return;
-
-            _windowHandle.MinimizeWindow();
+            _mainWindow.Minimize();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -273,9 +205,19 @@ namespace WinUI.CustomControls
 
         public void RestoreWindow_Click(object sender, RoutedEventArgs e)
         {
-            if (!CheckHandleAsync()) return;
+            _mainWindow.Restore();
+        }
 
-            _windowHandle.RestoreWindow();
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Event handler. Called by CloseWindow for click events. </summary>
+        ///
+        /// <param name="sender">   Source of the event. </param>
+        /// <param name="e">        Routed event information. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void CloseWindow_Click(object sender, RoutedEventArgs e)
+        {
+            _mainWindow.Close();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -287,17 +229,13 @@ namespace WinUI.CustomControls
 
         public async void SetWindowTransparency_Click(object sender, RoutedEventArgs e)
         {
-            if (Vm == null) return;
-
             if (Vm.NumberBoxValue > 50)
             {
                 if (!await Vm.DialogService.ConfirmAsync(
                     $"About Changing Transparency to {Vm.NumberBoxValue}",
-                    $"A Window Transparency of {Vm.NumberBoxValue} could make it impossible to close the Window without a debugger.  Are you sure you want to continue?")) { return; }
+                    $"A MainWindow Transparency of {Vm.NumberBoxValue} could make it impossible to close the MainWindow without a debugger.  Are you sure you want to continue?")) { return; }
             }
-            if (!CheckHandleAsync()) return;
-
-            _windowHandle.SetWindowTransparency(Vm.NumberBoxValue);
+            _mainWindow.SetTransparency(Vm.NumberBoxValue);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -309,23 +247,10 @@ namespace WinUI.CustomControls
 
         public void RemoveWindowTransparency_Click(object sender, RoutedEventArgs e)
         {
-            if (!CheckHandleAsync()) return;
-
-            _windowHandle.RemoveWindowTransparency();
+            _mainWindow.RemoveTransparency();
         }
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Determines if we can check handle asynchronous. </summary>
-        ///
-        /// <returns>   True if it succeeds, false if it fails. </returns>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private bool CheckHandleAsync()
-        {
-            if (_windowHandle != IntPtr.Zero) return true;
-            var _ = Vm?.DialogService.WarnAsync("WindowHandle", $"Hmm, the {nameof(_windowHandle)} property was null.  That's interesting, please let Jason Brower know about this.");
-            return false;
-        }
+        //Ignoring this because they are applying it to event handlers too!
 #pragma warning restore IDE0060 // Remove unused parameter
     }
 }

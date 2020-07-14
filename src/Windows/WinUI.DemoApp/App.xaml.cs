@@ -23,7 +23,6 @@ namespace WinUI.DemoApp
 {
     using Microsoft.UI.Threading;
     using Microsoft.UI.Xaml;
-    using WinUI.Native;
     using Microsoft.Extensions.DependencyInjection;
     using WinUI.CustomControls;
 
@@ -37,17 +36,7 @@ namespace WinUI.DemoApp
         /// <summary>   The service provider. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private ServiceProvider _serviceProvider;
-
-        //Hang on to the reference
-#pragma warning disable IDE0052 // Remove unread private members
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   The drag move feature. </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private DragMoveFeature? _dragMoveFeature;
-#pragma warning restore IDE0052 // Remove unread private members
+        private readonly ServiceProvider _serviceProvider;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Initializes a new instance of the WinUI.DemoApp.App class. </summary>
@@ -82,43 +71,14 @@ namespace WinUI.DemoApp
             base.OnLaunched(args);
 
             //Create a window and set the page.
-            var window = _serviceProvider.GetRequiredService<MainWindow>();
-            window.SetPage(_serviceProvider.GetRequiredService<SettingsPage>());
+            var window = _serviceProvider.GetRequiredService<WpfWindow>();
+            window.Content = _serviceProvider.GetRequiredService<SettingsPage>();
 
-            //Merely requesting an instance of the drag feature is all it takes to attach it to the applications
-            // main window.  It's probably more intuitive to have an initialize method.  Technically you wouldn't
-            // need to hold onto this instance anymore because it attaches to the Window instance and is detached
-            // when it is disposed.  Sinces it lasts the life of the application, the service container will dispose
-            // of it when the application ends and the container is disposed.
-            _dragMoveFeature = _serviceProvider.GetRequiredService<DragMoveFeature>();
-            _dragMoveFeature.AttachDragMoveHandlers(window.Content);
-
-            //Listen to close since we don't have the same application wide events that WPF offers for shutdown
-            window.Closed += Window_Closed;
             window.Activate();
 
             //This will have a jarring effect because I have not had time to figure out how to set the size before
             // the window is activated for the first time.
-            window.ResizeWindow(600, 500);
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by Window for closed events. </summary>
-        ///
-        /// <param name="sender">   Source of the event. </param>
-        /// <param name="args">     Window event information. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private void Window_Closed(object sender, WindowEventArgs args)
-        {
-            //This could be a bit wonkey because the window has now closed, yet we will be accessing that instance
-            // to remove the event handlers.  We probably need to do that or nullify _dragMoveFeature because the
-            // _dragMoveFeature could keep the Window instance alive.  This is just a bit overly anal because in this
-            // sample application the app is about to close, but I just wanted newer developers to understand this
-            // before they copy and paste this code to fit their own needs.
-            _dragMoveFeature?.RemoveDragMoveHandlers();
-
-            _serviceProvider?.Dispose();
+            window.Resize(600, 600);
         }
     }
 }

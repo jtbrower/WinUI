@@ -1,0 +1,24 @@
+﻿<Window
+    x:Class="WinUI.CustomControls.WpfWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:WinUI.CustomControls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+    <!--
+        Warning : When using the drag move feature, it attaches to the Window's Content.  If the content does not
+        have a color assigned, it will not register pointer down events.
+        
+        Size is set to stretch so we can use as much space as possible for dragging.  
+    
+        Note that the WindowRootGrid custom control will not work in code behind for some odd reason.  Only
+        in XAML.  I am guessing this is a WinUI Preview Version 1 bug.
+    -->
+    <local:WindowRootGrid
+        x:Name="RootGrid"
+        HorizontalAlignment="Stretch"
+        VerticalAlignment="Stretch"
+        Background="Transparent"
+        DoubleTapped="RootGrid_DoubleTapped" />
+</Window>

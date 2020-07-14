@@ -186,7 +186,6 @@ namespace WinUI.CustomControls
         /// <param name="container">   The window. </param>
         /// <param name="content">  The content. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-
         public static void ShrinkToContent(this Window window, UIElement content)
         {
             var rootContainer = window?.GetRootElement();
@@ -196,10 +195,6 @@ namespace WinUI.CustomControls
             //It does not understand that we just checked window for null by checking window?.Content
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
 #pragma warning disable CS8604 // Possible null reference argument.
-
-            //Determine if the content has enough room
-            var info = VisibilityInfo.GetVisibilityInfo(rootContainer,content);
-            Debug.WriteLine(info);
 
             var actualContentSize = content.ActualSize;
             var actualWindowContentSize = rootContainer.ActualSize;

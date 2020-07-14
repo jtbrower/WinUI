@@ -21,14 +21,12 @@
 // SOFTWARE.
 namespace WinUI.DemoApp
 {
-    using Microsoft.UI.Threading;
     using Microsoft.UI.Xaml;
-    using WinUI.Native;
     using Microsoft.Extensions.DependencyInjection;
     using WinUI.CustomControls;
     using WinUI.Vm;
+    using System;
     using System.Diagnostics;
-    using System.Linq;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>   A program. </summary>
@@ -40,7 +38,17 @@ namespace WinUI.DemoApp
         /// <summary>   The service provider. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        internal static ServiceProvider? ServiceProvider { get; private set;}
+        internal static ServiceProvider? ServiceProvider { get; private set; }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The application. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
+#pragma warning disable IDE0052 // Remove unread private members
+        private static App _application;
+#pragma warning restore IDE0052 // Remove unread private members
+#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Initializes the services. </summary>
@@ -52,9 +60,8 @@ namespace WinUI.DemoApp
         {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddScoped<IDialogService, DialogService>();
-            serviceCollection.AddSingleton<MainWindow>();
-            serviceCollection.AddSingleton<Window>(s => s.GetRequiredService<MainWindow>());
-            serviceCollection.AddSingleton<IMainWindow>(s => s.GetRequiredService<MainWindow>());
+            serviceCollection.AddSingleton<WpfWindow>();
+            serviceCollection.AddSingleton<IWpfWindow>(s => s.GetRequiredService<WpfWindow>());
             serviceCollection.AddSingleton<SettingsPage>();
             serviceCollection.AddSingleton<SettingsPageVm>();
             serviceCollection.AddSingleton<DragMoveFeature>();
@@ -73,12 +80,29 @@ namespace WinUI.DemoApp
         ///
         /// <param name="args"> An array of command-line argument strings. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-
+#pragma warning disable IDE0060 // Remove unused parameter
         static void Main(string[] args)
+#pragma warning restore IDE0060 // Remove unused parameter
         {
             WinRT.ComWrappersSupport.InitializeComWrappers();
-            ServiceProvider = InitializeServices();
-            Application.Start(e => new App(ServiceProvider));
+            Application.Start(ApplicationInitializationCallback);
+            ServiceProvider?.Dispose();
+        }
+        static void ApplicationInitializationCallback(ApplicationInitializationCallbackParams p)
+        {
+            try
+            {
+                ServiceProvider = InitializeServices();
+
+                //Yes, this is actually how this callback works.  You really don't even need to
+                // save the application instance, you just instantiate it.  I am saving it here
+                // out of clarity.  Declaring an object in space just feels different.
+                _application = new App(ServiceProvider);
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+            }
         }
     }
 }

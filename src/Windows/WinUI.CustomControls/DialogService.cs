@@ -43,7 +43,7 @@ namespace WinUI.CustomControls
         /// <param name="xamlRoot"> The XAML root. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public DialogService(IMainWindow mainWindow)
+        public DialogService(IWpfWindow mainWindow)
         {
             _xamlRoot = mainWindow.XamlRoot;
         }

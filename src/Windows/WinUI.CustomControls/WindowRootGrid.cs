@@ -19,51 +19,62 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace WinUI.DemoApp
+namespace WinUI.CustomControls
 {
-    using Microsoft.UI.Xaml;
     using Microsoft.UI.Xaml.Controls;
-    using WinUI.CustomControls;
+    using Windows.Foundation;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// <content>   The application's main form. This class cannot be inherited. </content>
+    /// <summary>   A window root grid. </summary>
+    ///
+    /// <seealso cref="Microsoft.UI.Xaml.Controls.Grid"/>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public sealed partial class MainWindow : IMainWindow
+    public sealed class WindowRootGrid : Grid
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Initializes a new instance of the WinUI.DemoApp.MainWindow class. </summary>
+        /// <summary>   Size of the infinity. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Gets the XAML root. </summary>
-        ///
-        /// <value> The XAML root. </value>
-        ///
-        /// <seealso cref="WinUI.CustomControls.IMainWindow.XamlRoot"/>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public XamlRoot XamlRoot => Content.XamlRoot;
+        private readonly Size _infinitySize = new Size(float.PositiveInfinity, float.PositiveInfinity);
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// The reason why I use a Grid is so that it will stretch out to fill the entire Window and the
-        /// event handlers for drag move can be attached to that. If the end user blows away the
-        /// MainWindow content it will affect the drag move handlers.  So as a quick fix I provided this
-        /// method.
+        /// If given infinity during a MeasureOverride, the grid desires this Size of space.
         /// </summary>
         ///
-        /// <param name="page"> The page. </param>
+        /// <value> The size desired if given Positive Infinity to measure within. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public void SetPage(Page page)
+        public Size? TrueDesiredSize { get; private set; }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// Provides the behavior for the "Measure" pass of the layout cycle. We ovveride this so that we
+        /// can determine how much space all of the controls truly needed.  This information is useful
+        /// when trying to emulate the WPF Window.SizeToContent feature.
+        /// </summary>
+        ///
+        /// <param name="availableSize">    The available size that this object can give to child
+        ///                                 objects. Infinity can be specified as a value to indicate that
+        ///                                 the object will size to whatever content is available. </param>
+        ///
+        /// <returns>
+        /// The size that this object determines it needs during layout, based on its calculations of the
+        /// allocated sizes for child objects or based on other considerations such as a fixed container
+        /// size.
+        /// </returns>
+        ///
+        /// <seealso cref="Microsoft.UI.Xaml.FrameworkElement.MeasureOverride(Size)"/>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        protected override Size MeasureOverride(Size availableSize)
         {
-            MainGrid.Children.Add(page);
+            //By passing inifinity to the base it will tell us truly how much size it needs.  Otherwise 
+            // as space becomes limited its desired size won't show what's truly required to fit controls
+            // like StackPanels.
+            TrueDesiredSize = base.MeasureOverride(_infinitySize);
+            return base.MeasureOverride(availableSize);
         }
     }
 }

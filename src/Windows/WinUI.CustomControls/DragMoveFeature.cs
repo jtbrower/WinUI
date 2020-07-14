@@ -29,7 +29,7 @@ namespace WinUI.CustomControls
     using static PInvoke.User32;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// <summary>   A drag move feature. </summary>
+    /// <summary>   A drag move feature that I plan on changing into a behavior. </summary>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public class DragMoveFeature
@@ -75,13 +75,14 @@ namespace WinUI.CustomControls
         /// Initializes a new instance of the WinUI.CustomControls.DragMoveFeature class.
         /// </summary>
         ///
-        /// <param name="window">   The window. </param>
+        /// <param name="window">       The window. </param>
+        /// <param name="windowHandle"> Handle of the window. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public DragMoveFeature(Window window)
+        public DragMoveFeature(Window window, IntPtr windowHandle)
         {
             _window = window;
-            _windowHandle = window.GetHandle();
+            _windowHandle = windowHandle;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
