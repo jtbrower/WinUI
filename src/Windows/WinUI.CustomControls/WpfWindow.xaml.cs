@@ -37,12 +37,6 @@ namespace WinUI.CustomControls
     public sealed partial class WpfWindow : IWpfWindow
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   The drag move feature. </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private readonly DragMoveFeature _dragMoveFeature;
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets the handle. </summary>
         ///
         /// <value> The handle. </value>
@@ -61,27 +55,6 @@ namespace WinUI.CustomControls
             InitializeComponent();
 
             Handle = this.GetHandle();
-
-            Closed +=Window_Closed;
-            _dragMoveFeature = new DragMoveFeature(this,Handle);
-            _dragMoveFeature.AttachDragMoveHandlers(RootGrid);
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by Window for closed events. </summary>
-        ///
-        /// <param name="sender">   Source of the event. </param>
-        /// <param name="args">     Window event information. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private void Window_Closed(object sender, WindowEventArgs args)
-        {
-            //This could be a bit wonkey because the window has now closed, yet we will be accessing that instance
-            // to remove the event handlers.  We probably need to do that or nullify _dragMoveFeature because the
-            // _dragMoveFeature could keep the Window instance alive.  This is just a bit overly anal because in this
-            // sample application the app is about to close, but I just wanted newer developers to understand this
-            // before they copy and paste this code to fit their own needs.
-            _dragMoveFeature.RemoveDragMoveHandlers();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -152,10 +125,9 @@ namespace WinUI.CustomControls
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// Mimic WPF's SizeToContent feature where the Content is give a positive infinity value for
-        /// available space to determine how much size would truly be needed to render all of the content
-        /// on the screen.  Then the Window is resized (either bigger or smaller) to perfectly fit the
-        /// required space.
+        /// Mimic WPF's SizeToContent feature.  Note that I have a current limitation where I do not account
+        /// for the non-client space requirements of a Window so it only works if the Window Border and 
+        /// Titlebar have already been removed.  
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -174,6 +146,8 @@ namespace WinUI.CustomControls
                 return;
             }
 
+            //TODO : account for the Window's non-client space requirements.  
+
             //Convert to device units
             var heightInDevicePixels = RootGrid.DipToDevice(sizeRequired.Height);
             var widthInDevicePixels = RootGrid.DipToDevice(sizeRequired.Width);
@@ -182,7 +156,10 @@ namespace WinUI.CustomControls
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Converts this  to a window. </summary>
+        /// <summary>   
+        ///   When the end user needs to cast the Interface to a Window, they can call this 
+        ///   method to avoid the warnings. 
+        /// </summary>
         ///
         /// <returns>   A Window. </returns>
         ///

@@ -119,6 +119,12 @@ namespace WinUI.CustomControls
         public void AddWindowBorder_Click(object sender, RoutedEventArgs e)
         {
             _mainWindow.AddBorder();
+
+            //Note that I consider this a hack and I am resizing the window back to a known constant
+            // just to make sure that when the Window Border / Titlebar + Window content has enough
+            // space.  A call to _mainWindow.SizeToContent(); would will work once I assure that 
+            // the SizeToContent call accounts for the Window's non-client space requirements.
+            _mainWindow.Resize(600, 600);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -417,10 +417,14 @@ namespace WinUI.Native
         /// <param name="y">            The y coordinate. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public static void MoveBy(this Window window, IntPtr windowHandle, int x, int y)
+        public static void MoveBy(this IntPtr windowHandle, int x, int y)
         {
-            var r = GetWindowRect(window, windowHandle);
-            MoveWindow(windowHandle, r.Left + x, r.Top + y, r.GetWidth(), r.GetHeight(), true);
+            if(!PInvoke.User32.GetWindowRect(windowHandle, out var r))
+            {
+                WriteGlobalErrorMsgIfSet();
+                return;
+            }
+            MoveWindow(windowHandle, r.left + x, r.top + y, r.GetWidth(), r.GetHeight(), true);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -557,6 +561,19 @@ namespace WinUI.Native
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   A RECT extension method that gets a width. </summary>
+        ///
+        /// <param name="r">    The r to act on. </param>
+        ///
+        /// <returns>   The width. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static int GetWidth(this PInvoke.RECT r)
+        {
+            return r.right - r.left;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   A RECT extension method that gets a height. </summary>
         ///
         /// <param name="r">    The r to act on. </param>
@@ -567,6 +584,19 @@ namespace WinUI.Native
         public static int GetHeight(this RECT r)
         {
             return r.Bottom - r.Top;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   A RECT extension method that gets a height. </summary>
+        ///
+        /// <param name="r">    The r to act on. </param>
+        ///
+        /// <returns>   The height. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static int GetHeight(this PInvoke.RECT r)
+        {
+            return r.bottom - r.top;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////

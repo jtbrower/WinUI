@@ -64,7 +64,6 @@ namespace WinUI.DemoApp
             serviceCollection.AddSingleton<IWpfWindow>(s => s.GetRequiredService<WpfWindow>());
             serviceCollection.AddSingleton<SettingsPage>();
             serviceCollection.AddSingleton<SettingsPageVm>();
-            serviceCollection.AddSingleton<DragMoveFeature>();
             return serviceCollection.BuildServiceProvider();
         }
         ////////////////////////////////////////////////////////////////////////////////////////////////////

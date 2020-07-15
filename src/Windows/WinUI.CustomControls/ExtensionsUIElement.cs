@@ -122,25 +122,6 @@ namespace WinUI.CustomControls
             } while (parent != null);
             return false;
         }
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   A Rect extension method that gets a width. </summary>
-        ///
-        /// <param name="r">    The r to act on. </param>
-        ///
-        /// <returns>   The width. </returns>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public static float GetWidth(this Rect r) => r.Right - r.Left;
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   A Rect extension method that gets a height. </summary>
-        ///
-        /// <param name="r">    The r to act on. </param>
-        ///
-        /// <returns>   The height. </returns>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public static float GetHeight(this Rect r) => r.Bottom - r.Top;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   An UIElement extension method that gets bounding rectangle. </summary>
