@@ -20,7 +20,6 @@
 * Although the project uses DI and View Models, I did not go through the trouble to disable buttons that are not applicable.  For example, if you remove the Window border, the button to remove is still enabled.
 * Currently I have not gone through the trouble to use ICommands for the buttons.
 * I need to figure out the cleanest way to set the Window icon
-* DropShadowPanel control stretches vertically, but not horizontally. See [this issue](https://github.com/windows-toolkit/WindowsCommunityToolkit/issues/3384) I filed for details.
 * When I resize the Window on startup, it is not a smooth transition because I currently have to call Window.Activate and then resize directly after.  
 * The Debug window shows 5 'WinRT transform error' exceptions that are swallowed on app start
 * Debug Window shows a 'mincore\com\oleaut32\dispatch\ups.cpp(2122)\OLEAUT32.dll' library not registered error.
