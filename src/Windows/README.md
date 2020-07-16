@@ -7,14 +7,14 @@
 * Sometimes Visual Studio puts an AnyCPU platform back into the solution.  Don't use it.
 
 # Current Features and What you can Learn
-* Provides a class called WpfWindow that mimics some WPF Windowing features
+* Provides a class called WpfWindow that mimics some WPF Windowing features.  My choice of name for this class is questionable.
 * Place a shadow around a grid without using the DropShadowPanel. Shadow has rounded corners.
 * Two examples of how to create a Behavior
 * Remove and Add a Window Border/Titlebar
-* Provide Window Drag like the Titlebar normally provides.  Works with the Mouse and Touch, see DragMoveBehavior.cs
-* Provides many examples of use the Win32 PInvoke API
-* Set the Window transparency between 0 (fully visible) and 100 (fully transparent)
-* Provide a SizeToContent feature like WPF provides.
+* Provide Window DragMove like the Titlebar normally provides.  Works with the Mouse and Touch, see DragMoveBehavior.cs
+* Provides many examples of using Win32 PInvoke API calls.
+* Set the Window transparency between 0 (fully visible) and 100 (fully transparent).
+* Provide a SizeToContent feature like WPF provides.  Capable of sizing up and down to fit client space requirements.
 * Maximize, Restore, Minimize capabilities
 * Change the size of the Window
 * Provide double tap to maximize a Window while disabling a double tap of a button from triggering the maximize
@@ -32,8 +32,6 @@
 * Currently I have not gone through the trouble to use ICommands for the buttons, or disable buttons that are not applicable to a given state.
 * I need to figure out the cleanest way to set the Window icon
 * When I resize the Window on startup, it is not a smooth transition because I currently have to call Window.Activate and then resize directly after.  
-* The SizeToContent feature works well without a Window border, but if there is a border or titlebar, I do not account for those space requirements (yet).
-* 
 * The Debug window shows 5 'WinRT transform error' exceptions that are swallowed on app start
 * Debug Window shows a 'mincore\com\oleaut32\dispatch\ups.cpp(2122)\OLEAUT32.dll' library not registered error.
 

@@ -146,13 +146,19 @@ namespace WinUI.CustomControls
                 return;
             }
 
-            //TODO : account for the Window's non-client space requirements.  
-
             //Convert to device units
-            var heightInDevicePixels = RootGrid.DipToDevice(sizeRequired.Height);
-            var widthInDevicePixels = RootGrid.DipToDevice(sizeRequired.Width);
+            var clientHeightInDevicePixels = RootGrid.DipToDevice(sizeRequired.Height);
+            var clientWidthInDevicePixels = RootGrid.DipToDevice(sizeRequired.Width);
 
-            Handle.ResizeWindow(widthInDevicePixels, heightInDevicePixels);
+            //Now we need to calculate the non-client area of the Window.  This is only important when a Window has a border and or a
+            // titlebar (or menu).  In other words, if the RemoveWindowBorder method has been called on the Window then the nonClientSize
+            // should be zero.
+            if (!Handle.GetNonClientSize(out var nonClientSize))
+            {
+                Debug.WriteLine($"Unable to determine the non-client size needed in {nameof(SizeToContent)}");
+                return;
+            }
+            Handle.ResizeWindow((int)(clientWidthInDevicePixels+nonClientSize.Width), (int)(clientHeightInDevicePixels+nonClientSize.Height));
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////

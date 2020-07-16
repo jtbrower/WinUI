@@ -120,11 +120,9 @@ namespace WinUI.CustomControls
         {
             _mainWindow.AddBorder();
 
-            //Note that I consider this a hack and I am resizing the window back to a known constant
-            // just to make sure that when the Window Border / Titlebar + Window content has enough
-            // space.  A call to _mainWindow.SizeToContent(); would will work once I assure that 
-            // the SizeToContent call accounts for the Window's non-client space requirements.
-            _mainWindow.Resize(600, 600);
+            //Make sure the client area has enough space to render now that the border has been added back
+            // in.
+            _mainWindow.SizeToContent();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -182,11 +180,6 @@ namespace WinUI.CustomControls
 
         public void SizeToContent_Click(object sender, RoutedEventArgs e)
         {
-            //Note that for the time being, when I size to content I do not take into account 
-            // the Windows non-client area so if SizeToContent is called without removing the
-            // Non-Client space then it will be cramped.  For now, I just add this to 
-            // remove confusion.
-            _mainWindow.RemoveBorder();
             _mainWindow.SizeToContent();
         }
 

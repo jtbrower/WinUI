@@ -25,6 +25,8 @@ namespace WinUI.Native
     using System.ComponentModel;
     using System.Runtime.InteropServices;
     using WinRT;
+    using Windows.Foundation;
+    using PInvoke;
 
     public static class NativeMethods
     {
@@ -202,6 +204,46 @@ namespace WinUI.Native
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// Calculates the non-client size.  This is the space where any border, menu or titlebar is
+        /// located.
+        /// </summary>
+        ///
+        /// <param name="hWnd">             The window. </param>
+        /// <param name="nonClientSize">    [out] Size of the non client area in Physical Pixels or
+        ///                                 device units. </param>
+        /// <param name="hasMenu">          (Optional) True if has menu, false if not. </param>
+        ///
+        /// <returns>   True if it succeeds, false if it fails. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static bool GetNonClientSize(this IntPtr hWnd, out Size nonClientSize)
+        {
+            //A client rect sitting at 0,0 with calculated height and width.
+            nonClientSize = new Size();
+            if (!User32.GetClientRect(hWnd, out var clientRect))
+            {
+                WriteGlobalErrorMsgIfSet();
+                return false;
+            }
+
+            if (!User32.GetWindowRect(hWnd, out var windowRect))
+            {
+                WriteGlobalErrorMsgIfSet();
+                return false;
+            }
+
+            var windowHeight = windowRect.GetHeight();
+            var windowWidth = windowRect.GetWidth();
+            var clientHeight = clientRect.GetHeight();
+            var clientWidth = clientRect.GetWidth();
+
+            nonClientSize.Height = windowHeight - clientHeight;
+            nonClientSize.Width = windowWidth - clientWidth;
+            return true;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The lwa alpha. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -355,7 +397,8 @@ namespace WinUI.Native
         /// <value> A message describing the last window 32 error. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public static string LastWin32ErrorMessage => new Win32Exception(Marshal.GetLastWin32Error()).Message;
+        public static string LastWin32ErrorMessage =>
+            new System.ComponentModel.Win32Exception(Marshal.GetLastWin32Error()).Message;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Sets window flags. </summary>
@@ -381,9 +424,9 @@ namespace WinUI.Native
 
         private static void WriteLineIf(bool condition, string? msg)
         {
-            if(!condition || msg == null)return;
+            if (!condition || msg == null) return;
             Debug.WriteLine(msg);
-            if(!S_BreakOnError)return;
+            if (!S_BreakOnError) return;
 #if DEBUG
             //Note that this call is not removed automatically like Debug.WriteLine.  If hit in production
             // it will throw an exception.  Lesson learned years ago!
@@ -419,7 +462,7 @@ namespace WinUI.Native
 
         public static void MoveBy(this IntPtr windowHandle, int x, int y)
         {
-            if(!PInvoke.User32.GetWindowRect(windowHandle, out var r))
+            if (!PInvoke.User32.GetWindowRect(windowHandle, out var r))
             {
                 WriteGlobalErrorMsgIfSet();
                 return;
@@ -439,7 +482,7 @@ namespace WinUI.Native
         public static void ShrinkBy(this Window window, IntPtr windowHandle, int x, int y)
         {
             var r = GetWindowRect(window, windowHandle);
-            MoveWindow(windowHandle, r.Left, r.Top, r.GetWidth()-x, r.GetHeight()-y, true);
+            MoveWindow(windowHandle, r.Left, r.Top, r.GetWidth() - x, r.GetHeight() - y, true);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -454,7 +497,7 @@ namespace WinUI.Native
         public static void ResizeWindow(this IntPtr windowHandle, int x, int y)
         {
             //Using SWP_NOMOVE causes the location coordinates (0,0) to be ignored.
-            if(!PInvoke.User32.SetWindowPos(windowHandle, IntPtr.Zero, 0, 0, x, y, PInvoke.User32.SetWindowPosFlags.SWP_NOZORDER | PInvoke.User32.SetWindowPosFlags.SWP_NOMOVE))
+            if (!PInvoke.User32.SetWindowPos(windowHandle, IntPtr.Zero, 0, 0, x, y, PInvoke.User32.SetWindowPosFlags.SWP_NOZORDER | PInvoke.User32.SetWindowPosFlags.SWP_NOMOVE))
             {
                 WriteGlobalErrorMsgIfSet();
             }
