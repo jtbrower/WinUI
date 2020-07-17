@@ -80,8 +80,6 @@ namespace WinUI.CustomControls
             RootGrid.Loaded += RootGrid_Loaded;
         }
 
-        public bool EnableSizeToContent { get; set; } = false;
-
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Event handler. Called by RootGrid for loaded events. </summary>
         ///
