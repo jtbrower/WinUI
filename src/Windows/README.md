@@ -19,7 +19,7 @@
 * Change the size of the Window
 * Provide double tap to maximize a Window while disabling a double tap of a button from triggering the maximize
 
-#Requirements
+# Requirements
 * Uses .Net5.0, initial version was/is preview 6 but check to see if that is the current version
 * Uses WinUI Preview 1, again check to make sure that is the current version
 * Uses Microsoft's dependency injection container and attempts to fully decouple that app from static refs
