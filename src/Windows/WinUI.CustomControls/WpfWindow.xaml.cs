@@ -19,14 +19,18 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+using Microsoft.UI.Xaml;
+using System;
+using WinUI.Native;
+using System.Diagnostics;
+using System.Linq;
+using Windows.Graphics.Display;
+using Microsoft.UI.Xaml.Media;
+using Microsoft.Toolkit.Uwp.UI.Controls;
+using Windows.Foundation;
+
 namespace WinUI.CustomControls
 {
-    using Microsoft.UI.Xaml;
-    using System;
-    using WinUI.Native;
-    using System.Diagnostics;
-    using System.Linq;
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>   A window that attempts to mimic some of the features found in a WPF Window. </summary>
     ///
@@ -36,6 +40,25 @@ namespace WinUI.CustomControls
 
     public sealed partial class WpfWindow : IWpfWindow
     {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// The scale transform is attached to the Window Content to adapt to DPI changes.
+        /// </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        ScaleTransform? _dpiChangedScaleTransform;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// When the Window's content is first loaded, we save the DPI scale and attempt to make the
+        /// content look like it does on the first monitor it is loaded on.  Anytime the end user moves
+        /// this window to another screen, the DPI changed event will fire and we will scale the Window's
+        /// content accordingly.
+        /// </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private double _dpiScaleDuringLoadedEvent;
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets the handle. </summary>
         ///
@@ -53,8 +76,64 @@ namespace WinUI.CustomControls
         public WpfWindow()
         {
             InitializeComponent();
-
             Handle = this.GetHandle();
+            RootGrid.Loaded += RootGrid_Loaded;
+        }
+
+        public bool EnableSizeToContent { get; set; } = false;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Event handler. Called by RootGrid for loaded events. </summary>
+        ///
+        /// <param name="sender">   Source of the event. </param>
+        /// <param name="e">        Routed event information. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void RootGrid_Loaded(object sender, RoutedEventArgs e)
+        {
+            _dpiScaleDuringLoadedEvent = GetDpiScale();
+            var displayInfo = DisplayInformation.GetForCurrentView();
+            displayInfo.DpiChanged += DisplayInfo_DpiChanged;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets DPI scale. </summary>
+        ///
+        /// <returns>   The DPI scale. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private double GetDpiScale()
+        {
+            return (RootGrid.XamlRoot.RasterizationScale * 96.0) / PInvoke.User32.GetDpiForWindow(Handle);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Scale content for DPI. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void ScaleContentForDpi()
+        {
+            if (_dpiChangedScaleTransform == null) return;
+
+            var scale = GetDpiScale();
+            //I saw this hit inifinity once when closing a window, it caused an exception.  
+            if (double.IsInfinity(scale) || scale <= 0 || scale == _dpiScaleDuringLoadedEvent) scale = 1.0;
+
+            //Update the Content's scale
+            _dpiChangedScaleTransform.ScaleY = scale;
+            _dpiChangedScaleTransform.ScaleX = scale;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Displays an information DPI changed. </summary>
+        ///
+        /// <param name="sender">   Source of the event. </param>
+        /// <param name="args">     The arguments. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void DisplayInfo_DpiChanged(DisplayInformation sender, object args)
+        {
+            ScaleContentForDpi();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,8 +181,12 @@ namespace WinUI.CustomControls
 
         new public UIElement? Content
         {
+            // The reason why I use a Grid is so that it will stretch out to fill the entire Window and the
+            // event handlers for drag move can be attached to that. If the end user blows away the
+            // WpfWindow content it will affect the drag move handlers.  So replacing the Window.Content
+            // with this implementation lets me achieve those goals.
             get => RootGrid.Children.FirstOrDefault();
-            set=> SetContent(value);
+            set => SetContent(value);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,13 +197,47 @@ namespace WinUI.CustomControls
 
         private void SetContent(UIElement? content)
         {
-            // The reason why I use a Grid is so that it will stretch out to fill the entire Window and the
-            // event handlers for drag move can be attached to that. If the end user blows away the
-            // WpfWindow content it will affect the drag move handlers.  So replacing the Window.Content
-            // with this implementation lets me achieve those goals.
+            //Grab the current.
+            var currentContent = RootGrid.Children.FirstOrDefault();
+            
+            //Clear current
             RootGrid.Children.Clear();
+
+            //If they are changing the content then we need to remove the LayoutTransform we placed
+            // upon the prior content.
+            if (currentContent is LayoutTransformControl layoutTransformControl)
+            {
+                layoutTransformControl.Child = null;
+                _dpiChangedScaleTransform = null;
+            }
+
+            //If they are setting it to null we are done.
             if (content == null) return;
-            RootGrid.Children.Add(content);
+
+            //Otherwise we need to attach a LayoutTransform to handle DPI changes.
+            if (content is FrameworkElement fe)
+            {
+                //Note that this gives me the power to handle DPI changes as the end user moves this window
+                // from the DPI it was loaded at to another DPI.  As that DPI changes we attempt to scale 
+                // the content to account for the size differences the new DPI would cause.  I accomplish 
+                // that by adding a scale transform to the Content.
+                _dpiChangedScaleTransform = new ScaleTransform { CenterX = .5, CenterY = .5, ScaleX = 1.0, ScaleY = 1.0 };
+                var layoutTransform = new LayoutTransformControl
+                {
+                    RenderTransformOrigin = new Point(.5f, .5f),
+                    HorizontalAlignment = HorizontalAlignment.Center,
+                    VerticalAlignment = VerticalAlignment.Center,
+                    Child = fe,
+                    Transform = _dpiChangedScaleTransform
+                };
+                RootGrid.Children.Add(layoutTransform);
+            }
+            //If they are not adding a Framework element then we cannot attach a LayoutTransform.  Just add the
+            // element.
+            else
+            {
+                RootGrid.Children.Add(content);
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -139,7 +256,7 @@ namespace WinUI.CustomControls
                 return;
             }
             var sizeRequired = RootGrid.TrueDesiredSize.Value;
-            
+
             if (sizeRequired.Width <= 0 || sizeRequired.Height <= 0)
             {
                 Debug.WriteLine($"An attempt to resize the Window with a (Width x Height) of {sizeRequired.Width}x{sizeRequired.Height}.");
@@ -158,7 +275,8 @@ namespace WinUI.CustomControls
                 Debug.WriteLine($"Unable to determine the non-client size needed in {nameof(SizeToContent)}");
                 return;
             }
-            Handle.ResizeWindow((int)(clientWidthInDevicePixels+nonClientSize.Width), (int)(clientHeightInDevicePixels+nonClientSize.Height));
+
+            Handle.ResizeWindow((int)(clientWidthInDevicePixels + nonClientSize.Width), (int)(clientHeightInDevicePixels + nonClientSize.Height));
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -172,7 +290,7 @@ namespace WinUI.CustomControls
         /// <seealso cref="IWpfWindow.AsWindow()"/>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public Window AsWindow()=>this;
+        public Window AsWindow() => this;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Removes the border. </summary>
@@ -180,7 +298,7 @@ namespace WinUI.CustomControls
 
         public void RemoveBorder()
         {
-            this.RemoveWindowBorder(Handle);
+            Handle.RemoveWindowBorder();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////

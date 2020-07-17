@@ -25,7 +25,6 @@ namespace WinUI.CustomControls
     using Microsoft.UI.Xaml.Media;
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using Windows.Foundation;
     using WinUI.Native;
 
@@ -192,7 +191,7 @@ namespace WinUI.CustomControls
             rootContainer.Height-=yAxisPadding;
             rootContainer.Width-=xAxisPadding;
 
-            window.ShrinkBy(window.GetHandle(), xAxisPadding, yAxisPadding);
+            window.GetHandle().ShrinkBy(xAxisPadding, yAxisPadding);
 
 #pragma warning restore CS8604 // Possible null reference argument.
 #pragma warning restore CS8602 // Dereference of a possibly null reference.
