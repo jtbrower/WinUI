@@ -27,11 +27,11 @@
 * I have Nullable enabled on all projects to enforce clean coding practices.
 
 # Known Issues (Work in Progress)
-* '<PackageReference Include="Microsoft.Windows.CsWinRT" Version="0.1.0-prerelease.200629.3" />' was added to the DemoApp to avoid a compatibility issue between .Net5 preview 5/6 and WinUI
+* `<PackageReference Include=\"Microsoft.Windows.CsWinRT Version=\"0.1.0-prerelease.200629.3\" />` was added to the DemoApp to avoid a compatibility issue between .Net5 preview 5/6 and WinUI
 * When you set the Window transparency all of the Window content becomes transparent too.  I need to figure out how to handle this.
 * Currently I have not gone through the trouble to use ICommands for the buttons, or disable buttons that are not applicable to a given state.
 * I need to figure out the cleanest way to set the Window icon
-* When I resize the Window on startup, it is not a smooth transition because I currently have to call Window.Activate and then resize directly after.  
+* When I resize the Window on startup, it is not a smooth transition because I currently have to call Window.Activate and then resize directly after.
 * The Debug window shows 5 'WinRT transform error' exceptions that are swallowed on app start
 * Debug Window shows a 'mincore\com\oleaut32\dispatch\ups.cpp(2122)\OLEAUT32.dll' library not registered error.
 
@@ -46,7 +46,7 @@
 * Do not try to create a DependencyProperty with a IntPtr type.  It will throw exceptions.
 
 # WinUI 3 preview 2 is out
-On July 15th, WinUI preview two was released.  I gave it a really quick test and I am seeing program exceptions that I will need to 
+On July 15th, WinUI preview two was released.  I gave it a really quick test and I am seeing program exceptions that I will need to
 address before upgrading to the newer version.  I hope to work on that in the next day.
 ```
     <PackageReference Include="Microsoft.WinUI" Version="3.0.0-preview2.200713.0" />
