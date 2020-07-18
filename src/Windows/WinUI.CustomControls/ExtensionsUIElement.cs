@@ -26,7 +26,6 @@ namespace WinUI.CustomControls
     using System;
     using System.Collections.Generic;
     using Windows.Foundation;
-    using WinUI.Native;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>   The extensions user interface element. </summary>
@@ -152,49 +151,6 @@ namespace WinUI.CustomControls
             var uiElementPoint = uiElement.TransformToVisual(windowContent).TransformPoint(bottomRight);
 
             return new Rect(windowContentPoint, uiElementPoint);
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>
-        /// This method will attempt to resize the Window by shrinking down to fit the size of the
-        /// UIElement content.  Note that if you provide content that is Horizontally or Vertically
-        /// Stretched then this function will probably not work as you expected.  Also, if your content
-        /// has a shadow attached to it then your content's margin needs to be big enough to account for
-        /// that shadow because it isn't accounted for when we check the ActualSize.  I wish it was!
-        /// </summary>
-        ///
-        /// <param name="container">   The window. </param>
-        /// <param name="content">  The content. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        public static void ShrinkToContent(this Window window, UIElement content)
-        {
-            var rootContainer = window?.GetRootElement();
-            if (rootContainer == null) return;
-            if (content == null) return;
-
-            //It does not understand that we just checked window for null by checking window?.Content
-#pragma warning disable CS8602 // Dereference of a possibly null reference.
-#pragma warning disable CS8604 // Possible null reference argument.
-
-            var actualContentSize = content.ActualSize;
-            var actualWindowContentSize = rootContainer.ActualSize;
-            var yPadDip = actualWindowContentSize.Y - actualContentSize.Y;
-            var xPadDip = actualWindowContentSize.X - actualContentSize.X;
-
-            //Convert to device units
-            var yAxisPadding = rootContainer.DipToDevice(yPadDip);
-            var xAxisPadding = rootContainer.DipToDevice(xPadDip);
-
-            //Its already sized perfectly.
-            if(yAxisPadding == 0 && xAxisPadding == 0)return;
-
-            rootContainer.Height-=yAxisPadding;
-            rootContainer.Width-=xAxisPadding;
-
-            window.GetHandle().ShrinkBy(xAxisPadding, yAxisPadding);
-
-#pragma warning restore CS8604 // Possible null reference argument.
-#pragma warning restore CS8602 // Dereference of a possibly null reference.
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
