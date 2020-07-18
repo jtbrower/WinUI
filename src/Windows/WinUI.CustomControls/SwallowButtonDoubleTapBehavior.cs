@@ -21,7 +21,7 @@
 // SOFTWARE.
 namespace WinUI.CustomControls
 {
-    using Microsoft.UI.Xaml.Controls;
+    using Microsoft.UI.Xaml.Controls.Primitives;
     using Microsoft.Xaml.Interactivity;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -33,10 +33,10 @@ namespace WinUI.CustomControls
     /// behaviour as it will mark the event handled.
     /// </summary>
     ///
-    /// <seealso cref="Microsoft.Xaml.Interactivity.Behavior{Microsoft.UI.Xaml.Controls.Button}"/>
+    /// <seealso cref="Microsoft.Xaml.Interactivity.Behavior{ButtonBase}"/>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public class SwallowButtonDoubleTapBehavior : Behavior<Button>
+    public class SwallowButtonDoubleTapBehavior : Behavior<ButtonBase>
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
