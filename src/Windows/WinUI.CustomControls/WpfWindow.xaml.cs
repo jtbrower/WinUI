@@ -42,21 +42,10 @@ namespace WinUI.CustomControls
     public sealed partial class WpfWindow : IWpfWindow
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>
-        /// Gets or sets a value indicating whether the automatic DPI content scaling is enabled.  This
-        /// will scale content without making it appear blury as happens with a non DPI aware application.
-        /// </summary>
-        ///
-        /// <value> True if enable automatic DPI content scaling, false if not. </value>
+        /// <summary>   True to automatically DPI content scaling. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public void SetAutoDpiContentScaling(bool enable)
-        {
-            if (_autoDpiContentScaling == enable) return;
-            _autoDpiContentScaling = enable;
-        }
-
-        private bool _autoDpiContentScaling = true;
+        private bool _autoDpiContentScaling;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
@@ -266,7 +255,7 @@ namespace WinUI.CustomControls
                 // removing the LayoutTransformControl.  If you find this causes a jerky
                 // UI experience then try leaving the Transform in place and just setting
                 // it to 1.
-                if(scaleAt == 1.0)
+                if (scaleAt == 1.0)
                 {
                     var child = lt.Child;
                     RootGrid.Children.RemoveAt(0);
@@ -301,12 +290,12 @@ namespace WinUI.CustomControls
             //Determine what to use for the content alignment.
             var horizontalContentAlignment = fe.HorizontalAlignment;
             var verticalContentAlignment = fe.VerticalAlignment;
-            if(fe is Control control)
+            if (fe is Control control)
             {
                 horizontalContentAlignment = control.HorizontalContentAlignment;
                 verticalContentAlignment = control.VerticalContentAlignment;
             }
-            
+
             //Wrap the content with a transform
             var layoutTransformControl = new LayoutTransformControl
             {
@@ -453,6 +442,60 @@ namespace WinUI.CustomControls
         public void RemoveTransparency()
         {
             Handle.RemoveWindowTransparency();
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Enables the automatic scale on DPI change. </summary>
+        ///
+        /// <seealso cref="IWpfWindow.EnableAutoScaleOnDpiChange()"/>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void EnableAutoScaleOnDpiChange()
+        {
+            SetAutoDpiContentScaling(true);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Disables the automatic scale on DPI change. </summary>
+        ///
+        /// <seealso cref="IWpfWindow.DisableAutoScaleOnDpiChange()"/>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void DisableAutoScaleOnDpiChange()
+        {
+            SetAutoDpiContentScaling(false);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// Gets or sets a value indicating whether the automatic DPI content scaling is enabled.  This
+        /// will scale content without making it appear blury as happens with a non DPI aware application.
+        /// </summary>
+        ///
+        /// <value> True if enable automatic DPI content scaling, false if not. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void SetAutoDpiContentScaling(bool enable)
+        {
+            if (_autoDpiContentScaling == enable) return;
+            _autoDpiContentScaling = enable;
+
+            //In this case the window has not been activated for the first time.
+            if (!_dpiScaleOnFirstActivation.HasValue) return;
+
+            //Disabled
+            if (!_autoDpiContentScaling)
+            {
+                //This will remove any transform that has been added.
+                ScaleWindowContent(1.0);
+                return;
+            }
+
+            //See if the scale has changed since the window was first activated.  If it is different
+            // then we need to apply a transform.
+            var currentScale = GetDpiScale();
+            if (currentScale == _dpiScaleOnFirstActivation) return;
+            ScaleWindowContent(currentScale);
         }
     }
 }
