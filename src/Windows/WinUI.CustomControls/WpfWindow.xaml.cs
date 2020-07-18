@@ -28,6 +28,7 @@ using Windows.Graphics.Display;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.Toolkit.Uwp.UI.Controls;
 using Windows.Foundation;
+using Microsoft.UI.Xaml.Controls;
 
 namespace WinUI.CustomControls
 {
@@ -42,11 +43,20 @@ namespace WinUI.CustomControls
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// The scale transform is attached to the Window Content to adapt to DPI changes.
+        /// Gets or sets a value indicating whether the automatic DPI content scaling is enabled.  This
+        /// will scale content without making it appear blury as happens with a non DPI aware application.
         /// </summary>
+        ///
+        /// <value> True if enable automatic DPI content scaling, false if not. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        ScaleTransform? _dpiChangedScaleTransform;
+        public void SetAutoDpiContentScaling(bool enable)
+        {
+            if (_autoDpiContentScaling == enable) return;
+            _autoDpiContentScaling = enable;
+        }
+
+        private bool _autoDpiContentScaling = true;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
@@ -57,7 +67,7 @@ namespace WinUI.CustomControls
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private double _dpiScaleDuringLoadedEvent;
+        private double? _dpiScaleOnFirstActivation;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets the handle. </summary>
@@ -77,6 +87,7 @@ namespace WinUI.CustomControls
         {
             InitializeComponent();
             Handle = this.GetHandle();
+            Activated += WpfWindow_Activated;
             RootGrid.Loaded += RootGrid_Loaded;
         }
 
@@ -89,9 +100,24 @@ namespace WinUI.CustomControls
 
         private void RootGrid_Loaded(object sender, RoutedEventArgs e)
         {
-            _dpiScaleDuringLoadedEvent = GetDpiScale();
             var displayInfo = DisplayInformation.GetForCurrentView();
             displayInfo.DpiChanged += DisplayInfo_DpiChanged;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Event handler. Called by WpfWindow for activated events. </summary>
+        ///
+        /// <param name="sender">   Source of the event. </param>
+        /// <param name="args">     Window activated event information. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void WpfWindow_Activated(object sender, WindowActivatedEventArgs args)
+        {
+            //We only needed to be notified on the first activation.
+            Activated -= WpfWindow_Activated;
+
+            //The current scale is captured and used as a comparison for the times when the DPI changes.
+            _dpiScaleOnFirstActivation = GetDpiScale();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -111,15 +137,10 @@ namespace WinUI.CustomControls
 
         private void ScaleContentForDpi()
         {
-            if (_dpiChangedScaleTransform == null) return;
-
             var scale = GetDpiScale();
             //I saw this hit inifinity once when closing a window, it caused an exception.  
-            if (double.IsInfinity(scale) || scale <= 0 || scale == _dpiScaleDuringLoadedEvent) scale = 1.0;
-
-            //Update the Content's scale
-            _dpiChangedScaleTransform.ScaleY = scale;
-            _dpiChangedScaleTransform.ScaleX = scale;
+            if (double.IsInfinity(scale) || scale <= 0 || scale == _dpiScaleOnFirstActivation) scale = 1.0;
+            ScaleWindowContent(scale);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -131,6 +152,8 @@ namespace WinUI.CustomControls
 
         private void DisplayInfo_DpiChanged(DisplayInformation sender, object args)
         {
+            if (!_autoDpiContentScaling) return;
+
             ScaleContentForDpi();
         }
 
@@ -197,45 +220,106 @@ namespace WinUI.CustomControls
         {
             //Grab the current.
             var currentContent = RootGrid.Children.FirstOrDefault();
-            
+
             //Clear current
-            RootGrid.Children.Clear();
+            if (currentContent != null)
+                RootGrid.Children.RemoveAt(0);
 
-            //If they are changing the content then we need to remove the LayoutTransform we placed
-            // upon the prior content.
-            if (currentContent is LayoutTransformControl layoutTransformControl)
-            {
-                layoutTransformControl.Child = null;
-                _dpiChangedScaleTransform = null;
-            }
-
-            //If they are setting it to null we are done.
-            if (content == null) return;
-
-            //Otherwise we need to attach a LayoutTransform to handle DPI changes.
-            if (content is FrameworkElement fe)
-            {
-                //Note that this gives me the power to handle DPI changes as the end user moves this window
-                // from the DPI it was loaded at to another DPI.  As that DPI changes we attempt to scale 
-                // the content to account for the size differences the new DPI would cause.  I accomplish 
-                // that by adding a scale transform to the Content.
-                _dpiChangedScaleTransform = new ScaleTransform { CenterX = .5, CenterY = .5, ScaleX = 1.0, ScaleY = 1.0 };
-                var layoutTransform = new LayoutTransformControl
-                {
-                    RenderTransformOrigin = new Point(.5f, .5f),
-                    HorizontalAlignment = HorizontalAlignment.Center,
-                    VerticalAlignment = VerticalAlignment.Center,
-                    Child = fe,
-                    Transform = _dpiChangedScaleTransform
-                };
-                RootGrid.Children.Add(layoutTransform);
-            }
-            //If they are not adding a Framework element then we cannot attach a LayoutTransform.  Just add the
-            // element.
-            else
-            {
+            //Add the new
+            if (content != null)
                 RootGrid.Children.Add(content);
+
+            //With a content change, we need to make sure we did not attach a LayoutTransformControl.
+            // If we did, its probably best to disassociate the Conent from this control.
+            if (currentContent is LayoutTransformControl ltc) ltc.Child = null;
+
+            //If the scale is not the same as it was when this control was first loaded, then
+            // apply a transform.
+            var currentScale = GetDpiScale();
+            if (_dpiScaleOnFirstActivation.HasValue && _dpiScaleOnFirstActivation != currentScale)
+                ScaleWindowContent(currentScale);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// Note that this gives me the power to handle DPI changes as the end user moves this window
+        /// from the DPI it was loaded at to another DPI.  As that DPI changes we attempt to scale the
+        /// content to account for the size differences the new DPI would cause.  I accomplish that by
+        /// adding a scale transform to the Content.
+        /// </summary>
+        ///
+        /// <param name="scaleAt">  The scale to use on the Window's content. </param>
+        ///
+        /// <returns>   True if it succeeds, false if it fails. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void ScaleWindowContent(double scaleAt)
+        {
+            //Grab the current.
+            var currentContent = RootGrid.Children.FirstOrDefault();
+            if (currentContent == null) return;
+
+            //If there is already a transform applied then use the existing.
+            if (currentContent is LayoutTransformControl lt)
+            {
+                //If it is a 1 to 1 scale then we could just set it to 1 but instead I am 
+                // removing the LayoutTransformControl.  If you find this causes a jerky
+                // UI experience then try leaving the Transform in place and just setting
+                // it to 1.
+                if(scaleAt == 1.0)
+                {
+                    var child = lt.Child;
+                    RootGrid.Children.RemoveAt(0);
+                    lt.Child = null;
+                    RootGrid.Children.Add(child);
+                }
+                //See if we need to update the existing scale.
+                else if (lt.Transform is ScaleTransform st && st.ScaleX != scaleAt && st.ScaleX != scaleAt)
+                {
+                    st.ScaleX = scaleAt;
+                    st.ScaleY = scaleAt;
+                    return;
+                }
+                return;
             }
+
+            //The layout transform control requires a FrameworkElement.
+            if (!(currentContent is FrameworkElement fe)) return;
+
+            //This is the scale magic
+            var scaleTransform = new ScaleTransform
+            {
+                CenterX = .5,
+                CenterY = .5,
+                ScaleX = scaleAt,
+                ScaleY = scaleAt
+            };
+
+            //We already know we have a Child because we called FirstOrDefault and checked for null above.
+            RootGrid.Children.RemoveAt(0);
+
+            //Determine what to use for the content alignment.
+            var horizontalContentAlignment = fe.HorizontalAlignment;
+            var verticalContentAlignment = fe.VerticalAlignment;
+            if(fe is Control control)
+            {
+                horizontalContentAlignment = control.HorizontalContentAlignment;
+                verticalContentAlignment = control.VerticalContentAlignment;
+            }
+            
+            //Wrap the content with a transform
+            var layoutTransformControl = new LayoutTransformControl
+            {
+                RenderTransformOrigin = new Point(.5f, .5f),
+                HorizontalAlignment = fe.HorizontalAlignment,
+                VerticalAlignment = fe.VerticalAlignment,
+                HorizontalContentAlignment = horizontalContentAlignment,
+                VerticalContentAlignment = verticalContentAlignment,
+                Child = fe,
+                Transform = scaleTransform
+            };
+            //Add it back to the grid.
+            RootGrid.Children.Add(layoutTransformControl);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
