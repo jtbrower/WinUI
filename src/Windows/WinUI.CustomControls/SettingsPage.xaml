@@ -7,6 +7,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:extensions="using:Microsoft.Toolkit.Uwp.UI.Extensions"
     xmlns:local="using:WinUI.CustomControls"
+    xmlns:behave="using:WinUI.CustomControls.Behaviors"    
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:media="using:Microsoft.Toolkit.Uwp.UI.Media"
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
@@ -53,93 +54,105 @@
         </Style>
     </Page.Resources>
 
+    <!-- 
+    Note that I use an attached property to add a drop shadow to the Border inside of this grid.  It is a behavior that
+    requires the parent of what it is shadowing to be some sort of Panel type. This is needed so that it can insert
+    the required Canvas and Rectangle (if using rounded corners).  
+    -->
     <Grid
         x:Name="MainGrid"
         HorizontalAlignment="Center"
         VerticalAlignment="Center"
         Background="Transparent">
 
-        <Canvas Name="DropShadowCanvas" Margin="0,0,5,5" />
-
-        <Rectangle
-            x:Name="RectangleInstance"
-            Width="{Binding ElementName=MainContentBorder, Path=ActualWidth}"
-            Height="{Binding ElementName=MainContentBorder, Path=ActualHeight}"
-            Margin="0,0,5,5"
-            Fill="Black"
-            RadiusX="10"
-            RadiusY="10" />
-
+        <!-- 
+        By using the RoundedDropShadowBehavior, a Canvas and a Rectangle will be inserted right here.
+        -->
         <Border
             x:Name="MainContentBorder"
-            Margin="0,0,5,5"
             Style="{StaticResource KeyboardBorderStyle}">
-            <!--
-                Note that I attach a double tap handler to the MainWindow to maximize the window.  However, I don't want a button double tap
-                to cause the window to maximize because it is confusing.  So I wrote an attached property to swallow the button double taps
-                but I don't yet know how to attach it to all buttons through a style without other hand waving tricks at this moment. Note
-                that there is a property IsDoubleTapEnabled on the buttons setting that to false does not prevent the handler from still
-                passing on to the Window.
-            -->
-            <StackPanel VerticalAlignment="Center" Margin="5">
-                <Button Click="RemoveWindowBorder_Click" Content="Remove Window Border">
-                    <Interactivity:Interaction.Behaviors>
-                        <local:SwallowButtonDoubleTapBehavior />
-                    </Interactivity:Interaction.Behaviors>
-                </Button>
-                <Button Click="AddWindowBorder_Click" Content="Add Window Border">
-                    <Interactivity:Interaction.Behaviors>
-                        <local:SwallowButtonDoubleTapBehavior />
-                    </Interactivity:Interaction.Behaviors>
-                </Button>
-                <Button Click="MaximizeWindow_Click" Content="Maximize">
-                    <Interactivity:Interaction.Behaviors>
-                        <local:SwallowButtonDoubleTapBehavior />
-                    </Interactivity:Interaction.Behaviors>
-                </Button>
-                <Button Click="MinimizeWindow_Click" Content="Minimize">
-                    <Interactivity:Interaction.Behaviors>
-                        <local:SwallowButtonDoubleTapBehavior />
-                    </Interactivity:Interaction.Behaviors>
-                </Button>
-                <Button Click="RestoreWindow_Click" Content="Restore">
-                    <Interactivity:Interaction.Behaviors>
-                        <local:SwallowButtonDoubleTapBehavior />
-                    </Interactivity:Interaction.Behaviors>
-                </Button>
-                <StackPanel Orientation="Horizontal">
-                    <Button Click="SetWindowTransparency_Click" Content="Set Transparency">
+            <Interactivity:Interaction.Behaviors>
+                <behave:RoundedDropShadowBehavior />
+            </Interactivity:Interaction.Behaviors>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel
+                    Grid.Column="0"
+                    Margin="5"
+                    VerticalAlignment="Center">
+                    <Button Click="RemoveWindowBorder_Click" Content="Remove Window Border">
                         <Interactivity:Interaction.Behaviors>
-                            <local:SwallowButtonDoubleTapBehavior />
+                            <behave:SwallowButtonDoubleTapBehavior />
                         </Interactivity:Interaction.Behaviors>
                     </Button>
-                    <muxc:NumberBox
-                        Header="Window Transparency"
-                        LargeChange="20"
-                        Maximum="100"
-                        Minimum="0"
-                        SmallChange="5"
-                        SpinButtonPlacementMode="Inline"
-                        ValidationMode="InvalidInputOverwritten"
-                        Value="{x:Bind Path=Vm.NumberBoxValue, Mode=TwoWay}" />
+                    <Button Click="AddWindowBorder_Click" Content="Add Window Border">
+                        <Interactivity:Interaction.Behaviors>
+                            <behave:SwallowButtonDoubleTapBehavior />
+                        </Interactivity:Interaction.Behaviors>
+                    </Button>
+                    <Button Click="MaximizeWindow_Click" Content="Maximize">
+                        <Interactivity:Interaction.Behaviors>
+                            <behave:SwallowButtonDoubleTapBehavior />
+                        </Interactivity:Interaction.Behaviors>
+                    </Button>
+                    <Button Click="MinimizeWindow_Click" Content="Minimize">
+                        <Interactivity:Interaction.Behaviors>
+                            <behave:SwallowButtonDoubleTapBehavior />
+                        </Interactivity:Interaction.Behaviors>
+                    </Button>
+                    <Button Click="RestoreWindow_Click" Content="Restore">
+                        <Interactivity:Interaction.Behaviors>
+                            <behave:SwallowButtonDoubleTapBehavior />
+                        </Interactivity:Interaction.Behaviors>
+                    </Button>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Click="SetWindowTransparency_Click" Content="Set Transparency">
+                            <Interactivity:Interaction.Behaviors>
+                                <behave:SwallowButtonDoubleTapBehavior />
+                            </Interactivity:Interaction.Behaviors>
+                        </Button>
+                        <muxc:NumberBox
+                            Header="Window Transparency"
+                            LargeChange="20"
+                            Maximum="100"
+                            Minimum="0"
+                            SmallChange="5"
+                            SpinButtonPlacementMode="Inline"
+                            ValidationMode="InvalidInputOverwritten"
+                            Value="{x:Bind Path=Vm.NumberBoxValue, Mode=TwoWay}" />
 
+                    </StackPanel>
+                    <Button Click="RemoveWindowTransparency_Click" Content="Remove Transparency">
+                        <Interactivity:Interaction.Behaviors>
+                            <behave:SwallowButtonDoubleTapBehavior />
+                        </Interactivity:Interaction.Behaviors>
+                    </Button>
+                    <Button Click="SizeToContent_Click" Content="Size to Content">
+                        <Interactivity:Interaction.Behaviors>
+                            <behave:SwallowButtonDoubleTapBehavior />
+                        </Interactivity:Interaction.Behaviors>
+                    </Button>
+                    <Button Click="CloseWindow_Click" Content="Close Window">
+                        <Interactivity:Interaction.Behaviors>
+                            <behave:SwallowButtonDoubleTapBehavior />
+                        </Interactivity:Interaction.Behaviors>
+                    </Button>
                 </StackPanel>
-                <Button Click="RemoveWindowTransparency_Click" Content="Remove Transparency">
-                    <Interactivity:Interaction.Behaviors>
-                        <local:SwallowButtonDoubleTapBehavior />
-                    </Interactivity:Interaction.Behaviors>
-                </Button>
-                <Button Click="SizeToContent_Click" Content="Size to Content">
-                    <Interactivity:Interaction.Behaviors>
-                        <local:SwallowButtonDoubleTapBehavior />
-                    </Interactivity:Interaction.Behaviors>
-                </Button>
-                <Button Click="CloseWindow_Click" Content="Close Window">
-                    <Interactivity:Interaction.Behaviors>
-                        <local:SwallowButtonDoubleTapBehavior />
-                    </Interactivity:Interaction.Behaviors>
-                </Button>                
-            </StackPanel>
+                <StackPanel
+                    Grid.Column="1"
+                    Margin="5"
+                    VerticalAlignment="Center"
+                    Visibility="Collapsed">
+                    <CheckBox Click="EnableDpiAutoScale_Click" Content="Enable DPI Autoscale">
+                        <Interactivity:Interaction.Behaviors>
+                            <behave:SwallowButtonDoubleTapBehavior />
+                        </Interactivity:Interaction.Behaviors>
+                    </CheckBox>
+                </StackPanel>
+            </Grid>
         </Border>
     </Grid>
 </Page>

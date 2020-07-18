@@ -5,6 +5,7 @@
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:WinUI.CustomControls"
+    xmlns:behave="using:WinUI.CustomControls.Behaviors"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     <!--
@@ -34,7 +35,7 @@
             the generic type for a Behavior.
         -->
         <interactivity:Interaction.Behaviors>
-            <local:DragMoveBehavior />
+            <behave:DragMoveBehavior />
         </interactivity:Interaction.Behaviors>
     </local:WindowRootGrid>
 </Window>

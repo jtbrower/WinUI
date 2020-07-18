@@ -21,12 +21,9 @@
 // SOFTWARE.
 namespace WinUI.CustomControls
 {
-    using Microsoft.UI;
     using Microsoft.UI.Xaml;
     using Microsoft.UI.Xaml.Controls;
-    using Microsoft.UI.Xaml.Hosting;
     using System;
-    using System.Numerics;
     using WinUI.Vm;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -88,7 +85,6 @@ namespace WinUI.CustomControls
             InitializeComponent();
             Vm = vm;
             _mainWindow = window;
-            MainGrid.Loaded += MainGrid_Loaded;
         }
 
         //It's annoying when this warning is applied to event handler parameters.
@@ -135,40 +131,6 @@ namespace WinUI.CustomControls
         public void MaximizeWindow_Click(object sender, RoutedEventArgs e)
         {
             _mainWindow.Maximize();
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by MainGrid for loaded events. </summary>
-        ///
-        /// <param name="sender">   Source of the event. </param>
-        /// <param name="e">        Routed event information. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private void MainGrid_Loaded(object sender, RoutedEventArgs e)
-        {
-            //What I am doing in this event handler is applying a drop shadow to the main content in a way
-            // that a DropPanelShadow would work.  With the DropPanelShadow I noticed that it would not
-            // Horizontally stretch (Vertical worked) and the shadow size does not properly report itself.
-            // I had hoped I could figure out how to properly measure such that the shadow was included,
-            // but it didn't work with this appraoch either.  I needed to know the total size of everything
-            // inside of the MainGrid so that I could make the ShrinkToContent work properly.  I decided
-            // to keep this code because it is good to know how to create a drop shadow without the use
-            // of the UWP ToolKit.
-            var compositor = ElementCompositionPreview.GetElementVisual(DropShadowCanvas).Compositor;
-            var dropShadow = compositor.CreateDropShadow();
-            dropShadow.Color = Colors.Black;
-            dropShadow.BlurRadius = 4;
-            dropShadow.Opacity = .5f;
-            dropShadow.Offset = new Vector3(5F, 5F, 0);
-
-            var mask = RectangleInstance.GetAlphaMask();
-            dropShadow.Mask = mask;
-
-            var spriteVisual = compositor.CreateSpriteVisual();
-            spriteVisual.Size = new Vector2((float)DropShadowCanvas.ActualWidth, (float)DropShadowCanvas.ActualHeight);
-
-            spriteVisual.Shadow = dropShadow;
-            ElementCompositionPreview.SetElementChildVisual(DropShadowCanvas, spriteVisual);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -258,9 +220,9 @@ namespace WinUI.CustomControls
 
         public void EnableDpiAutoScale_Click(object sender, RoutedEventArgs e)
         {
-            if(!(sender is CheckBox cb))return;
+            if (!(sender is CheckBox cb)) return;
 
-            if(cb.IsChecked.HasValue && cb.IsChecked.Value)
+            if (cb.IsChecked.HasValue && cb.IsChecked.Value)
                 _mainWindow.EnableAutoScaleOnDpiChange();
             else
                 _mainWindow.DisableAutoScaleOnDpiChange();
