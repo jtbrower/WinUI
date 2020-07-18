@@ -63,8 +63,8 @@
 
         <Rectangle
             x:Name="RectangleInstance"
-            Width="{Binding ElementName=MainContentBorder, Path=Width}"
-            Height="{Binding ElementName=MainContentBorder, Path=Height}"
+            Width="{Binding ElementName=MainContentBorder, Path=ActualWidth}"
+            Height="{Binding ElementName=MainContentBorder, Path=ActualHeight}"
             Margin="0,0,5,5"
             Fill="Black"
             RadiusX="10"
