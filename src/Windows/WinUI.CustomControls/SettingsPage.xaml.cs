@@ -249,6 +249,23 @@ namespace WinUI.CustomControls
             _mainWindow.RemoveTransparency();
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Event handler. Called by EnableDpiAutoScale for click events. </summary>
+        ///
+        /// <param name="sender">   Source of the event. </param>
+        /// <param name="e">        Routed event information. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void EnableDpiAutoScale_Click(object sender, RoutedEventArgs e)
+        {
+            if(!(sender is CheckBox cb))return;
+
+            if(cb.IsChecked.HasValue && cb.IsChecked.Value)
+                _mainWindow.EnableAutoScaleOnDpiChange();
+            else
+                _mainWindow.DisableAutoScaleOnDpiChange();
+        }
+
         //Ignoring this because they are applying it to event handlers too!
 #pragma warning restore IDE0060 // Remove unused parameter
     }
