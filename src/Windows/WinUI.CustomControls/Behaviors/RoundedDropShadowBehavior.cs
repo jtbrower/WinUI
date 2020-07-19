@@ -265,11 +265,16 @@ namespace WinUI.CustomControls.Behaviors
                     //Bind both the height and width to the host properties so resizing does not cause problems.
                     _roundedRectMask.SetBinding(FrameworkElement.WidthProperty, new Microsoft.UI.Xaml.Data.Binding()
                     {
+                        //TODO figure out why output indicates Canvas.ActualWidthProperty does not exist
+                        //Note that the Debug output will warn that ActualWidthProperty does not exist on Canvas.  It cannot be correct
+                        // because if I change it to anything else (or remove it) the drop shadow will not be visible.
                         Path = new PropertyPath(nameof(FrameworkElement.ActualWidthProperty)),
                         Source = _dropShadowHost
                     });
                     _roundedRectMask.SetBinding(FrameworkElement.HeightProperty, new Microsoft.UI.Xaml.Data.Binding()
                     {
+                        //TODO figure out why output indicates Canvas.ActualHeightProperty does not exist
+                        //As I stated above, debug will warn that the ActualHeightProperty does not exist, but that cannot be correct.
                         Path = new PropertyPath(nameof(FrameworkElement.ActualHeightProperty)),
                         Source = _dropShadowHost
                     });
