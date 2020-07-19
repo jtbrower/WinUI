@@ -153,6 +153,12 @@ namespace WinUI.CustomControls
             if (!_autoDpiContentScaling) return;
 
             ScaleContentForDpi();
+
+            //When the non-client area such as the titlebar is auto-scaled by the framework, it will either
+            // leave extra space or require more.  Keep an eye on this call, I noticed that resizing the
+            // window was causing recursive DPI changed events, but recent design changes might have 
+            // affected it because it works fine now.
+            SizeToContent();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
