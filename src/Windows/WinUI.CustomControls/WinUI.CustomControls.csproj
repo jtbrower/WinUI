@@ -17,6 +17,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="SettingsPage.xaml" />
+    <None Remove="WindowRootGrid.xaml" />
+    <None Remove="WpfWindow - Copy.xaml" />
     <None Remove="WpfWindow.xaml" />
   </ItemGroup>
   <ItemGroup>

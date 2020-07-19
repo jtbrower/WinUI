@@ -326,7 +326,7 @@ namespace WinUI.Native
         {
             SetWindowFlags(windowHandle, GWL_STYLE, WindowStyles.WS_VISIBLE | WindowStyles.WS_POPUP);
 
-            //Needed to force a repaint because other sain methods are not working.
+            //Needed to force a repaint because other sane methods are not working.
             windowHandle.HackForceRepaint();
         }
 
@@ -703,10 +703,10 @@ namespace WinUI.Native
             SetWindowFlags(windowHandle, GWL_STYLE, WindowStyles.WS_OVERLAPPEDWINDOW);
 
             //If you do not call this then the window won't have any content showing and it will not be
-            // useable.
+            // usable.
             window.Activate();
 
-            //Needed to force a repaint because other sain methods are not working.
+            //Needed to force a repaint because other sane methods are not working.
             windowHandle.HackForceRepaint();
         }
 

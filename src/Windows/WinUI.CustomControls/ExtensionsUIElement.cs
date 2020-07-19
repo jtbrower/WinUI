@@ -155,7 +155,7 @@ namespace WinUI.CustomControls
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// If you keep walking up to the very first Framework elment attached to the Window you will
+        /// If you keep walking up to the very first Framework element attached to the Window you will
         /// find that it is many layers above the Window.Content.  This function iterates starting at
         /// Window.Content and keeps walking until it has found the topmost FrameworkElement in the XAML
         /// tree.

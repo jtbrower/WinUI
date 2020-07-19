@@ -87,6 +87,13 @@ namespace WinUI.DemoApp
             Application.Start(ApplicationInitializationCallback);
             ServiceProvider?.Dispose();
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Initializes the services and creates the application instance. </summary>
+        ///
+        /// <param name="p">    A variable-length parameters list containing p. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
         static void ApplicationInitializationCallback(ApplicationInitializationCallbackParams p)
         {
             try

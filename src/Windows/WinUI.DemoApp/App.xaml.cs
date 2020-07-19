@@ -41,7 +41,7 @@ namespace WinUI.DemoApp
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Initializes a new instance of the WinUI.DemoApp.App class. </summary>
         ///
-        /// <param name="paramters">    A variable-length parameters list containing paramters. </param>
+        /// <param name="paramters">    A variable-length parameters list containing parameters. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public App(ServiceProvider serviceProvider)

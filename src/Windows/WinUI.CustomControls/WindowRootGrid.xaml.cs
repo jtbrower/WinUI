@@ -21,7 +21,7 @@
 // SOFTWARE.
 namespace WinUI.CustomControls
 {
-    using Microsoft.UI.Xaml.Controls;
+    using Microsoft.Toolkit.Uwp.UI.Controls;
     using Windows.Foundation;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -30,8 +30,31 @@ namespace WinUI.CustomControls
     /// <seealso cref="Microsoft.UI.Xaml.Controls.Grid"/>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public sealed class WindowRootGrid : Grid
+    public sealed partial class WindowRootGrid : LayoutTransformControl
     {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// Initializes a new instance of the WinUI.CustomControls.WindowRootGrid class.
+        /// </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public WindowRootGrid()
+        {
+            InitializeComponent();
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Scale content. </summary>
+        ///
+        /// <param name="scaleAt">  The scale at. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void ScaleContent(double scaleAt)
+        {
+            ContentScaleTransform.ScaleX = scaleAt;
+            ContentScaleTransform.ScaleY = scaleAt;
+        }
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Size of the infinity. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,7 +73,7 @@ namespace WinUI.CustomControls
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// Provides the behavior for the "Measure" pass of the layout cycle. We ovveride this so that we
+        /// Provides the behavior for the "Measure" pass of the layout cycle. We override this so that we
         /// can determine how much space all of the controls truly needed.  This information is useful
         /// when trying to emulate the WPF Window.SizeToContent feature.
         /// </summary>
@@ -70,7 +93,7 @@ namespace WinUI.CustomControls
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            //By passing inifinity to the base it will tell us truly how much size it needs.  Otherwise 
+            //By passing infinity to the base it will tell us truly how much size it needs.  Otherwise 
             // as space becomes limited its desired size won't show what's truly required to fit controls
             // like StackPanels.
             TrueDesiredSize = base.MeasureOverride(_infinitySize);

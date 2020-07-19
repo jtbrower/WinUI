@@ -146,7 +146,7 @@
                     Margin="5"
                     VerticalAlignment="Center"
                     Visibility="Collapsed">
-                    <CheckBox Click="EnableDpiAutoScale_Click" Content="Enable DPI Autoscale">
+                    <CheckBox Click="EnableDpiAutoScale_Click" Content="Enable DPI Auto-scale">
                         <Interactivity:Interaction.Behaviors>
                             <behave:SwallowButtonDoubleTapBehavior />
                         </Interactivity:Interaction.Behaviors>

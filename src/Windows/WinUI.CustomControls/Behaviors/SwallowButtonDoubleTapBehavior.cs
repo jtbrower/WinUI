@@ -30,7 +30,7 @@ namespace WinUI.CustomControls.Behaviors
     /// double tap event handler that is attached elsewhere.  For example, if a button is in a grid
     /// and you attached a double tap handler to the grid to maximize a window and you didn't want a
     /// double tap of a button to cause that event handler to fire (its confusing) then attach this
-    /// behaviour as it will mark the event handled.
+    /// behavior as it will mark the event handled.
     /// </summary>
     ///
     /// <seealso cref="Microsoft.Xaml.Interactivity.Behavior{ButtonBase}"/>

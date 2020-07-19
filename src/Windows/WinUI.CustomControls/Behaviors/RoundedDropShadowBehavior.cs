@@ -109,7 +109,7 @@ namespace WinUI.CustomControls.Behaviors
                 _dropShadowLogic?.RemoveDropShadow();
             }
             //I would not want cleanup work to cause an exception.  There is nothing we can do, but change the
-            // design if we see this occuring in development.
+            // design if we see this occurring in development.
             catch (Exception e)
             {
                 Debug.WriteLine($"{nameof(OnDetaching)} caused the following exception : {e}");
@@ -187,7 +187,7 @@ namespace WinUI.CustomControls.Behaviors
                     _roundedRectMask = null;
                     _dropShadowHost = null;
                 }
-                //I would not want cleanup work to cause an exception.  Ther is nothing we need to do, but
+                //I would not want cleanup work to cause an exception.  There is nothing we need to do, but
                 // we developers need to know if it is happening during development.
                 catch (Exception e)
                 {
@@ -197,7 +197,7 @@ namespace WinUI.CustomControls.Behaviors
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////
             /// <summary>
-            /// Given a parent Panel, this function will apply a drop shadow around a choosen child element
+            /// Given a parent Panel, this function will apply a drop shadow around a chosen child element
             /// of the panel.  At the time I wrote this function, the Windows Community ToolKit still did not
             /// provide a way to render rounded corners on the shadow, this function does.
             /// </summary>
