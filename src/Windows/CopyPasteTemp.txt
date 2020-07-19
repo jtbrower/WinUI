@@ -46,3 +46,15 @@ namespace WinUI.Native
 
 //Notes to self
 - Figure out or log a potential issue where custom controls that inherit from other controls such as a grid, only work in XAML, not code behind.  Code behind throws exceptions.  See the WindowRootGrid control.
+
+7/19/2020
+On a side note, I hit the bug that is trying to hide from me where 
+the DPI changed event fires in infinite recursion causing visual 
+studio to freeze.  I found a related cause.  I can force the problem
+by maximizing the window, then use my SizeToContent feature.
+This will reduce the size of the Window, but the Window still 
+thinks it is maximized, now if you drag the window slowly
+between two monitors that cause a DPI change it will lock up.
+My guess is that I am not fully refreshing the window, or making
+the wrong combo of Win32 calls that leave the Window in an
+invalid state.  This should be my next challenge.

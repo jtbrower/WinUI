@@ -18,7 +18,6 @@
   <ItemGroup>
     <None Remove="SettingsPage.xaml" />
     <None Remove="WindowRootGrid.xaml" />
-    <None Remove="WpfWindow - Copy.xaml" />
     <None Remove="WpfWindow.xaml" />
   </ItemGroup>
   <ItemGroup>
@@ -27,7 +26,10 @@
     </Page>
     <Page Update="WpfWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
-    </Page>    
+    </Page>
+    <Page Update="WindowRootGrid.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
 
   <ItemGroup>

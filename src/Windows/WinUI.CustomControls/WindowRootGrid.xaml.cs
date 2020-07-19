@@ -56,12 +56,6 @@ namespace WinUI.CustomControls
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Size of the infinity. </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private readonly Size _infinitySize = new Size(float.PositiveInfinity, float.PositiveInfinity);
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// If given infinity during a MeasureOverride, the grid desires this Size of space.
         /// </summary>
@@ -93,11 +87,8 @@ namespace WinUI.CustomControls
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            //By passing infinity to the base it will tell us truly how much size it needs.  Otherwise 
-            // as space becomes limited its desired size won't show what's truly required to fit controls
-            // like StackPanels.
-            TrueDesiredSize = base.MeasureOverride(_infinitySize);
-            return base.MeasureOverride(availableSize);
+            TrueDesiredSize = base.MeasureOverride(availableSize);
+            return TrueDesiredSize.Value;
         }
     }
 }
