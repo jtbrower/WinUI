@@ -42,3 +42,9 @@ namespace WinUI.Native
 
     }
 }
+
+
+//Notes to self
+- I need to understand why my method to measure the size of a windows content never accounts for DropShadows or Scale behaviors attached.
+- Figure out or log a potential issue where custom controls that inherit from other controls such as a grid, ony work in XAML, not code behind.  Code behind throws exceptions.  See the WindowRootGrid control.
+- Start a discussion about not being able to change the window size on a DPI changed event because it causes recursive behavior.
