@@ -511,6 +511,31 @@ namespace WinUI.Native
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   An IntPtr extension method that query if 'windowHandle' is maximized. </summary>
+        ///
+        /// <param name="windowHandle"> Handle of the window. </param>
+        ///
+        /// <returns>   True if maximized, false if not. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static bool IsMaximized(this IntPtr windowHandle)
+        {
+            //This command will throw a Win32 exception if something goes wrong.  Prevent the exception and just return
+            // false, but assure its written to the Debug pipe.
+            try
+            {
+                var windowPlacement = User32.GetWindowPlacement(windowHandle);
+                var showStyle = windowPlacement.showCmd;
+                return showStyle == User32.WindowShowStyle.SW_MAXIMIZE || showStyle == User32.WindowShowStyle.SW_SHOWMAXIMIZED;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+            }
+            return false;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   A Window extension method that resize window. </summary>
         ///
         /// <param name="windowHandle"> Handle of the window. </param>
@@ -520,6 +545,18 @@ namespace WinUI.Native
 
         public static void ResizeWindow(this IntPtr windowHandle, int x, int y)
         {
+            if (windowHandle.IsMaximized())
+            {
+                //Note that if the Window is currently maximized and we resize the Window, it will continue to 
+                // believe it is in a maximized state.  To avoid this problem I call to assure it is
+                // restored before I change the size, but it seems there has to be a better way to handle this.
+                //
+                // Note that there is a fatal and strange bug that occurs if the Window thinks it is in a 
+                // maximized state and it crosses between two monitors that cause a DPI change.  It will cause
+                // infinite recursive DPI changed events to fire to the point your only option to kill the app
+                // is with the task manager.
+                User32.ShowWindow(windowHandle, User32.WindowShowStyle.SW_SHOWNORMAL);
+            }
             //Using SWP_NOMOVE causes the location coordinates (0,0) to be ignored.
             if (!User32.SetWindowPos(windowHandle, IntPtr.Zero, 0, 0, x, y, User32.SetWindowPosFlags.SWP_NOZORDER | User32.SetWindowPosFlags.SWP_NOMOVE))
             {
