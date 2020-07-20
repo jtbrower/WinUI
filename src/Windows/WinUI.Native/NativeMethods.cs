@@ -325,9 +325,6 @@ namespace WinUI.Native
         public static void RemoveWindowBorder(this IntPtr windowHandle)
         {
             SetWindowFlags(windowHandle, GWL_STYLE, WindowStyles.WS_VISIBLE | WindowStyles.WS_POPUP);
-
-            //Needed to force a repaint because other sane methods are not working.
-            windowHandle.HackForceRepaint();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -565,50 +562,6 @@ namespace WinUI.Native
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>
-        /// An ugly hack that will add one pixel to the Window height, then remove the added pixel to
-        /// force the Window to update itself and its contents.  See the function for more details on the
-        /// hack.
-        /// </summary>
-        ///
-        /// <param name="windowHandle"> Handle of the window. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private static void HackForceRepaint(this IntPtr windowHandle)
-        {
-            if (!User32.GetWindowRect(windowHandle, out var r))
-            {
-                WriteGlobalErrorMsgIfSet();
-                return;
-            }
-
-            var width = r.GetWidth();
-            var height = r.GetHeight();
-
-            // Here is the hack, add 1 pixel to either the width or the height and the redraw will happen. 
-            // The use case for this 'temporary' hack comes from the fact that when I remove the Window
-            // border and titlebar, I found that the bottom area of the window was not hit testable for my
-            // DragMove feature.  I tried to call various functions such as RedrawWindow but so far nothing
-            // would cause the update except changing the size of the window.  The side effect of this hack
-            // would be that when the window is in the maximized state, adding another pixel pushes it off
-            // screen.  So I decided to make the call twice, removing the added pixel. Fixing this is low
-            // priority in the big picture of work.
-            if (!User32.SetWindowPos(windowHandle, IntPtr.Zero, 0, 0, width, height + 1,
-                User32.SetWindowPosFlags.SWP_NOZORDER | User32.SetWindowPosFlags.SWP_NOMOVE))
-            {
-                WriteGlobalErrorMsgIfSet();
-                return;
-            }
-
-            if (!User32.SetWindowPos(windowHandle, IntPtr.Zero, 0, 0, width, height - 1,
-                User32.SetWindowPosFlags.SWP_NOZORDER | User32.SetWindowPosFlags.SWP_NOMOVE))
-            {
-                WriteGlobalErrorMsgIfSet();
-                return;
-            }
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   A rectangle. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -742,9 +695,6 @@ namespace WinUI.Native
             //If you do not call this then the window won't have any content showing and it will not be
             // usable.
             window.Activate();
-
-            //Needed to force a repaint because other sane methods are not working.
-            windowHandle.HackForceRepaint();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
