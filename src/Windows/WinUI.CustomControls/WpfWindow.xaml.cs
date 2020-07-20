@@ -170,8 +170,15 @@ namespace WinUI.CustomControls
 
         private void RootGrid_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
         {
-            //I need a setting for this to enable or disable.
-            Handle.MaximizeWindow();
+            if (Handle.IsMaximized())
+            {
+                Handle.RestoreWindow();
+            }
+            else
+            {
+                //I need a setting for this to enable or disable.
+                Handle.MaximizeWindow();
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
