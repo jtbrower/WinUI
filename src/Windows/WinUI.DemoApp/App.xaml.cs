@@ -71,14 +71,14 @@ namespace WinUI.DemoApp
             base.OnLaunched(args);
 
             //Create a window and set the page.
-            var window = _serviceProvider.GetRequiredService<WpfWindow>();
-            window.Content = _serviceProvider.GetRequiredService<SettingsPage>();
+            var window = _serviceProvider.GetRequiredService<ExtWindow>();
+            window.Content = _serviceProvider.GetRequiredService<MainPage>();
 
             window.Activate();
 
             //This will have a jarring effect because I have not had time to figure out how to set the size before
             // the window is activated for the first time.
-            window.Resize(600, 600);
+            window.Resize(600, 400);
         }
     }
 }

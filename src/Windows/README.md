@@ -7,7 +7,7 @@
 * Sometimes Visual Studio puts an AnyCPU platform back into the solution.  Don't use it.
 
 # Current Features and What you can Learn
-* Provides a class called WpfWindow that mimics some WPF Windowing features.  My choice of name for this class is questionable and I plan to change it.
+* Provides a class called ExtWindow that mimics some WPF Windowing features.  My choice of name for this class is questionable and I plan to change it.
 * Provide double tap to maximize a Window
 * Provide a behavior that with one line of code will place a shadow around a control.  Unlike the UWP DropShadowPanel, it can have rounded corners.
 * A behavior that Swallows double clicks so they are not triggered by buttons. Please see SwallowButtonDoubleTapBehavior.cs
@@ -17,7 +17,7 @@
 * Set the Window transparency between 0 (fully visible) and 100 (fully transparent).
 * Provide a SizeToContent feature like WPF provides.  Capable of sizing up and down to fit client space requirements; great for border-less windows but still works with border.
 * Maximize, Restore, Minimize, change Window size and move it to a new location.
-* Ability to automatically scale the WpfWindow content upon a DPI change.
+* Ability to automatically scale the ExtWindow content upon a DPI change.
 
 # Requirements
 * Uses .Net5.0, initial version was/is preview 6 but check to see if that is the current version

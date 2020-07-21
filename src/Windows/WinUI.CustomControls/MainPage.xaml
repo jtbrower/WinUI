@@ -1,0 +1,140 @@
+﻿<Page
+    x:Class="WinUI.CustomControls.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:behave="using:WinUI.CustomControls.Behaviors"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:converters="using:Microsoft.Toolkit.Uwp.UI.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:extensions="using:Microsoft.Toolkit.Uwp.UI.Extensions"
+    xmlns:local="using:WinUI.CustomControls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:media="using:Microsoft.Toolkit.Uwp.UI.Media"
+    xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
+    mc:Ignorable="d">
+    <Page.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" FalseValue="Collapsed" />
+
+        <!--  Button style just so I can keep them the same width and apply a small margin.  -->
+        <Style TargetType="Button">
+            <Setter Property="MinWidth" Value="200" />
+            <Setter Property="Margin" Value="1" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+        </Style>
+        <!--
+            This is a brush that I use to paint the background of a Virtual Keyboard component that I wrote
+            for my point-of-sale application.
+        -->
+        <LinearGradientBrush
+            x:Key="KeyboardBackgroundBrush"
+            MappingMode="Absolute"
+            StartPoint="411,362"
+            EndPoint="411,93">
+            <LinearGradientBrush.GradientStops>
+                <GradientStopCollection>
+                    <GradientStop Offset="0.81" Color="#B9B7BB" />
+                    <GradientStop Offset="0.86" Color="#B9B7BB" />
+                    <GradientStop Offset="0.92" Color="#E2E7E9" />
+                    <GradientStop Offset="0.95" Color="#D9DFE1" />
+                    <GradientStop Offset="0.96" Color="#B2B5B8" />
+                    <GradientStop Offset="0.98" Color="#9C9C9D" />
+                </GradientStopCollection>
+            </LinearGradientBrush.GradientStops>
+            <LinearGradientBrush.Transform>
+                <TransformGroup>
+                    <RotateTransform Angle="-0.05" />
+                    <TranslateTransform X="-107.34" Y="-98.92" />
+                </TransformGroup>
+            </LinearGradientBrush.Transform>
+        </LinearGradientBrush>
+        <FontIcon
+            x:Key="RestoreIcon"
+            Margin="5"
+            FontFamily="{StaticResource SymbolThemeFontFamily}"
+            Glyph="&#xE923;" />
+        <Style x:Key="KeyboardBorderStyle" TargetType="Border">
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="BorderBrush" Value="DarkGray" />
+            <Setter Property="Background" Value="{StaticResource KeyboardBackgroundBrush}" />
+        </Style>
+        <Color x:Key="TitleBarColor">#0078D4</Color>
+    </Page.Resources>
+    <controls:DockPanel>
+        <local:TitleBar
+            x:Name="TitleBarInstance"
+            controls:DockPanel.Dock="Top"
+            Background="{StaticResource TitleBarColor}"
+            Visibility="{x:Bind Path=Vm.TitleBarVm.IsVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+            Vm="{x:Bind Path=Vm.TitleBarVm, Mode=OneWay}" />
+        <!--
+            Note that I use an attached property to add a drop shadow to the Border inside of this grid.  It is a behavior that
+            requires the parent of what it is shadowing to be some sort of Panel type. This is needed so that it can insert
+            the required Canvas and Rectangle (if using rounded corners).
+        -->
+        <Grid
+            x:Name="MainGrid"
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            controls:DockPanel.Dock="Bottom"
+            Background="Transparent">
+
+            <!--
+                By using the RoundedDropShadowBehavior, a Canvas and a Rectangle will be inserted right here.
+            -->
+            <Border x:Name="MainContentBorder" Style="{StaticResource KeyboardBorderStyle}">
+                <Interactivity:Interaction.Behaviors>
+                    <behave:RoundedDropShadowBehavior />
+                </Interactivity:Interaction.Behaviors>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel
+                        Grid.Column="0"
+                        Margin="5"
+                        VerticalAlignment="Center">
+                        <Button Click="RemoveWindowBorder_Click" Content="Remove Window Border">
+                            <Interactivity:Interaction.Behaviors>
+                                <behave:SwallowButtonDoubleTapBehavior />
+                            </Interactivity:Interaction.Behaviors>
+                        </Button>
+                        <Button Click="AddWindowBorder_Click" Content="Add Window Border">
+                            <Interactivity:Interaction.Behaviors>
+                                <behave:SwallowButtonDoubleTapBehavior />
+                            </Interactivity:Interaction.Behaviors>
+                        </Button>
+                        <StackPanel Orientation="Horizontal">
+                            <Button Click="SetWindowTransparency_Click" Content="Set Transparency">
+                                <Interactivity:Interaction.Behaviors>
+                                    <behave:SwallowButtonDoubleTapBehavior />
+                                </Interactivity:Interaction.Behaviors>
+                            </Button>
+                            <muxc:NumberBox
+                                LargeChange="20"
+                                Maximum="100"
+                                Minimum="0"
+                                SmallChange="5"
+                                SpinButtonPlacementMode="Inline"
+                                ValidationMode="InvalidInputOverwritten"
+                                Value="{x:Bind Path=Vm.NumberBoxValue, Mode=TwoWay}" />
+
+                        </StackPanel>
+                        <Button Click="RemoveWindowTransparency_Click" Content="Remove Transparency">
+                            <Interactivity:Interaction.Behaviors>
+                                <behave:SwallowButtonDoubleTapBehavior />
+                            </Interactivity:Interaction.Behaviors>
+                        </Button>
+                        <Button Click="SizeToContent_Click" Content="Size to Content">
+                            <Interactivity:Interaction.Behaviors>
+                                <behave:SwallowButtonDoubleTapBehavior />
+                            </Interactivity:Interaction.Behaviors>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+        </Grid>
+    </controls:DockPanel>
+</Page>

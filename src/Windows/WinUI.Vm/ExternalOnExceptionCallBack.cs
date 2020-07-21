@@ -21,43 +21,52 @@
 // SOFTWARE.
 namespace WinUI.Vm
 {
+    using System;
+    using System.Diagnostics;
+    using System.Runtime.ExceptionServices;
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// <summary>   A ViewModel for the settings page. </summary>
-    ///
-    /// <seealso cref="WinUI.Vm.PropChangeBase"/>
+    /// <summary>
+    /// Provides a way of handling exceptions without coupling this library to a logging framework or
+    /// related interfaces.  Just set the static once and your free.
+    /// </summary>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public class SettingsPageVm : PropChangeBase
+    public static class ExternalOnExceptionCallBack
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Number of box values. </summary>
+        /// <summary>
+        /// Gets or sets the on exception action.  Rather than include interfaces to libraries for the
+        /// logging service, we using this Action to prevent coupling.
+        /// </summary>
+        ///
+        /// <value> The s on exception action. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private int _numberBoxValue;
+        public static Action<Exception>? OnExceptionAction { get; set; }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Initializes a new instance of the WinUI.Vm.SettingsPageVm class. </summary>
+        /// <summary>   Try notify of exception. </summary>
+        ///
+        /// <param name="e">    An Exception to process. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public SettingsPageVm(IDialogService dialogService)
+        public static void TryNotifyOfException(Exception e)
         {
-            DialogService = dialogService;
+            if (OnExceptionAction == null)
+            {
+                Console.WriteLine(e.ToString());
+#if DEBUG
+                if (Debugger.IsAttached)
+                    Debugger.Break();
+#endif
+                if (e is AggregateException aggregateException)
+                {
+                    e = aggregateException.Flatten();
+                }
+                ExceptionDispatchInfo.Capture(e.InnerException ?? e).Throw();
+            }
+            OnExceptionAction.Invoke(e);
         }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Gets or sets the number of box values. </summary>
-        ///
-        /// <value> The total number of box value. </value>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public int NumberBoxValue { get => _numberBoxValue; set => SetProperty(ref _numberBoxValue, value); }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Gets the dialog service. </summary>
-        ///
-        /// <value> The dialog service. </value>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public IDialogService DialogService { get; }
     }
 }

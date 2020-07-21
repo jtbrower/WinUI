@@ -29,13 +29,15 @@ namespace WinUI.CustomControls
     using Microsoft.UI.Xaml.Controls;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// <summary>   A window that attempts to mimic some of the features found in a WPF Window. </summary>
-    ///
+    /// <content>
+    /// A window that attempts to mimic some of the features found in a WPF Window.
+    /// </content>
     /// <seealso cref="Microsoft.UI.Xaml.Window"/>
-    /// <seealso cref="WinUI.CustomControls.IWpfWindow"/>
+    /// <seealso cref="WinUI.CustomControls.IExtWindow"/>
+    /// <seealso cref="WinUI.CustomControls.IPlatform"/>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public sealed partial class WpfWindow : IWpfWindow
+    public sealed partial class ExtWindow : IExtWindow, IPlatform
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   True to automatically DPI content scaling. </summary>
@@ -68,21 +70,22 @@ namespace WinUI.CustomControls
         ///
         /// <value> The handle. </value>
         ///
-        /// <seealso cref="WinUI.CustomControls.IWpfWindow.Handle"/>
+        /// <seealso cref="WinUI.CustomControls.IExtWindow.Handle"/>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public IntPtr Handle { get; }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Initializes a new instance of the WinUI.DemoApp.WpfWindow class. </summary>
+        /// <summary>   Initializes a new instance of the WinUI.DemoApp.ExtWindow class. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public WpfWindow()
+        public ExtWindow()
         {
             InitializeComponent();
             Handle = this.GetHandle();
             RootGrid.Loaded += RootGrid_Loaded;
             RootGrid.Unloaded += RootGrid_Unloaded;
+            RemoveBorder();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -186,7 +189,7 @@ namespace WinUI.CustomControls
         ///
         /// <value> The XAML root. </value>
         ///
-        /// <seealso cref="WinUI.CustomControls.IWpfWindow.XamlRoot"/>
+        /// <seealso cref="WinUI.CustomControls.IExtWindow.XamlRoot"/>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public XamlRoot XamlRoot => RootGrid.XamlRoot;
@@ -195,7 +198,7 @@ namespace WinUI.CustomControls
         /// <summary>
         /// The Window.Content was redeclared as a new property so we could change the setter to prevent
         /// an unsuspecting victim from blowing over the top of the WindowRootGrid that this class
-        /// depends on.  I will admit, it is slightly wonky because the XAML for the WpfWindow is setting 
+        /// depends on.  I will admit, it is slightly wonky because the XAML for the ExtWindow is setting 
         /// the content to our WindowRootGrid type.  BTW, I actually didn't want or need the XAML for this
         /// class but I stumbled upon an odd bug that I need to report.  I was unable to use the custom
         /// WindowRootGrid type in this code behind, it through access violations in native code, but if
@@ -215,7 +218,7 @@ namespace WinUI.CustomControls
         {
             // The reason why I use a Grid is so that it will stretch out to fill the entire Window and the
             // event handlers for drag move can be attached to that. If the end user blows away the
-            // WpfWindow content it will affect the drag move handlers.  So replacing the Window.Content
+            // ExtWindow content it will affect the drag move handlers.  So replacing the Window.Content
             // with this implementation lets me achieve those goals.
             get => RootGrid.Child;
             set => SetContent(value);
@@ -277,7 +280,7 @@ namespace WinUI.CustomControls
         {
             if (!RootGrid.TrueDesiredSize.HasValue)
             {
-                Debug.WriteLine($"{nameof(SizeToContent)} called before {nameof(RootGrid.TrueDesiredSize.HasValue)} had a value.");
+                Debug.WriteLine($"{nameof(SizeToContent)} called before {nameof(RootGrid.TrueDesiredSize)} had a value.  Unable to resize.");
                 return;
             }
 
@@ -315,7 +318,7 @@ namespace WinUI.CustomControls
         ///
         /// <returns>   A Window. </returns>
         ///
-        /// <seealso cref="IWpfWindow.AsWindow()"/>
+        /// <seealso cref="IExtWindow.AsWindow()"/>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public Window AsWindow() => this;
@@ -359,7 +362,7 @@ namespace WinUI.CustomControls
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Restores this. </summary>
         ///
-        /// <seealso cref="IWpfWindow.Restore()"/>
+        /// <seealso cref="IExtWindow.Restore()"/>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public void Restore()
@@ -373,7 +376,7 @@ namespace WinUI.CustomControls
         /// <param name="width">    The width. </param>
         /// <param name="height">   The height. </param>
         ///
-        /// <seealso cref="IWpfWindow.Resize(int,int)"/>
+        /// <seealso cref="IExtWindow.Resize(int,int)"/>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public void Resize(int width, int height)
@@ -404,7 +407,7 @@ namespace WinUI.CustomControls
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Enables the automatic scale on DPI change. </summary>
         ///
-        /// <seealso cref="IWpfWindow.EnableAutoScaleOnDpiChange()"/>
+        /// <seealso cref="IExtWindow.EnableAutoScaleOnDpiChange()"/>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public void EnableAutoScaleOnDpiChange()
@@ -415,7 +418,7 @@ namespace WinUI.CustomControls
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Disables the automatic scale on DPI change. </summary>
         ///
-        /// <seealso cref="IWpfWindow.DisableAutoScaleOnDpiChange()"/>
+        /// <seealso cref="IExtWindow.DisableAutoScaleOnDpiChange()"/>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public void DisableAutoScaleOnDpiChange()

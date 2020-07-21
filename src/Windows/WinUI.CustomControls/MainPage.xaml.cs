@@ -21,24 +21,25 @@
 // SOFTWARE.
 namespace WinUI.CustomControls
 {
+    using Microsoft.Toolkit.Uwp.Helpers;
     using Microsoft.UI.Xaml;
     using Microsoft.UI.Xaml.Controls;
     using System;
     using WinUI.Vm;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// <content>   The settings page. This class cannot be inherited. </content>
+    /// <content>   A main page. This class cannot be inherited. </content>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public sealed partial class SettingsPage : Page
+    public sealed partial class MainPage : Page
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The view model property. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public static readonly DependencyProperty VmProperty = DependencyProperty.Register(nameof(Vm),
-            typeof(SettingsPageVm),
-            typeof(SettingsPage),
+            typeof(MainPageVm),
+            typeof(MainPage),
             new PropertyMetadata(null));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -47,12 +48,12 @@ namespace WinUI.CustomControls
         /// <value> The view model. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public SettingsPageVm Vm
+        public MainPageVm Vm
         {
             //The only reason this shows up is because I have to keep the constructor for the designer 
             // so that when WinUI does work with a designer someday it will be there.
 #pragma warning disable CS8603 // Possible null reference return.
-            get => GetValue(VmProperty) as SettingsPageVm;
+            get => GetValue(VmProperty) as MainPageVm;
 #pragma warning restore CS8603 // Possible null reference return.
             private set => SetValue(VmProperty, value);
         }
@@ -61,12 +62,12 @@ namespace WinUI.CustomControls
         /// <summary>   The main window for the entire application. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private readonly IWpfWindow _mainWindow;
+        private readonly IExtWindow _mainWindow;
 
         //Note that this is only needed for the Designer which always causes headaches with Nullable.  Since
         // the designer doesn't work with WinUI right now I just make the Constructor private.
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-        private SettingsPage()
+        private MainPage()
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         {
             //This constructor is to please the designer when one works with WinUI
@@ -74,13 +75,13 @@ namespace WinUI.CustomControls
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Initializes a new instance of the WinUI.CustomControls.SettingsPage class. </summary>
+        /// <summary>   Initializes a new instance of the WinUI.CustomControls.MainPage class. </summary>
         ///
         /// <param name="vm">       The view model. </param>
         /// <param name="window">   The window. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public SettingsPage(SettingsPageVm vm, IWpfWindow window)
+        public MainPage(MainPageVm vm, IExtWindow window)
         {
             InitializeComponent();
             Vm = vm;
@@ -99,7 +100,9 @@ namespace WinUI.CustomControls
 
         public void RemoveWindowBorder_Click(object sender, RoutedEventArgs e)
         {
-            _mainWindow.RemoveBorder();
+            Vm.TitleBarVm.IsVisible = false;
+            UpdateLayout();
+            DispatcherQueue.ExecuteOnUIThreadAsync(() => _mainWindow.SizeToContent());
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,23 +117,9 @@ namespace WinUI.CustomControls
 
         public void AddWindowBorder_Click(object sender, RoutedEventArgs e)
         {
-            _mainWindow.AddBorder();
-
-            //Make sure the client area has enough space to render now that the border has been added back
-            // in.
-            _mainWindow.SizeToContent();
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by MaximizeWindow for click events. </summary>
-        ///
-        /// <param name="sender">   Source of the event. </param>
-        /// <param name="e">        Routed event information. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public void MaximizeWindow_Click(object sender, RoutedEventArgs e)
-        {
-            _mainWindow.Maximize();
+            Vm.TitleBarVm.IsVisible = true;
+            UpdateLayout();
+            DispatcherQueue.ExecuteOnUIThreadAsync(() => _mainWindow.SizeToContent());
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -143,42 +132,6 @@ namespace WinUI.CustomControls
         public void SizeToContent_Click(object sender, RoutedEventArgs e)
         {
             _mainWindow.SizeToContent();
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by MinimizeWindow for click events. </summary>
-        ///
-        /// <param name="sender">   Source of the event. </param>
-        /// <param name="e">        Routed event information. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public void MinimizeWindow_Click(object sender, RoutedEventArgs e)
-        {
-            _mainWindow.Minimize();
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by RestoreWindow for click events. </summary>
-        ///
-        /// <param name="sender">   Source of the event. </param>
-        /// <param name="e">        Routed event information. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public void RestoreWindow_Click(object sender, RoutedEventArgs e)
-        {
-            _mainWindow.Restore();
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by CloseWindow for click events. </summary>
-        ///
-        /// <param name="sender">   Source of the event. </param>
-        /// <param name="e">        Routed event information. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public void CloseWindow_Click(object sender, RoutedEventArgs e)
-        {
-            _mainWindow.Close();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -209,23 +162,6 @@ namespace WinUI.CustomControls
         public void RemoveWindowTransparency_Click(object sender, RoutedEventArgs e)
         {
             _mainWindow.RemoveTransparency();
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by EnableDpiAutoScale for click events. </summary>
-        ///
-        /// <param name="sender">   Source of the event. </param>
-        /// <param name="e">        Routed event information. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public void EnableDpiAutoScale_Click(object sender, RoutedEventArgs e)
-        {
-            if (!(sender is CheckBox cb)) return;
-
-            if (cb.IsChecked.HasValue && cb.IsChecked.Value)
-                _mainWindow.EnableAutoScaleOnDpiChange();
-            else
-                _mainWindow.DisableAutoScaleOnDpiChange();
         }
 
         //Ignoring this because they are applying it to event handlers too!

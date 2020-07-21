@@ -1,0 +1,61 @@
+﻿<UserControl
+    x:Class="WinUI.CustomControls.TitleBar"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:WinUI.CustomControls"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"   
+    xmlns:behave="using:WinUI.CustomControls.Behaviors"    
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Margin="0,0,0,5"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style x:Key="TitleBarButtonStyle" TargetType="Button">
+            <Setter Property="FontFamily" Value="{StaticResource SymbolThemeFontFamily}" />
+            <Setter Property="Margin" Value="5" />
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Background" Value="Transparent" />
+        </Style>
+    </UserControl.Resources>
+    <Border BorderBrush="Black" BorderThickness="1" CornerRadius="1">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Margin="5"  Grid.Column="0" Text="{x:Bind Path=Vm.Title, Mode=OneWay}" Foreground="Red"  VerticalAlignment="Center"/>
+            <StackPanel
+            Grid.Column="1"
+            HorizontalAlignment="Right"
+            Orientation="Horizontal">
+                <Button Style="{StaticResource TitleBarButtonStyle}" Command="{x:Bind Path=Vm.MinimizeWindowCmd, Mode=OneWay}">
+                    <interactivity:Interaction.Behaviors>
+                        <behave:SwallowButtonDoubleTapBehavior />
+                    </interactivity:Interaction.Behaviors>
+                    <FontIcon Glyph="&#xE921;" />
+                </Button>
+                <Button Style="{StaticResource TitleBarButtonStyle}" Command="{x:Bind Path=Vm.MaximizeWindowCmd, Mode=OneWay}">
+                    <interactivity:Interaction.Behaviors>
+                        <behave:SwallowButtonDoubleTapBehavior />
+                    </interactivity:Interaction.Behaviors>                    
+                    <FontIcon Glyph="&#xE922;" />
+                </Button>
+                <Button Style="{StaticResource TitleBarButtonStyle}" Command="{x:Bind Path=Vm.RestoreWindowCmd, Mode=OneWay}">
+                    <interactivity:Interaction.Behaviors>
+                        <behave:SwallowButtonDoubleTapBehavior />
+                    </interactivity:Interaction.Behaviors>
+                    <FontIcon Glyph="&#xE923;" />
+                </Button>
+                <Button Style="{StaticResource TitleBarButtonStyle}" Command="{x:Bind Path=Vm.CloseWindowCmd, Mode=OneWay}">
+                    <interactivity:Interaction.Behaviors>
+                        <behave:SwallowButtonDoubleTapBehavior />
+                    </interactivity:Interaction.Behaviors>                    
+                    <FontIcon Foreground="Red" Glyph="&#xE8BB;" />
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

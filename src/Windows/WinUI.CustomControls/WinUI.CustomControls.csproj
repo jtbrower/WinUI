@@ -16,18 +16,22 @@
     <PackageReference Include="PInvoke.User32" Version="0.6.49" />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="SettingsPage.xaml" />
+    <None Remove="ExtWindow.xaml" />
+    <None Remove="MainPage.xaml" />
+    <None Remove="TitleBar.xaml" />
     <None Remove="WindowRootGrid.xaml" />
-    <None Remove="WpfWindow.xaml" />
   </ItemGroup>
   <ItemGroup>
-    <Page Update="SettingsPage.xaml">
+    <Page Update="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="WpfWindow.xaml">
+    <Page Update="ExtWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="WindowRootGrid.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="TitleBar.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

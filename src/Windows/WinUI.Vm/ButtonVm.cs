@@ -19,83 +19,90 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace WinUI.CustomControls
+using System;
+
+namespace WinUI.Vm
 {
-    using Microsoft.Toolkit.Uwp.UI.Controls;
-    using Windows.Foundation;
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// <summary>   A window root grid. </summary>
+    /// <summary>   A ViewModel for the button. </summary>
     ///
-    /// <seealso cref="Microsoft.UI.Xaml.Controls.Grid"/>
+    /// <seealso cref="WinUI.Vm.PropChangeBase"/>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public sealed partial class WindowRootGrid : LayoutTransformControl
+    public class ButtonVm : PropChangeBase
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>
-        /// Initializes a new instance of the WinUI.CustomControls.WindowRootGrid class.
-        /// </summary>
+        /// <summary>   The display content. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public WindowRootGrid()
+        private object _displayContent;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   True if is visible, false if not. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private bool _isVisible = true;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   True if is enabled, false if not. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private bool _isEnabled = true;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Initializes a new instance of the WinUI.Vm.ButtonVm class. </summary>
+        ///
+        /// <param name="displayContent">   The display content. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public ButtonVm(Action clickedCmd, object displayContent)
         {
-            InitializeComponent();
+            ClickedCmd=new DelegateCmd(clickedCmd);;
+            _displayContent = displayContent;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Size of the infinite. </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private static readonly Size _infiniteSize = new Size(double.PositiveInfinity,double.PositiveInfinity);
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Scale content. </summary>
+        /// <summary>   Gets or sets the 'clicked' command. </summary>
         ///
-        /// <param name="scaleAt">  The scale at. </param>
+        /// <value> The 'clicked' command. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public void ScaleContent(double scaleAt)
+        public DelegateCmd ClickedCmd { get; }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets the display content. </summary>
+        ///
+        /// <value> The display content. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public object DisplayContent
         {
-            ContentScaleTransform.ScaleX = scaleAt;
-            ContentScaleTransform.ScaleY = scaleAt;
+            get => _displayContent;
+            set => SetProperty(ref _displayContent, value);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>
-        /// If given infinity during a MeasureOverride, the grid desires this Size of space.
-        /// </summary>
+        /// <summary>   Gets or sets a value indicating whether this  is visible. </summary>
         ///
-        /// <value> The size desired if given Positive Infinity to measure within. </value>
+        /// <value> True if this  is visible, false if not. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public Size? TrueDesiredSize { get; private set; }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>
-        /// Provides the behavior for the "Measure" pass of the layout cycle. We override this so that we
-        /// can determine how much space all of the controls truly needed.  This information is useful
-        /// when trying to emulate the WPF Window.SizeToContent feature.
-        /// </summary>
-        ///
-        /// <param name="availableSize">    The available size that this object can give to child
-        ///                                 objects. Infinity can be specified as a value to indicate that
-        ///                                 the object will size to whatever content is available. </param>
-        ///
-        /// <returns>
-        /// The size that this object determines it needs during layout, based on its calculations of the
-        /// allocated sizes for child objects or based on other considerations such as a fixed container
-        /// size.
-        /// </returns>
-        ///
-        /// <seealso cref="Microsoft.UI.Xaml.FrameworkElement.MeasureOverride(Size)"/>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        protected override Size MeasureOverride(Size availableSize)
+        public bool IsVisible
         {
-            //Use infinity to assure it returns the real space needs.
-            TrueDesiredSize = base.MeasureOverride(_infiniteSize);
-            return base.MeasureOverride(availableSize);
+            get => _isVisible;
+            set => SetProperty(ref _isVisible, value);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets a value indicating whether this  is enabled. </summary>
+        ///
+        /// <value> True if this  is enabled, false if not. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set => SetProperty(ref _isEnabled, value);
         }
     }
 }

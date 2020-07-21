@@ -40,12 +40,12 @@ namespace WinUI.CustomControls
         /// Initializes a new instance of the WinUI.CustomControls.DialogService class.
         /// </summary>
         ///
-        /// <param name="xamlRoot"> The XAML root. </param>
+        /// <param name="iPlatform">    Zero-based index of the platform. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public DialogService(IWpfWindow mainWindow)
+        public DialogService(IPlatform iPlatform)
         {
-            _xamlRoot = mainWindow.XamlRoot;
+            _xamlRoot = iPlatform.XamlRoot;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
