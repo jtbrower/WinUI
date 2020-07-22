@@ -6,11 +6,15 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:local="using:WinUI.CustomControls"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"   
+    xmlns:converters="using:Microsoft.Toolkit.Uwp.UI.Converters"    
     xmlns:behave="using:WinUI.CustomControls.Behaviors"    
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Margin="0,0,0,5"
     mc:Ignorable="d">
     <UserControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" FalseValue="Collapsed" />
+        <converters:BoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter" FalseValue="Visible" TrueValue="Collapsed" />
+
         <Style x:Key="TitleBarButtonStyle" TargetType="Button">
             <Setter Property="FontFamily" Value="{StaticResource SymbolThemeFontFamily}" />
             <Setter Property="Margin" Value="5" />
@@ -37,13 +41,13 @@
                     </interactivity:Interaction.Behaviors>
                     <FontIcon Glyph="&#xE921;" />
                 </Button>
-                <Button Style="{StaticResource TitleBarButtonStyle}" Command="{x:Bind Path=Vm.MaximizeWindowCmd, Mode=OneWay}">
+                <Button Style="{StaticResource TitleBarButtonStyle}" Command="{x:Bind Path=Vm.MaximizeWindowCmd, Mode=OneWay}" Visibility="{x:Bind Path=Vm.IsMaximized, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                     <interactivity:Interaction.Behaviors>
                         <behave:SwallowButtonDoubleTapBehavior />
                     </interactivity:Interaction.Behaviors>                    
                     <FontIcon Glyph="&#xE922;" />
                 </Button>
-                <Button Style="{StaticResource TitleBarButtonStyle}" Command="{x:Bind Path=Vm.RestoreWindowCmd, Mode=OneWay}">
+                <Button Style="{StaticResource TitleBarButtonStyle}" Command="{x:Bind Path=Vm.RestoreWindowCmd, Mode=OneWay}" Visibility="{x:Bind Path=Vm.IsMaximized, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                     <interactivity:Interaction.Behaviors>
                         <behave:SwallowButtonDoubleTapBehavior />
                     </interactivity:Interaction.Behaviors>

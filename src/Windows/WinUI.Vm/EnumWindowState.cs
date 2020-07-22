@@ -19,41 +19,21 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using Microsoft.UI.Xaml;
-using WinUI.Vm;
-
-namespace WinUI.CustomControls
+namespace WinUI.Vm
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// <content>   A title bar. This class cannot be inherited. </content>
+    /// <summary>   Values that represent enum window states. </summary>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public sealed partial class TitleBar
+    public enum EnumWindowState
     {
-        public static readonly DependencyProperty VmProperty = DependencyProperty.Register(nameof(Vm),
-            typeof(TitleBarVm),
-            typeof(TitleBar),
-            new PropertyMetadata(null));
+        /// <summary>   An enum constant representing the maximized option. </summary>
+        Maximized,
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Gets or sets the view model. </summary>
-        ///
-        /// <value> The view model. </value>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   An enum constant representing the minimized option. </summary>
+        Minimized,
 
-        public TitleBarVm? Vm
-        {
-            get => GetValue(VmProperty) as TitleBarVm;
-            set => SetValue(VmProperty, value);
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Initializes a new instance of the WinUI.CustomControls.TitleBar class. </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public TitleBar()
-        {
-            InitializeComponent();
-        }
+        /// <summary>   An enum constant representing the normal option. </summary>
+        Other
     }
 }

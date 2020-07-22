@@ -1,0 +1,39 @@
+﻿<controls:LayoutTransformControl
+    x:Class="WinUI.CustomControls.WindowRoot"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
+    xmlns:converters="using:Microsoft.Toolkit.Uwp.UI.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="using:WinUI.CustomControls"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:media="using:Microsoft.UI.Xaml.Media"
+    RenderTransformOrigin=".5,.5"
+    mc:Ignorable="d">
+    <controls:LayoutTransformControl.Resources>
+        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" FalseValue="Collapsed" />
+        <Color x:Key="TitleBarColor">#0078D4</Color>
+    </controls:LayoutTransformControl.Resources>
+    <controls:LayoutTransformControl.Transform>
+        <media:ScaleTransform
+            x:Name="ContentScaleTransform"
+            CenterX=".5"
+            CenterY=".5"
+            ScaleX="1.0"
+            ScaleY="1.0" />
+    </controls:LayoutTransformControl.Transform>
+    <controls:LayoutTransformControl.Child>
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="ChildGrid">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <local:TitleBar
+                x:Name="TitleBarInstance"
+                controls:DockPanel.Dock="Top"
+                Background="{StaticResource TitleBarColor}"
+                Visibility="{x:Bind Path=Vm.TitleBarVm.IsVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                Vm="{x:Bind Path=Vm.TitleBarVm, Mode=OneWay}" />
+        </Grid>
+    </controls:LayoutTransformControl.Child>
+</controls:LayoutTransformControl>

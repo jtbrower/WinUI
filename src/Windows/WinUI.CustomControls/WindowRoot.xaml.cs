@@ -21,33 +21,108 @@
 // SOFTWARE.
 namespace WinUI.CustomControls
 {
+    using Microsoft.UI.Xaml;
+    using Microsoft.Toolkit.Uwp.Helpers;
     using Microsoft.Toolkit.Uwp.UI.Controls;
+    using Microsoft.UI.Xaml;
+    using System;
+    using System.Linq;
     using Windows.Foundation;
+    using WinUI.Vm;
+    using Microsoft.UI.Xaml.Controls;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// <summary>   A window root grid. </summary>
-    ///
-    /// <seealso cref="Microsoft.UI.Xaml.Controls.Grid"/>
+    /// <content>   Container for window contents. This class cannot be inherited. </content>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public sealed partial class WindowRootGrid : LayoutTransformControl
+    public sealed partial class WindowRoot : LayoutTransformControl
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The view model property. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static readonly DependencyProperty VmProperty = DependencyProperty.Register(nameof(Vm),
+            typeof(WindowRootVm),
+            typeof(WindowRoot),
+            new PropertyMetadata(null));
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets the view model. </summary>
+        ///
+        /// <value> The view model. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public WindowRootVm? Vm
+        {
+            get => GetValue(VmProperty) as WindowRootVm;
+            set => SetValue(VmProperty, value);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// Initializes a new instance of the WinUI.CustomControls.WindowRootGrid class.
+        /// This constructor should not be used in production.  It exists to please the Designer
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public WindowRootGrid()
+        public WindowRoot()
         {
             InitializeComponent();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Initializes a new instance of the WinUI.CustomControls.WindowRoot class. </summary>
+        ///
+        /// <param name="windowRootVm"> The window root view model. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public WindowRoot(WindowRootVm windowRootVm)
+        {
+            InitializeComponent();
+
+            Vm = windowRootVm;
+        }
+
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The content property. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static readonly DependencyProperty ContentProperty =
+            DependencyProperty.Register(nameof(Content),
+                typeof(FrameworkElement), typeof(WindowRoot), new PropertyMetadata(null, ContentPropertyChanged));
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets the view model. </summary>
+        ///
+        /// <value> The view model. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public FrameworkElement? Content
+        {
+            get => GetValue(ContentProperty) as FrameworkElement;
+            set => SetValue(ContentProperty, value);
+        }
+
+        static void ContentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (!(d is WindowRoot windowRoot)) return;
+            foreach (var child in windowRoot.ChildGrid.Children.Where(c => !c.Equals(windowRoot.TitleBarInstance)))
+            {
+                windowRoot.ChildGrid.Children.Remove(child);
+            }
+
+            if (!(e.NewValue is UIElement uiElement)) return;
+
+            uiElement.SetValue(Grid.RowProperty, 1);
+            windowRoot.ChildGrid.Children.Add(uiElement);
+        }
+
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Size of the infinite. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private static readonly Size _infiniteSize = new Size(double.PositiveInfinity,double.PositiveInfinity);
+        private static readonly Size _infiniteSize = new Size(double.PositiveInfinity, double.PositiveInfinity);
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Scale content. </summary>

@@ -27,6 +27,9 @@ namespace WinUI.CustomControls
     using System.Diagnostics;
     using Windows.Graphics.Display;
     using Microsoft.UI.Xaml.Controls;
+    using WinUI.Vm;
+    using PInvoke;
+    using Microsoft.Toolkit.Uwp.Helpers;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>
@@ -66,6 +69,24 @@ namespace WinUI.CustomControls
         private DisplayInformation? _displayInformation;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Occurs when Window State Changed. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public event EventHandler<EnumWindowState>? WindowStateChanged;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// Note that I am going to make a best attempt at trying to keep this in sync with the actual
+        /// Win32 windows Show State but I am cautious in that this could be a tough challenge to meet in
+        /// all edge cases.  The primary purpose of state track is to help assure that we know whether to
+        /// show the Maximize or Restore button in the titlebar.  So be cautious until this is hardened
+        /// through use.
+        /// </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public EnumWindowState _currentWindowState = EnumWindowState.Other;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets the handle. </summary>
         ///
         /// <value> The handle. </value>
@@ -76,16 +97,136 @@ namespace WinUI.CustomControls
         public IntPtr Handle { get; }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Initializes a new instance of the WinUI.DemoApp.ExtWindow class. </summary>
+        /// <summary>
+        /// Should not be called by production code, this exists only to please the designer.
+        /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public ExtWindow()
         {
             InitializeComponent();
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// Initializes a new instance of the WinUI.CustomControls.ExtWindow class.
+        /// </summary>
+        ///
+        /// <param name="windowRoot">   The window root. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public ExtWindow(WindowRoot windowRoot) : this()
+        {
+            InitializeComponent();
+
+            if (windowRoot.Vm != null)
+            {
+                var tb = windowRoot.Vm.TitleBarVm;
+                tb.CloseWindowCmd = new DelegateCmd(Close);
+                tb.MinimizeWindowCmd = new DelegateCmd(Minimize);
+                tb.MaximizeWindowCmd = new DelegateCmd(Maximize);
+                tb.RestoreWindowCmd = new DelegateCmd(Restore);
+            }
+
+            RootGrid = windowRoot;
+            WindowGrid.Children.Add(windowRoot);
+
             Handle = this.GetHandle();
             RootGrid.Loaded += RootGrid_Loaded;
             RootGrid.Unloaded += RootGrid_Unloaded;
             RemoveBorder();
+            SizeChanged += ExtWindow_SizeChanged;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets the root grid. </summary>
+        ///
+        /// <value> The root grid. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public WindowRoot RootGrid { get; }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// The faux title bar can be used in place of the Win32 titlebar.  This function will change the
+        /// visibility of that titlebar, not the Win32 titlebar.
+        /// </summary>
+        ///
+        /// <param name="isVisible">    True if is visible, false if not. </param>
+        ///
+        /// <seealso cref="IExtWindow.ChangeFauxTitlebarVisibility(bool)"/>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void ChangeFauxTitlebarVisibility(bool isVisible)
+        {
+            if (RootGrid.Vm == null) return;
+            if (RootGrid.Vm.TitleBarVm.IsVisible == isVisible) return;
+
+            RootGrid.Vm.TitleBarVm.IsVisible = isVisible;
+
+            base.Content?.UpdateLayout();
+
+            DispatcherQueue.ExecuteOnUIThreadAsync(() => SizeToContent());
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Event handler. Called by ExtWindow for size changed events. </summary>
+        ///
+        /// <param name="sender">   Source of the event. </param>
+        /// <param name="args">     Window size changed event information. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void ExtWindow_SizeChanged(object sender, WindowSizeChangedEventArgs args)
+        {
+            var windowState = GetWindowState();
+
+            if (RootGrid.Vm != null)
+                RootGrid.Vm.TitleBarVm.IsMaximized = windowState == EnumWindowState.Maximized;
+
+            if (WindowStateChanged == null) return;
+            //Note that I am checking again for null on the event handler to assure
+            // nothing un-subscribed since I requested the state.  Unlikely but thats
+            // how threading issues are born.
+            if (_currentWindowState != windowState) WindowStateChanged?.Invoke(this, windowState);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// An IntPtr extension method that gets window state representing minimized, maximized or other.
+        /// </summary>
+        ///
+        /// <param name="windowHandle"> Handle of the window. </param>
+        ///
+        /// <returns>   The window state. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private EnumWindowState GetWindowState()
+        {
+            //This command will throw a Win32 exception if something goes wrong.  Prevent the exception and just return
+            // false, but assure its written to the Debug pipe.  I was going to put this entire method in the
+            // NativeMethods library, but I wanted the EnumWindowStyle to be available in the View Models library
+            // without coupling the view models to NativeMethods.  I also didn't want to couple native methods
+            // to the view model library.  That said, I could either duplicate the type and cause more confusion
+            // or put the method here.
+            try
+            {
+                var windowPlacement = User32.GetWindowPlacement(Handle);
+                var showStyle = windowPlacement.showCmd;
+
+                if (showStyle == User32.WindowShowStyle.SW_MINIMIZE ||
+                    showStyle == User32.WindowShowStyle.SW_FORCEMINIMIZE ||
+                    showStyle == User32.WindowShowStyle.SW_SHOWMINIMIZED ||
+                    showStyle == User32.WindowShowStyle.SW_SHOWMINNOACTIVE) return EnumWindowState.Minimized;
+
+
+                if (showStyle == User32.WindowShowStyle.SW_MAXIMIZE ||
+                    showStyle == User32.WindowShowStyle.SW_SHOWMAXIMIZED) return EnumWindowState.Maximized;
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e);
+            }
+            return EnumWindowState.Other;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -129,7 +270,7 @@ namespace WinUI.CustomControls
                 Debug.WriteLine($"{nameof(GetDpiScale)} called before {nameof(RootGrid)}.XamlRoot was available.");
                 return null;
             }
-            return (RootGrid.XamlRoot.RasterizationScale * 96.0) / PInvoke.User32.GetDpiForWindow(Handle);
+            return (RootGrid.XamlRoot.RasterizationScale * 96.0) / User32.GetDpiForWindow(Handle);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -143,6 +284,9 @@ namespace WinUI.CustomControls
             if (!scale.HasValue || double.IsInfinity(scale.Value) || scale <= 0 || scale == _dpiScaleOnLoaded) scale = 1.0;
             ScaleWindowContent(scale.Value);
         }
+
+        //It's annoying when this warning is applied to event handler parameters.
+#pragma warning disable IDE0060 // Remove unused parameter
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Displays an information DPI changed. </summary>
@@ -171,7 +315,7 @@ namespace WinUI.CustomControls
         /// <param name="e">        Double tapped routed event information. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void RootGrid_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs e)
+        private void RootGrid_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs args)
         {
             if (Handle.IsMaximized())
             {
@@ -183,6 +327,8 @@ namespace WinUI.CustomControls
                 Handle.MaximizeWindow();
             }
         }
+        //Ignoring this because they are applying it to event handlers too!
+#pragma warning restore IDE0060 // Remove unused parameter
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets the XAML root. </summary>
@@ -197,11 +343,11 @@ namespace WinUI.CustomControls
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// The Window.Content was redeclared as a new property so we could change the setter to prevent
-        /// an unsuspecting victim from blowing over the top of the WindowRootGrid that this class
+        /// an unsuspecting victim from blowing over the top of the WindowRoot that this class
         /// depends on.  I will admit, it is slightly wonky because the XAML for the ExtWindow is setting 
-        /// the content to our WindowRootGrid type.  BTW, I actually didn't want or need the XAML for this
+        /// the content to our WindowRoot type.  BTW, I actually didn't want or need the XAML for this
         /// class but I stumbled upon an odd bug that I need to report.  I was unable to use the custom
-        /// WindowRootGrid type in this code behind, it through access violations in native code, but if
+        /// WindowRoot type in this code behind, it through access violations in native code, but if
         /// you use the same custom type in XAML it works fine.  I have not encountered anything like that
         /// before.
         /// 
@@ -220,7 +366,7 @@ namespace WinUI.CustomControls
             // event handlers for drag move can be attached to that. If the end user blows away the
             // ExtWindow content it will affect the drag move handlers.  So replacing the Window.Content
             // with this implementation lets me achieve those goals.
-            get => RootGrid.Child;
+            get => RootGrid.Content;
             set => SetContent(value);
         }
 
@@ -248,7 +394,7 @@ namespace WinUI.CustomControls
                 RootGrid.HorizontalContentAlignment = horizontalContentAlignment;
                 RootGrid.VerticalContentAlignment = verticalContentAlignment;
             }
-            RootGrid.Child = clientsContent;
+            RootGrid.Content = clientsContent;
         }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>

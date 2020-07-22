@@ -19,7 +19,7 @@
     <None Remove="ExtWindow.xaml" />
     <None Remove="MainPage.xaml" />
     <None Remove="TitleBar.xaml" />
-    <None Remove="WindowRootGrid.xaml" />
+    <None Remove="WindowRoot.xaml" />
   </ItemGroup>
   <ItemGroup>
     <Page Update="MainPage.xaml">
@@ -28,7 +28,7 @@
     <Page Update="ExtWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="WindowRootGrid.xaml">
+    <Page Update="WindowRoot.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Update="TitleBar.xaml">

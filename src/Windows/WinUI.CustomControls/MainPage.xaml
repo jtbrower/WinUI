@@ -48,26 +48,14 @@
                 </TransformGroup>
             </LinearGradientBrush.Transform>
         </LinearGradientBrush>
-        <FontIcon
-            x:Key="RestoreIcon"
-            Margin="5"
-            FontFamily="{StaticResource SymbolThemeFontFamily}"
-            Glyph="&#xE923;" />
         <Style x:Key="KeyboardBorderStyle" TargetType="Border">
             <Setter Property="BorderThickness" Value="1" />
             <Setter Property="CornerRadius" Value="10" />
             <Setter Property="BorderBrush" Value="DarkGray" />
             <Setter Property="Background" Value="{StaticResource KeyboardBackgroundBrush}" />
         </Style>
-        <Color x:Key="TitleBarColor">#0078D4</Color>
     </Page.Resources>
     <controls:DockPanel>
-        <local:TitleBar
-            x:Name="TitleBarInstance"
-            controls:DockPanel.Dock="Top"
-            Background="{StaticResource TitleBarColor}"
-            Visibility="{x:Bind Path=Vm.TitleBarVm.IsVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
-            Vm="{x:Bind Path=Vm.TitleBarVm, Mode=OneWay}" />
         <!--
             Note that I use an attached property to add a drop shadow to the Border inside of this grid.  It is a behavior that
             requires the parent of what it is shadowing to be some sort of Panel type. This is needed so that it can insert
@@ -96,12 +84,12 @@
                         Grid.Column="0"
                         Margin="5"
                         VerticalAlignment="Center">
-                        <Button Click="RemoveWindowBorder_Click" Content="Remove Window Border">
+                        <Button Click="RemoveFauxTitleBar_Click" Content="Remove Window Border">
                             <Interactivity:Interaction.Behaviors>
                                 <behave:SwallowButtonDoubleTapBehavior />
                             </Interactivity:Interaction.Behaviors>
                         </Button>
-                        <Button Click="AddWindowBorder_Click" Content="Add Window Border">
+                        <Button Click="AddFauxTitleBar_Click" Content="Add Window Border">
                             <Interactivity:Interaction.Behaviors>
                                 <behave:SwallowButtonDoubleTapBehavior />
                             </Interactivity:Interaction.Behaviors>

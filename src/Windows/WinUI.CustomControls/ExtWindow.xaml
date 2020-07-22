@@ -19,7 +19,7 @@
         Size is set to stretch so we can use as much space as possible for dragging.
         
         **Bug/Issue/Misunderstanding?**
-        Note that the WindowRootGrid custom control will not work in code behind for some odd reason.  Only
+        Note that the WindowRoot custom control will not work in code behind for some odd reason.  Only
         in XAML.  I am guessing this is a WinUI Preview Version 1 bug or a Jason Brower bug!  However, i just
         couldn't instantiate any custom class that inherits from a Panel/Grid.  I have not tried other
         custom controls to see if the problem extends beyond a Grid/Panel class.  To test this out I subclassed
@@ -27,6 +27,7 @@
         when I replaced the custom Grid class with a normal Grid, it worked fine.
     -->
     <Grid
+        x:Name="WindowGrid"
         HorizontalAlignment="Stretch"
         VerticalAlignment="Stretch"
         Background="Transparent"
@@ -40,6 +41,5 @@
         <interactivity:Interaction.Behaviors>
             <behave:DragMoveBehavior />
         </interactivity:Interaction.Behaviors>
-        <local:WindowRootGrid x:Name="RootGrid" />
     </Grid>
 </Window>

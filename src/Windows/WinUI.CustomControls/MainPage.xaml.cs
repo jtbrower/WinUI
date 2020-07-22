@@ -92,34 +92,27 @@ namespace WinUI.CustomControls
 #pragma warning disable IDE0060 // Remove unused parameter
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by RemoveWindowBorder for click events. </summary>
+        /// <summary>   Event handler. Called by RemoveFauxTitleBar for click events. </summary>
         ///
         /// <param name="sender">   Source of the event. </param>
         /// <param name="e">        Routed event information. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public void RemoveWindowBorder_Click(object sender, RoutedEventArgs e)
+        public void RemoveFauxTitleBar_Click(object sender, RoutedEventArgs e)
         {
-            Vm.TitleBarVm.IsVisible = false;
-            UpdateLayout();
-            DispatcherQueue.ExecuteOnUIThreadAsync(() => _mainWindow.SizeToContent());
+            _mainWindow.ChangeFauxTitlebarVisibility(false);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by AddWindowBorder for click events. </summary>
-        ///
-        /// <exception cref="InvalidOperationException">    Thrown when the requested operation is
-        ///                                                 invalid. </exception>
+        /// <summary>   Event handler. Called by AddFauxTitleBar for click events. </summary>
         ///
         /// <param name="sender">   Source of the event. </param>
         /// <param name="e">        Routed event information. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public void AddWindowBorder_Click(object sender, RoutedEventArgs e)
+        public void AddFauxTitleBar_Click(object sender, RoutedEventArgs e)
         {
-            Vm.TitleBarVm.IsVisible = true;
-            UpdateLayout();
-            DispatcherQueue.ExecuteOnUIThreadAsync(() => _mainWindow.SizeToContent());
+            _mainWindow.ChangeFauxTitlebarVisibility(true);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////

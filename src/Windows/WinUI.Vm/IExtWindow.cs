@@ -19,7 +19,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace WinUI.CustomControls
+namespace WinUI.Vm
 {
     using System;
 
@@ -113,5 +113,21 @@ namespace WinUI.CustomControls
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         void DisableAutoScaleOnDpiChange();
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Occurs when Window State Changed. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        event EventHandler<EnumWindowState> WindowStateChanged;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// The faux title bar can be used in place of the Win32 titlebar.  This function will change the
+        /// visibility of that titlebar, not the Win32 titlebar.
+        /// </summary>
+        ///
+        /// <param name="isVisible">    True if is visible, false if not. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        void ChangeFauxTitlebarVisibility(bool isVisible);
     }
 }

@@ -121,7 +121,13 @@ namespace WinUI.Vm
         /// <summary>   True if is visible, false if not. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public bool _isVisible=true;
+        public bool _isVisible = true;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   True if is maximized, false if not. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private bool _isMaximized;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets or sets a value indicating whether this  is visible. </summary>
@@ -133,6 +139,18 @@ namespace WinUI.Vm
         {
             get => _isVisible;
             set => SetProperty(ref _isVisible, value);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets a value indicating whether this  is maximized. </summary>
+        ///
+        /// <value> True if this  is maximized, false if not. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public bool IsMaximized
+        {
+            get => _isMaximized;
+            set => SetProperty(ref _isMaximized, value);
         }
     }
 }

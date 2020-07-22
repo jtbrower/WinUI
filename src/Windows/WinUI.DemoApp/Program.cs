@@ -59,20 +59,20 @@ namespace WinUI.DemoApp
         private static ServiceProvider InitializeServices()
         {
             var serviceCollection = new ServiceCollection();
-            serviceCollection.AddScoped<IDialogService, DialogService>();
+
             serviceCollection.AddSingleton<ExtWindow>();
             serviceCollection.AddSingleton<IExtWindow>(s => s.GetRequiredService<ExtWindow>());
             serviceCollection.AddSingleton<IPlatform>(s => s.GetRequiredService<ExtWindow>());
-            serviceCollection.AddSingleton<MainPage>();
-            serviceCollection.AddSingleton<MainPageVm>();
-            serviceCollection.AddSingleton<TitleBar>();
-            serviceCollection.AddSingleton(s => new TitleBarVm
+
+            serviceCollection.AddScoped<IDialogService, DialogService>();
+            serviceCollection.AddTransient<MainPage>();
+            serviceCollection.AddTransient<MainPageVm>();
+            serviceCollection.AddTransient<WindowRoot>();
+            serviceCollection.AddTransient<WindowRootVm>();
+            serviceCollection.AddTransient<TitleBar>();
+            serviceCollection.AddTransient(s => new TitleBarVm
             {
                 Title = "WinUI Desktop Demo",
-                CloseWindowCmd = new DelegateCmd(s.GetRequiredService<IExtWindow>().Close),
-                MinimizeWindowCmd = new DelegateCmd(s.GetRequiredService<IExtWindow>().Minimize),
-                MaximizeWindowCmd = new DelegateCmd(s.GetRequiredService<IExtWindow>().Maximize),
-                RestoreWindowCmd = new DelegateCmd(s.GetRequiredService<IExtWindow>().Restore),
             });
             return serviceCollection.BuildServiceProvider();
         }
