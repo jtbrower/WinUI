@@ -19,18 +19,55 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using System;
-
 namespace WinUI.Vm
 {
+    using System;
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// <summary>   A ViewModel for the button. </summary>
+    /// <summary>   A ViewModel for the toggle button. </summary>
     ///
     /// <seealso cref="WinUI.Vm.PropChangeBase"/>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public class ButtonVm : PropChangeBase
+    public class ToggleButtonVm : PropChangeBase
     {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Initializes a new instance of the WinUI.Vm.ToggleButtonVm class. </summary>
+        ///
+        /// <param name="toggledAction">    The toggled action. </param>
+        /// <param name="displayContent">   The display content. </param>
+        /// <param name="isChecked">        (Optional) True if is checked, false if not. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public ToggleButtonVm(
+            Action<ToggleButtonVm> toggledAction, 
+            object displayContent, 
+            bool isChecked = false)
+        {
+            //Set initial values.
+            _isChecked = isChecked;
+            _displayContent = displayContent;
+
+            ClickedCmd = new DelegateCmd<ToggleButtonVm>(toggledAction);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   True if is checked, false if not. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private bool _isChecked;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets a value indicating whether this  is checked. </summary>
+        ///
+        /// <value> True if this  is checked, false if not. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public bool IsChecked
+        {
+            get => _isChecked;
+            set => SetProperty(ref _isChecked, value);
+        }
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The display content. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -50,24 +87,12 @@ namespace WinUI.Vm
         private bool _isEnabled = true;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Initializes a new instance of the WinUI.Vm.ButtonVm class. </summary>
-        ///
-        /// <param name="displayContent">   The display content. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public ButtonVm(Action clickedCmd, object displayContent)
-        {
-            ClickedCmd=new DelegateCmd(clickedCmd);
-            _displayContent = displayContent;
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Gets or sets the 'clicked' command. </summary>
+        /// <summary>   Gets the 'clicked' command. </summary>
         ///
         /// <value> The 'clicked' command. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public DelegateCmd ClickedCmd { get; }
+        public DelegateCmd<ToggleButtonVm> ClickedCmd { get; }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets or sets the display content. </summary>

@@ -22,6 +22,7 @@
 namespace WinUI.CustomControls.Behaviors
 {
     using Microsoft.UI;
+    using Microsoft.UI.Composition;
     using Microsoft.UI.Xaml;
     using Microsoft.UI.Xaml.Controls;
     using Microsoft.UI.Xaml.Hosting;
@@ -42,6 +43,137 @@ namespace WinUI.CustomControls.Behaviors
     public class RoundedDropShadowBehavior : Behavior<FrameworkElement>
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Hides the drop shadow. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void HideDropShadow()
+        {
+            _dropShadowLogic?.HideDropShadow();
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Shows the drop shadow. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void ShowDropShadow()
+        {
+            _dropShadowLogic?.ShowDropShadow();
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The corner radius property. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static readonly DependencyProperty CornerRadiusProperty =
+            DependencyProperty.Register(nameof(CornerRadius),
+                typeof(double),
+                typeof(WindowRoot),
+                new PropertyMetadata(0.0));
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets the shadow size. </summary>
+        ///
+        /// <value> The size of the shadow. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public double ShadowSize
+        {
+            get => (double)GetValue(ShadowSizeProperty);
+            set => SetValue(ShadowSizeProperty, value);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The shadow size property. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static readonly DependencyProperty ShadowSizeProperty =
+            DependencyProperty.Register(
+                nameof(ShadowSize), typeof(double), 
+                typeof(RoundedDropShadowBehavior), 
+                new PropertyMetadata(5.0));
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets the opacity. </summary>
+        ///
+        /// <value> The opacity. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public double Opacity
+        {
+            get => (double)GetValue(OpacityProperty);
+            set => SetValue(OpacityProperty, value);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The opacity property. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static readonly DependencyProperty OpacityProperty =
+            DependencyProperty.Register(
+                nameof(Opacity), 
+                typeof(double), 
+                typeof(RoundedDropShadowBehavior), 
+                new PropertyMetadata(.6));
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets the blur radius. </summary>
+        ///
+        /// <value> The blur radius. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public double BlurRadius
+        {
+            get => (double)GetValue(BlurRadiusProperty);
+            set => SetValue(BlurRadiusProperty, value);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The blur radius property. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static readonly DependencyProperty BlurRadiusProperty =
+            DependencyProperty.Register(
+                nameof(BlurRadius), 
+                typeof(double), 
+                typeof(RoundedDropShadowBehavior), 
+                new PropertyMetadata(4.0));
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets the color of the shadow. </summary>
+        ///
+        /// <value> The color of the shadow. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public Color ShadowColor
+        {
+            get => (Color)GetValue(ShadowColorProperty);
+            set => SetValue(ShadowColorProperty, value);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The shadow color property. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static readonly DependencyProperty ShadowColorProperty =
+            DependencyProperty.Register(
+                nameof(ShadowColor), 
+                typeof(Color), 
+                typeof(RoundedDropShadowBehavior), 
+                new PropertyMetadata(Colors.Black));
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets the view model. </summary>
+        ///
+        /// <value> The view model. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public double CornerRadius
+        {
+            get => (double)GetValue(CornerRadiusProperty);
+            set => SetValue(CornerRadiusProperty, value);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The drop shadow logic. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -58,10 +190,8 @@ namespace WinUI.CustomControls.Behaviors
         /// <see cref="P:Microsoft.Xaml.Interactivity.Behavior.AssociatedObject" />
         /// </remarks>
         ///
-        /// <exception cref="InvalidOperationException">    Thrown when the requested operation is
-        ///                                                 invalid. </exception>
+        /// <seealso cref="Behavior{Microsoft.UI.Xaml.FrameworkElement}.OnAttached()"/>
         ///
-        /// <seealso cref="Microsoft.Xaml.Interactivity.Behavior{Microsoft.UI.Xaml.FrameworkElement}.OnAttached()"/>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         protected override void OnAttached()
@@ -73,6 +203,9 @@ namespace WinUI.CustomControls.Behaviors
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Event handler. Called by AssociatedObject for loaded events. </summary>
         ///
+        /// <exception cref="InvalidOperationException">    Thrown when the requested operation is
+        ///                                                 invalid. </exception>
+        ///
         /// <param name="sender">   Source of the event. </param>
         /// <param name="e">        Routed event information. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,12 +213,13 @@ namespace WinUI.CustomControls.Behaviors
         private void AssociatedObject_Loaded(object sender, RoutedEventArgs e)
         {
             if (!(AssociatedObject.Parent is Panel parentPanel))
-                throw new InvalidOperationException($"{nameof(RoundedDropShadowBehavior)} must be attached to a FrameworkElement with a Parent of type Panel");
+                throw new InvalidOperationException
+                    ($"{nameof(RoundedDropShadowBehavior)} must be attached to a FrameworkElement with a Parent of type Panel");
 
             _dropShadowLogic = new DropShadowLogic(parentPanel, AssociatedObject);
 
             AssociatedObject.Loaded -= AssociatedObject_Loaded;
-            _dropShadowLogic?.InsertDropShadow();
+            _dropShadowLogic?.InsertDropShadow(ShadowSize, CornerRadius, Opacity, BlurRadius, ShadowColor);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -108,8 +242,8 @@ namespace WinUI.CustomControls.Behaviors
             {
                 _dropShadowLogic?.RemoveDropShadow();
             }
-            //I would not want cleanup work to cause an exception.  There is nothing we can do, but change the
-            // design if we see this occurring in development.
+            //I would not want cleanup work to cause an exception.  There is nothing we can do, but change
+            // the design if we see this occurring in development.
             catch (Exception e)
             {
                 Debug.WriteLine($"{nameof(OnDetaching)} caused the following exception : {e}");
@@ -144,10 +278,38 @@ namespace WinUI.CustomControls.Behaviors
             private readonly Panel _parent;
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////
+            /// <summary>   The sprite visual. </summary>
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            private SpriteVisual? _spriteVisual;
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
             /// <summary>   The element to shadow. </summary>
             ////////////////////////////////////////////////////////////////////////////////////////////////////
 
             private readonly FrameworkElement _elementToShadow;
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            /// <summary>   The size animation expression. </summary>
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            private ExpressionAnimation? _sizeAnimationExpression;
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            /// <summary>
+            /// Sometimes we must modify the original margin of the element being shadowed.  If the end user
+            /// hides the shadow we need to use this saved value to revert any changes made to the original
+            /// value.
+            /// </summary>
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            private Thickness? _elementsOriginalMargin;
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            /// <summary>   The elements modified margin. </summary>
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            private Thickness? _elementsModifiedMargin;
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////
             /// <summary>
@@ -176,6 +338,11 @@ namespace WinUI.CustomControls.Behaviors
                 try
                 {
                     if (_parent == null) return;
+
+                    //Hiding the shadow will take care of a few steps needed to completely remove
+                    // the shadow.
+                    HideDropShadow();
+
                     var childCollection = _parent.Children;
 
                     if (childCollection.Contains(_roundedRectMask))
@@ -186,6 +353,7 @@ namespace WinUI.CustomControls.Behaviors
 
                     _roundedRectMask = null;
                     _dropShadowHost = null;
+                    _elementsOriginalMargin = null;
                 }
                 //I would not want cleanup work to cause an exception.  There is nothing we need to do, but
                 // we developers need to know if it is happening during development.
@@ -196,11 +364,51 @@ namespace WinUI.CustomControls.Behaviors
             }
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////
+            /// <summary>   Hides the drop shadow. </summary>
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            public void HideDropShadow()
+            {
+                _dropShadowHost?.SetValue(UIElement.VisibilityProperty, Visibility.Collapsed);
+                _roundedRectMask?.SetValue(UIElement.VisibilityProperty, Visibility.Collapsed);
+
+                if (_elementsOriginalMargin != null)
+                    _elementToShadow.Margin = _elementsOriginalMargin.Value;
+
+                if (_spriteVisual == null) return;
+
+                _spriteVisual.StopAnimation("Size");
+                _spriteVisual.IsVisible = false;
+
+            }
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            /// <summary>   Shows the drop shadow. </summary>
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            public void ShowDropShadow()
+            {
+                _dropShadowHost?.SetValue(UIElement.VisibilityProperty, Visibility.Visible);
+                _roundedRectMask?.SetValue(UIElement.VisibilityProperty, Visibility.Visible);
+
+                if (_elementsModifiedMargin != null)
+                    _elementToShadow.Margin = _elementsModifiedMargin.Value;
+
+                if (_spriteVisual == null) return;
+
+                _spriteVisual.StartAnimation("Size", _sizeAnimationExpression);
+                _spriteVisual.IsVisible = true;
+            }
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
             /// <summary>
-            /// Given a parent Panel, this function will apply a drop shadow around a chosen child element
-            /// of the panel.  At the time I wrote this function, the Windows Community ToolKit still did not
+            /// Given a parent Panel, this function will apply a drop shadow around a chosen child element of
+            /// the panel.  At the time I wrote this function, the Windows Community ToolKit still did not
             /// provide a way to render rounded corners on the shadow, this function does.
             /// </summary>
+            ///
+            /// <exception cref="InvalidOperationException">    Thrown when the requested operation is
+            ///                                                 invalid. </exception>
             ///
             /// <param name="shadowSize">           (Optional) Size of the shadow. </param>
             /// <param name="shadowCornerRadius">   (Optional) The shadow corner radius. </param>
@@ -217,7 +425,8 @@ namespace WinUI.CustomControls.Behaviors
                 Color? shadowColor = null)
             {
                 if (_dropShadowHost != null)
-                    throw new InvalidOperationException($"{nameof(InsertDropShadow)} already attached a drop shadow.");
+                    throw new InvalidOperationException(
+                        $"{nameof(InsertDropShadow)} already attached a drop shadow.");
 
                 //I choose to make a custom shadow over using the UWP ToolKit DropShadowPanel because the UWP
                 // version does not have rounded corners (it has the properties but they do not work).
@@ -245,10 +454,16 @@ namespace WinUI.CustomControls.Behaviors
                 // right margins have enough space for the shadowSize.  Some of you control experts probably know a
                 // better way to do this?  It feels like there has to be a better way.
                 var leftMargin = _elementToShadow.Margin.Left;
-                var rightMargin = _elementToShadow.Margin.Right >= shadowSize ? _elementToShadow.Margin.Right : shadowSize;
-                var bottomMargin = _elementToShadow.Margin.Bottom >= shadowSize ? _elementToShadow.Margin.Bottom : shadowSize;
+                var rightMargin = _elementToShadow.Margin.Right >= 
+                    shadowSize ? _elementToShadow.Margin.Right : shadowSize;
+                var bottomMargin = _elementToShadow.Margin.Bottom >= 
+                    shadowSize ? _elementToShadow.Margin.Bottom : shadowSize;
                 var topMargin = _elementToShadow.Margin.Top;
-                _elementToShadow.Margin = new Thickness(leftMargin, topMargin, rightMargin, bottomMargin);
+
+                //Save the current margin and apply the new one
+                _elementsOriginalMargin = _elementToShadow.Margin;
+                _elementsModifiedMargin = new Thickness(leftMargin, topMargin, rightMargin, bottomMargin);
+                _elementToShadow.Margin = _elementsModifiedMargin.Value;
                 #endregion
 
                 //If the caller wants the shadow to have rounded corners, we need to perform this additional logic.
@@ -257,24 +472,26 @@ namespace WinUI.CustomControls.Behaviors
                     //The rectangle is used as a mask to round the corners.
                     _roundedRectMask = new Rectangle
                     {
-                        RadiusX = (float)shadowCornerRadius,
-                        RadiusY = (float)shadowCornerRadius,
+                        RadiusX = shadowCornerRadius,
+                        RadiusY = shadowCornerRadius,
                         Margin = requiredMargin,
                         Fill = shadowColor.HasValue ? new SolidColorBrush(shadowColor.Value) : new SolidColorBrush(Colors.Black)
                     };
                     //Bind both the height and width to the host properties so resizing does not cause problems.
                     _roundedRectMask.SetBinding(FrameworkElement.WidthProperty, new Microsoft.UI.Xaml.Data.Binding()
                     {
-                        //TODO figure out why output indicates Canvas.ActualWidthProperty does not exist
-                        //Note that the Debug output will warn that ActualWidthProperty does not exist on Canvas.  It cannot be correct
-                        // because if I change it to anything else (or remove it) the drop shadow will not be visible.
+                        // TODO figure out why output indicates Canvas.ActualWidthProperty does not exist Note that the
+                        // Debug output will warn that ActualWidthProperty does not exist on Canvas.  It cannot be
+                        // correct because if I change it to anything else (or remove it) the drop shadow will not be
+                        // visible.
                         Path = new PropertyPath(nameof(FrameworkElement.ActualWidthProperty)),
                         Source = _dropShadowHost
                     });
                     _roundedRectMask.SetBinding(FrameworkElement.HeightProperty, new Microsoft.UI.Xaml.Data.Binding()
                     {
-                        //TODO figure out why output indicates Canvas.ActualHeightProperty does not exist
-                        //As I stated above, debug will warn that the ActualHeightProperty does not exist, but that cannot be correct.
+                        // TODO figure out why output indicates Canvas.ActualHeightProperty does not exist As I stated
+                        // above, debug will warn that the ActualHeightProperty does not exist, but that cannot be
+                        // correct.
                         Path = new PropertyPath(nameof(FrameworkElement.ActualHeightProperty)),
                         Source = _dropShadowHost
                     });
@@ -286,21 +503,21 @@ namespace WinUI.CustomControls.Behaviors
                 }
 
                 //Create the sprite visual and attach the shadow
-                var spriteVisual = compositor.CreateSpriteVisual();
-                spriteVisual.Size = contentVisual.Size;
-                spriteVisual.CenterPoint = contentVisual.CenterPoint;
-                spriteVisual.Shadow = dropShadow;
+                _spriteVisual = compositor.CreateSpriteVisual();
+                _spriteVisual.Size = contentVisual.Size;
+                _spriteVisual.CenterPoint = contentVisual.CenterPoint;
+                _spriteVisual.Shadow = dropShadow;
 
                 //Attach the shadow
-                ElementCompositionPreview.SetElementChildVisual(_dropShadowHost, spriteVisual);
+                ElementCompositionPreview.SetElementChildVisual(_dropShadowHost, _spriteVisual);
 
                 //A little anal about refactor proofing, but I refactor constantly.
                 var animatedObjectName = nameof(contentVisual);
 
                 //Assure that the shadow sizing follows the item it is shadowing
-                var sizeAnimationExpression = compositor.CreateExpressionAnimation($"{animatedObjectName}.Size");
-                sizeAnimationExpression.SetReferenceParameter(animatedObjectName, contentVisual);
-                spriteVisual.StartAnimation("Size", sizeAnimationExpression);
+                _sizeAnimationExpression = compositor.CreateExpressionAnimation($"{animatedObjectName}.Size");
+                _sizeAnimationExpression.SetReferenceParameter(animatedObjectName, contentVisual);
+                _spriteVisual.StartAnimation("Size", _sizeAnimationExpression);
             }
         }
         #endregion

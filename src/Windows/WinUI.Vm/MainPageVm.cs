@@ -34,6 +34,7 @@ namespace WinUI.Vm
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         private int _numberBoxValue;
+        private ToggleButtonVm? _toggleNonClientVisibilityButtonVm;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Initializes a new instance of the WinUI.Vm.MainPageVm class. </summary>
@@ -61,5 +62,17 @@ namespace WinUI.Vm
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public IDialogService DialogService { get; }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets the toggle non client visibility button view model. </summary>
+        ///
+        /// <value> The toggle non client visibility button view model. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public ToggleButtonVm? ToggleNonClientVisibilityButtonVm
+        {
+            get => _toggleNonClientVisibilityButtonVm;
+            set => SetProperty(ref _toggleNonClientVisibilityButtonVm, value);
+        }
     }
 }

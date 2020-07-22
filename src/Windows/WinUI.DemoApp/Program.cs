@@ -66,7 +66,22 @@ namespace WinUI.DemoApp
 
             serviceCollection.AddScoped<IDialogService, DialogService>();
             serviceCollection.AddTransient<MainPage>();
-            serviceCollection.AddTransient<MainPageVm>();
+            serviceCollection.AddTransient<MainPageVm>(s =>
+            {
+                var window = s.GetRequiredService<ExtWindow>();
+                return new MainPageVm(s.GetRequiredService<IDialogService>())
+                {
+                    ToggleNonClientVisibilityButtonVm = new ToggleButtonVm(
+                        self =>
+                        {
+                            if (self.IsChecked)
+                                window.ShowCustomNonClientArea();
+                            else
+                                s.GetRequiredService<ExtWindow>().HideCustomNonClientArea();
+
+                        }, "Show Non-Client Area", true)
+                };
+            });
             serviceCollection.AddTransient<WindowRoot>();
             serviceCollection.AddTransient<WindowRootVm>();
             serviceCollection.AddTransient<TitleBar>();

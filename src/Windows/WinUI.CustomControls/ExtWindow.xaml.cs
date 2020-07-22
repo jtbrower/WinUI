@@ -29,7 +29,7 @@ namespace WinUI.CustomControls
     using Microsoft.UI.Xaml.Controls;
     using WinUI.Vm;
     using PInvoke;
-    using Microsoft.Toolkit.Uwp.Helpers;
+    using Microsoft.UI.Xaml.Input;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>
@@ -79,7 +79,7 @@ namespace WinUI.CustomControls
         /// Note that I am going to make a best attempt at trying to keep this in sync with the actual
         /// Win32 windows Show State but I am cautious in that this could be a tough challenge to meet in
         /// all edge cases.  The primary purpose of state track is to help assure that we know whether to
-        /// show the Maximize or Restore button in the titlebar.  So be cautious until this is hardened
+        /// show the Maximize or Restore button in the TitleBar.  So be cautious until this is hardened
         /// through use.
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,7 +102,9 @@ namespace WinUI.CustomControls
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
+#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         public ExtWindow()
+#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
         {
             InitializeComponent();
         }
@@ -134,7 +136,7 @@ namespace WinUI.CustomControls
             Handle = this.GetHandle();
             RootGrid.Loaded += RootGrid_Loaded;
             RootGrid.Unloaded += RootGrid_Unloaded;
-            RemoveBorder();
+            HideWin32NonClientArea();
             SizeChanged += ExtWindow_SizeChanged;
         }
 
@@ -145,29 +147,6 @@ namespace WinUI.CustomControls
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public WindowRoot RootGrid { get; }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>
-        /// The faux title bar can be used in place of the Win32 titlebar.  This function will change the
-        /// visibility of that titlebar, not the Win32 titlebar.
-        /// </summary>
-        ///
-        /// <param name="isVisible">    True if is visible, false if not. </param>
-        ///
-        /// <seealso cref="IExtWindow.ChangeFauxTitlebarVisibility(bool)"/>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public void ChangeFauxTitlebarVisibility(bool isVisible)
-        {
-            if (RootGrid.Vm == null) return;
-            if (RootGrid.Vm.TitleBarVm.IsVisible == isVisible) return;
-
-            RootGrid.Vm.TitleBarVm.IsVisible = isVisible;
-
-            base.Content?.UpdateLayout();
-
-            DispatcherQueue.ExecuteOnUIThreadAsync(() => SizeToContent());
-        }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Event handler. Called by ExtWindow for size changed events. </summary>
@@ -281,7 +260,12 @@ namespace WinUI.CustomControls
         {
             var scale = GetDpiScale();
             //I saw this hit infinity once when closing a window, it caused an exception.  
-            if (!scale.HasValue || double.IsInfinity(scale.Value) || scale <= 0 || scale == _dpiScaleOnLoaded) scale = 1.0;
+            if (
+                !scale.HasValue || double.IsInfinity(scale.Value) || scale <= 0 ||
+                scale == _dpiScaleOnLoaded)
+            {
+                scale = 1.0;
+            }
             ScaleWindowContent(scale.Value);
         }
 
@@ -301,7 +285,7 @@ namespace WinUI.CustomControls
 
             ScaleContentForDpi();
 
-            //When the non-client area such as the titlebar is auto-scaled by the framework, it will either
+            //When the non-client area such as the TitleBar is auto-scaled by the framework, it will either
             // leave extra space or require more.  Keep an eye on this call, I noticed that resizing the
             // window was causing recursive DPI changed events, but recent design changes might have 
             // affected it because it works fine now.
@@ -315,7 +299,7 @@ namespace WinUI.CustomControls
         /// <param name="e">        Double tapped routed event information. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void RootGrid_DoubleTapped(object sender, Microsoft.UI.Xaml.Input.DoubleTappedRoutedEventArgs args)
+        private void RootGrid_DoubleTapped(object sender, DoubleTappedRoutedEventArgs args)
         {
             if (Handle.IsMaximized())
             {
@@ -418,7 +402,7 @@ namespace WinUI.CustomControls
         /// <summary>
         /// Mimic WPF's SizeToContent feature.  Note that I have a current limitation where I do not account
         /// for the non-client space requirements of a Window so it only works if the Window Border and 
-        /// Titlebar have already been removed.  
+        /// TitleBar have already been removed.  
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -445,7 +429,7 @@ namespace WinUI.CustomControls
             var clientWidthInDevicePixels = RootGrid.DipToDevice(sizeRequired.Width);
 
             //Now we need to calculate the non-client area of the Window.  This is only important when a Window has a border and or a
-            // titlebar (or menu).  In other words, if the RemoveWindowBorder method has been called on the Window then the nonClientSize
+            // TitleBar (or menu).  In other words, if the HideNonClientArea method has been called on the Window then the nonClientSize
             // should be zero.
             if (!Handle.GetNonClientSize(out var nonClientSize))
             {
@@ -470,21 +454,25 @@ namespace WinUI.CustomControls
         public Window AsWindow() => this;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Removes the border. </summary>
+        /// <summary>   Hides the window 32 non client area. </summary>
+        ///
+        /// <seealso cref="IExtWindow.HideWin32NonClientArea()"/>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public void RemoveBorder()
+        public void HideWin32NonClientArea()
         {
-            Handle.RemoveWindowBorder();
+            Handle.HideWin32NonClientArea();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Adds border. </summary>
+        /// <summary>   Shows the window 32 non client area. </summary>
+        ///
+        /// <seealso cref="IExtWindow.ShowWin32NonClientArea()"/>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public void AddBorder()
+        public void ShowWin32NonClientArea()
         {
-            this.AddWindowBorder(Handle);
+            this.ShowWin32NonClientArea(Handle);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -603,6 +591,60 @@ namespace WinUI.CustomControls
                 if (!currentScale.HasValue) return;
                 ScaleWindowContent(currentScale.Value);
             }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Hides the custom non client area. </summary>
+        ///
+        /// <seealso cref="IExtWindow.HideCustomNonClientArea()"/>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void HideCustomNonClientArea()
+        {
+            ChangeCustomNonClientAreaVisibility(false);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Shows the custom non client area. </summary>
+        ///
+        /// <seealso cref="IExtWindow.ShowCustomNonClientArea()"/>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void ShowCustomNonClientArea()
+        {
+            ChangeCustomNonClientAreaVisibility(true);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Change custom non client area visibility. </summary>
+        ///
+        /// <param name="isVisible">    True if is visible, false if not. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void ChangeCustomNonClientAreaVisibility(bool isVisible)
+        {
+            if (RootGrid.Vm == null) return;
+
+            //If the current state matches the requested leave.
+            if (RootGrid.Vm.TitleBarVm.IsVisible == isVisible) return;
+
+            //Removing or showing the DropShadow is somewhat similar to removing or showing the Win32 
+            // Window border
+            if (isVisible)
+                RootGrid.ShowDropShadow();
+            else
+                RootGrid.HideDropShadow();
+
+
+            RootGrid.Vm.TitleBarVm.IsVisible = isVisible;
+
+            //Force the content to recompute its space requirements
+            base.Content?.UpdateLayout();
+
+            //If we hid the non-client area then there will be extra empty space around the Window's Content
+            // that we can remove with this call.  If we are adding the non-client area back in, this call
+            // assures it has enough space to render.
+            SizeToContent();
         }
     }
 }

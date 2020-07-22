@@ -92,30 +92,6 @@ namespace WinUI.CustomControls
 #pragma warning disable IDE0060 // Remove unused parameter
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by RemoveFauxTitleBar for click events. </summary>
-        ///
-        /// <param name="sender">   Source of the event. </param>
-        /// <param name="e">        Routed event information. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public void RemoveFauxTitleBar_Click(object sender, RoutedEventArgs e)
-        {
-            _mainWindow.ChangeFauxTitlebarVisibility(false);
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by AddFauxTitleBar for click events. </summary>
-        ///
-        /// <param name="sender">   Source of the event. </param>
-        /// <param name="e">        Routed event information. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public void AddFauxTitleBar_Click(object sender, RoutedEventArgs e)
-        {
-            _mainWindow.ChangeFauxTitlebarVisibility(true);
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Event handler. Called by ShrinkToContent for click events./ </summary>
         ///
         /// <param name="sender">   Source of the event. </param>

@@ -7,12 +7,12 @@
 * Sometimes Visual Studio puts an AnyCPU platform back into the solution.  Don't use it.
 
 # Current Features and What you can Learn
-* Provides a class called ExtWindow that mimics some WPF Windowing features.  My choice of name for this class is questionable and I plan to change it.
-* Provide double tap to maximize a Window
+* Provides a class called ExtWindow that mimics some WPF Windowing features.
+* Provide double tap to maximize and Minimize a Window
 * Provide a behavior that with one line of code will place a shadow around a control.  Unlike the UWP DropShadowPanel, it can have rounded corners.
 * A behavior that Swallows double clicks so they are not triggered by buttons. Please see SwallowButtonDoubleTapBehavior.cs
-* Provide Window DragMove Behavior like the Titlebar normally provides.  Works with the Mouse and Touch, see DragMoveBehavior.cs
-* Remove and Add a Window Border/Titlebar
+* Provide Window DragMove Behavior like the TitleBar normally provides.  Works with the Mouse and Touch, see DragMoveBehavior.cs
+* Remove and Add the Win32 Border/TitleBar and Add or Remove a Custom XAML Version that is not normally available in WinUI Desktop apps.
 * Provides many examples of using Win32 PInvoke API calls directly or via the NuGet package PInvoke.User32.
 * Set the Window transparency between 0 (fully visible) and 100 (fully transparent).
 * Provide a SizeToContent feature like WPF provides.  Capable of sizing up and down to fit client space requirements; great for border-less windows but still works with border.
@@ -28,13 +28,17 @@
 
 # Known Issues (Work in Progress)
 * `<PackageReference Include=\"Microsoft.Windows.CsWinRT Version=\"0.1.0-prerelease.200629.3\" />` was added to the DemoApp to avoid a compatibility issue between .Net5 preview 6 and WinUI
-* When you set the Window transparency all of the Window content becomes transparent too.  I need to figure out how to handle this.
-* Currently I have not gone through the trouble to use ICommands for the buttons, or disable buttons that are not applicable to a given state.
-* I need to figure out the cleanest way to set the Window icon
-* When I resize the Window on startup, it is not a smooth transition because I currently have to call Window.Activate and then resize directly after.
+* "Warning	WMC9999	Type universe cannot resolve assembly: WinRT.Runtime, Version=0.1.0.2153, Culture=neutral, PublicKeyToken=null.	WinUI.DemoApp"
 * The Debug window shows 5 'WinRT transform error' exceptions that are swallowed on app start
 * Debug Window shows a 'mincore\com\oleaut32\dispatch\ups.cpp(2122)\OLEAUT32.dll' library not registered error.
 * The Debug Window warns that ActualWidthProperty is not found on Canvas.  I thought that maybe creating a property path, I should switch to just "ActualWidth"; even though the error goes away, it breaks the drop shadow and can't be correct.
+
+# TODO
+* Add an icon to the custom TitleBar
+* Change Cursor on DragMove operation
+* When you set the Window transparency all of the Window content becomes transparent too.  I need to figure out how to handle this.
+* I have not gone through the trouble to use ICommands for all of the buttons (or disable buttons that are not applicable to a given state like remove window transparency when there isn't any).
+* When I resize the Window on startup, it is not a smooth transition because I currently have to call Window.Activate and then resize directly after.
 
 ## Known Visual Studio or Project Issues
 * MSB4181 regarding CompileXaml task returned false but did not log and error warning keeps showing up.

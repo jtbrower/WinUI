@@ -2,9 +2,11 @@
     x:Class="WinUI.CustomControls.WindowRoot"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:behave="using:WinUI.CustomControls.Behaviors"
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:converters="using:Microsoft.Toolkit.Uwp.UI.Converters"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:local="using:WinUI.CustomControls"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:media="using:Microsoft.UI.Xaml.Media"
@@ -23,17 +25,26 @@
             ScaleY="1.0" />
     </controls:LayoutTransformControl.Transform>
     <controls:LayoutTransformControl.Child>
-        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" x:Name="ChildGrid">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <local:TitleBar
-                x:Name="TitleBarInstance"
-                controls:DockPanel.Dock="Top"
-                Background="{StaticResource TitleBarColor}"
-                Visibility="{x:Bind Path=Vm.TitleBarVm.IsVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
-                Vm="{x:Bind Path=Vm.TitleBarVm, Mode=OneWay}" />
+        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <Grid
+                x:Name="ChildGrid"
+                HorizontalAlignment="Stretch"
+                Background="White"
+                VerticalAlignment="Stretch">
+                <interactivity:Interaction.Behaviors>
+                    <behave:RoundedDropShadowBehavior x:Name="ChildGridDropShadow" CornerRadius="0" />
+                </interactivity:Interaction.Behaviors>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <local:TitleBar
+                    x:Name="TitleBarInstance"
+                    controls:DockPanel.Dock="Top"
+                    Background="{StaticResource TitleBarColor}"
+                    Visibility="{x:Bind Path=Vm.TitleBarVm.IsVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}"
+                    Vm="{x:Bind Path=Vm.TitleBarVm, Mode=OneWay}" />
+            </Grid>
         </Grid>
     </controls:LayoutTransformControl.Child>
 </controls:LayoutTransformControl>

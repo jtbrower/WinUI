@@ -208,7 +208,7 @@ namespace WinUI.Native
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// Calculates the non-client size.  This is the space where any border, menu or titlebar is
+        /// Calculates the non-client size.  This is the space where any border, menu or TitleBar is
         /// located.
         /// </summary>
         ///
@@ -317,14 +317,30 @@ namespace WinUI.Native
         private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Removes the window border described by windowHandle. </summary>
+        /// <summary>   An IntPtr extension method that hides the window 32 non client area. </summary>
         ///
         /// <param name="windowHandle"> Handle of the window. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public static void RemoveWindowBorder(this IntPtr windowHandle)
+        public static void HideWin32NonClientArea(this IntPtr windowHandle)
         {
             SetWindowFlags(windowHandle, GWL_STYLE, WindowStyles.WS_VISIBLE | WindowStyles.WS_POPUP);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   A Window extension method that shows the window 32 non client area. </summary>
+        ///
+        /// <param name="window">       The window to act on. </param>
+        /// <param name="windowHandle"> Handle of the window. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static void ShowWin32NonClientArea(this Window window, IntPtr windowHandle)
+        {
+            SetWindowFlags(windowHandle, GWL_STYLE, WindowStyles.WS_OVERLAPPEDWINDOW);
+
+            //If you do not call this then the window won't have any content showing and it will not be
+            // usable.
+            window.Activate();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -679,22 +695,6 @@ namespace WinUI.Native
         {
             WindowWrapper windowWrapper = WindowWrapper.FromAbi(window.ThisPtr);
             return windowWrapper.WindowHandle;
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Adds a window border. </summary>
-        ///
-        /// <param name="window">       The window to act on. </param>
-        /// <param name="windowHandle"> Handle of the window. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public static void AddWindowBorder(this Window window, IntPtr windowHandle)
-        {
-            SetWindowFlags(windowHandle, GWL_STYLE, WindowStyles.WS_OVERLAPPEDWINDOW);
-
-            //If you do not call this then the window won't have any content showing and it will not be
-            // usable.
-            window.Activate();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////

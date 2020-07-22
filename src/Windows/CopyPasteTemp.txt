@@ -47,4 +47,3 @@ namespace WinUI.Native
 //Notes to self
 - Figure out or log a potential issue where custom controls that inherit from other controls such as a grid, only work in XAML, not code behind.  Code behind throws exceptions.  See the WindowRoot control.
 - Determine if I should open a discussion or issue regarding the infinite DPI change events firing.  If I do I need to create a small project that can most easily reproduce the problem.
-- Change the mouse cursor during a DragMove.
