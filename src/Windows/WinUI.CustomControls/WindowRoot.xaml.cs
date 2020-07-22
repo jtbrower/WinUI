@@ -22,10 +22,7 @@
 namespace WinUI.CustomControls
 {
     using Microsoft.UI.Xaml;
-    using Microsoft.Toolkit.Uwp.Helpers;
     using Microsoft.Toolkit.Uwp.UI.Controls;
-    using Microsoft.UI.Xaml;
-    using System;
     using System.Linq;
     using Windows.Foundation;
     using WinUI.Vm;
@@ -102,6 +99,13 @@ namespace WinUI.CustomControls
             get => GetValue(ContentProperty) as FrameworkElement;
             set => SetValue(ContentProperty, value);
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Content property changed. </summary>
+        ///
+        /// <param name="d">    A DependencyObject to process. </param>
+        /// <param name="e">    Dependency property changed event information. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         static void ContentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
