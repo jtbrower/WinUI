@@ -234,8 +234,9 @@ namespace WinUI.CustomControls.Behaviors
                 var dX = x - _priorContactX;
                 var dY = y - _priorContactY;
 
-                //Throttle DragMove operations to reduce CPU.
-                var distance = CalculateDistance(dX,dY);
+                //Throttle DragMove operations to reduce CPU by using the Pythagorean Theorem to calculate 
+                // distance moved.
+                var distance = (int)Math.Sqrt(dX * dX + dY * dY);
                 if(distance < C_DragMoveWhenDistanceIsThisManyPixels)return;
 
                 //Save for next time
@@ -244,24 +245,6 @@ namespace WinUI.CustomControls.Behaviors
 
                 //Move the window.
                 _windowHandle.MoveBy(dX, dY);
-            }
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////
-            /// <summary>
-            /// Using the Pythagorean Theorem, this calculates the distance between two points on a two
-            /// dimensional coordinate system.
-            /// </summary>
-            ///
-            /// <param name="dX">   Is x2-x1. </param>
-            /// <param name="dY">   Is y2-y1. </param>
-            ///
-            /// <returns>   The calculated distance. </returns>
-            ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-            private static int CalculateDistance(int dX, int dY)
-            {
-                //Use the Pythagorean Theorem.
-                return (int)Math.Sqrt(dX*dX+dY*dY);
             }
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////
