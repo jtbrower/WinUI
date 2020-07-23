@@ -39,6 +39,15 @@ namespace WinUI.CustomControls.Behaviors
     public class DragMoveBehavior : Behavior<Panel>
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// Using the Pythagorean Theorem, we calculate the distance moved by a mouse and then throttle
+        /// the calls to move a Window until it has reached this distance.
+        /// </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        const int C_DragMoveWhenDistanceIsThisManyPixels = 5;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The drag move logic. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -112,7 +121,7 @@ namespace WinUI.CustomControls.Behaviors
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// I tucked all of the logic for the DragMove into this class so that it would not be tied
-        /// specifcially the Microsoft.Xaml.Interactivity namespace and related classes.  It would be
+        /// specifically the Microsoft.Xaml.Interactivity namespace and related classes.  It would be
         /// easier to decouple the logic if someone needed to use it in another framework.  
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -225,12 +234,34 @@ namespace WinUI.CustomControls.Behaviors
                 var dX = x - _priorContactX;
                 var dY = y - _priorContactY;
 
+                //Throttle DragMove operations to reduce CPU.
+                var distance = CalculateDistance(dX,dY);
+                if(distance < C_DragMoveWhenDistanceIsThisManyPixels)return;
+
                 //Save for next time
                 _priorContactX = x;
                 _priorContactY = y;
 
                 //Move the window.
                 _windowHandle.MoveBy(dX, dY);
+            }
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            /// <summary>
+            /// Using the Pythagorean Theorem, this calculates the distance between two points on a two
+            /// dimensional coordinate system.
+            /// </summary>
+            ///
+            /// <param name="dX">   Is x2-x1. </param>
+            /// <param name="dY">   Is y2-y1. </param>
+            ///
+            /// <returns>   The calculated distance. </returns>
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            private static int CalculateDistance(int dX, int dY)
+            {
+                //Use the Pythagorean Theorem.
+                return (int)Math.Sqrt(dX*dX+dY*dY);
             }
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -247,7 +278,7 @@ namespace WinUI.CustomControls.Behaviors
                 x = 0;
                 y = 0;
 
-                //We need to know how much padding and border and titebar area surrounds the window because 
+                //We need to know how much padding and border and TitleBar area surrounds the window because 
                 // the pointer position we obtain is relative to the window.  There are many ways to do this
                 // but I found many of them do not work for all cases.  This seems to do the trick.
                 void GetNonClientSizes(RECT windowRect, out int borderWidth, out int borderHeight)
