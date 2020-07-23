@@ -44,7 +44,7 @@ namespace WinUI.CustomControls
 
         internal static Point DipToDevice(this UIElement element, Point point)
         {
-            var scale = (float)element.XamlRoot.RasterizationScale;
+            var scale = element.XamlRoot.RasterizationScale;
             return new Point(point.X * scale, point.Y * scale);
         }
 
@@ -74,7 +74,7 @@ namespace WinUI.CustomControls
 
         internal static Point DeviceToDip(this UIElement element, Point point)
         {
-            var scale = (float)element.XamlRoot.RasterizationScale;
+            var scale = element.XamlRoot.RasterizationScale;
             return new Point(point.X / scale, point.Y / scale);
         }
 
