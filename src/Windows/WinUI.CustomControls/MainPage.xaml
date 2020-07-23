@@ -55,7 +55,7 @@
             <Setter Property="Background" Value="{StaticResource KeyboardBackgroundBrush}" />
         </Style>
     </Page.Resources>
-    <controls:DockPanel>
+    <Grid>
         <!--
             Note that I use an attached property to add a drop shadow to the Border inside of this grid.  It is a behavior that
             requires the parent of what it is shadowing to be some sort of Panel type. This is needed so that it can insert
@@ -124,5 +124,5 @@
                 </Grid>
             </Border>
         </Grid>
-    </controls:DockPanel>
+    </Grid>
 </Page>

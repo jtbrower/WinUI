@@ -7,43 +7,6 @@
 //projects, I will know exactly where I left off.
         
 
-//In WPF this lets me have a completely transparent Window that is not hit testable and can have non-transparent 
-//content.  In WinUI, I have not been able to get it to work yet.  I know that WinUI does not support the acrylic
-//features but from what others stated, there are ways to have a transparent Window.  When I am done with the
-//SizeToContent feature, I might take another stab at it.  I moved over to SizeToContent, got it working perfectly
-//for downsizing but I am having a rough time calculating the required size of all controls such as StackPanels
-//and Grids. 
-using System;
-using System.Runtime.InteropServices;
-using PInvoke;
-namespace WinUI.Native
-{
-    public static class Transparency
-    {
-        private const int GWL_EXSTYLE = -20;
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern int GetWindowLong(IntPtr hwnd, int index);
-
-        [DllImport("user32.dll", SetLastError = true)]
-        private static extern int SetWindowLong(IntPtr hwnd, int index, int newStyle);
-
-        public static void MakeTransparent(IntPtr hwnd)
-        {
-            var extendedStyle = (User32.WindowStylesEx)GetWindowLong(hwnd, GWL_EXSTYLE);
-            SetWindowLong(hwnd, GWL_EXSTYLE, (int)(extendedStyle| User32.WindowStylesEx.WS_EX_TRANSPARENT | User32.WindowStylesEx.WS_EX_LAYERED));
-        }
-
-        public static void RemoveTransparency(IntPtr hwnd)
-        {
-            var extendedStyle = (User32.WindowStylesEx)GetWindowLong(hwnd, GWL_EXSTYLE);
-            SetWindowLong(hwnd, GWL_EXSTYLE, (int)(extendedStyle & ~User32.WindowStylesEx.WS_EX_TRANSPARENT));
-        }
-
-    }
-}
-
-
 //Notes to self
 - Figure out or log a potential issue where custom controls that inherit from other controls such as a grid, only work in XAML, not code behind.  Code behind throws exceptions.  See the WindowRoot control.
 - Determine if I should open a discussion or issue regarding the infinite DPI change events firing.  If I do I need to create a small project that can most easily reproduce the problem.

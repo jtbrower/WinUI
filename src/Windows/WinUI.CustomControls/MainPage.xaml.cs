@@ -21,10 +21,9 @@
 // SOFTWARE.
 namespace WinUI.CustomControls
 {
-    using Microsoft.Toolkit.Uwp.Helpers;
+    using WinUI.Native;
     using Microsoft.UI.Xaml;
     using Microsoft.UI.Xaml.Controls;
-    using System;
     using WinUI.Vm;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -118,7 +117,8 @@ namespace WinUI.CustomControls
                     $"About Changing Transparency to {Vm.NumberBoxValue}",
                     $"A MainWindow Transparency of {Vm.NumberBoxValue} could make it impossible to close the MainWindow without a debugger.  Are you sure you want to continue?")) { return; }
             }
-            _mainWindow.SetTransparency(Vm.NumberBoxValue);
+            _mainWindow.Handle.MakeTransparent_WorkInProgress();
+           // _mainWindow.SetTransparency(Vm.NumberBoxValue);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
