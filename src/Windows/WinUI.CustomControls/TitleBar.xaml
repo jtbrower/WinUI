@@ -35,18 +35,20 @@
         CornerRadius="1">
         <Grid>
             <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
+            <Image x:Name="IconImage" Height="32" Width="32"  Source="icon.ico"/>
             <TextBlock
-                Grid.Column="0"
+                Grid.Column="1"
                 Margin="5"
                 VerticalAlignment="Center"
                 Foreground="White"
                 FontSize="12"
                 Text="{x:Bind Path=Vm.Title, Mode=OneWay}" />
             <StackPanel
-                Grid.Column="1"
+                Grid.Column="2"
                 HorizontalAlignment="Right"
                 Orientation="Horizontal">
                 <Button Command="{x:Bind Path=Vm.MinimizeWindowCmd, Mode=OneWay}" Style="{StaticResource TitleBarButtonStyle}">
