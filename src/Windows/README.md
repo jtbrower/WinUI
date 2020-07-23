@@ -26,7 +26,8 @@
 * WinUI requires a Desktop app to be packaged and compiled to a specific platform (not AnyCpu). For that reason, I removed AnyCpu from projects but Visual Studio insists on placing it back in the solution.  Do not use AnyCpu.
 * I have Nullable enabled on all projects to enforce clean coding practices.  See Directory.Build.props, this is where it is enabled for all projects.
 
-# Known Issues (Work in Progress)
+# Known Issues
+* I am now seeing a Flaky DPI change Happening that is going to drive me mad.  Sometimes it happens, sometimes it does not.  I First noticed it after NativeMethods refactor but do not know if that was the cause. e6de79b3 might be more stable!
 * `<PackageReference Include=\"Microsoft.Windows.CsWinRT Version=\"0.1.0-prerelease.200629.3\" />` was added to the DemoApp to avoid a compatibility issue between .Net5 preview 6 and WinUI
 * "Warning	WMC9999	Type universe cannot resolve assembly: WinRT.Runtime, Version=0.1.0.2153, Culture=neutral, PublicKeyToken=null.	WinUI.DemoApp"
 * The Debug window shows 5 'WinRT transform error' exceptions that are swallowed on app start
