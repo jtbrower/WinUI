@@ -55,74 +55,67 @@
             <Setter Property="Background" Value="{StaticResource KeyboardBackgroundBrush}" />
         </Style>
     </Page.Resources>
-    <Grid>
+    <Grid
+        x:Name="MainGrid"
+        HorizontalAlignment="Center"
+        VerticalAlignment="Center"
+        controls:DockPanel.Dock="Bottom"
+        Background="Transparent">
+
         <!--
-            Note that I use an attached property to add a drop shadow to the Border inside of this grid.  It is a behavior that
-            requires the parent of what it is shadowing to be some sort of Panel type. This is needed so that it can insert
-            the required Canvas and Rectangle (if using rounded corners).
+            By using the RoundedDropShadowBehavior, a Canvas and a Rectangle will be inserted right here.
         -->
-        <Grid
-            x:Name="MainGrid"
-            HorizontalAlignment="Center"
-            VerticalAlignment="Center"
-            controls:DockPanel.Dock="Bottom"
-            Background="Transparent">
-
-            <!--
-                By using the RoundedDropShadowBehavior, a Canvas and a Rectangle will be inserted right here.
-            -->
-            <Border x:Name="MainContentBorder" Style="{StaticResource KeyboardBorderStyle}">
-                <interactivity:Interaction.Behaviors>
-                    <behave:RoundedDropShadowBehavior CornerRadius="10" />
-                </interactivity:Interaction.Behaviors>
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <StackPanel
-                        Grid.Column="0"
-                        Margin="5"
-                        VerticalAlignment="Center">
-                        <CheckBox
-                            Command="{x:Bind Vm.ToggleNonClientVisibilityButtonVm.ClickedCmd, Mode=OneWay}"
-                            CommandParameter="{x:Bind Vm.ToggleNonClientVisibilityButtonVm, Mode=OneWay}"
-                            Content="{x:Bind Vm.ToggleNonClientVisibilityButtonVm.DisplayContent, Mode=OneWay}"
-                            IsChecked="{x:Bind Vm.ToggleNonClientVisibilityButtonVm.IsChecked, Mode=TwoWay}"
-                            IsThreeState="False">
-                            <interactivity:Interaction.Behaviors>
-                                <behave:SwallowButtonDoubleTapBehavior />
-                            </interactivity:Interaction.Behaviors>
-                        </CheckBox>
-                        <StackPanel Orientation="Horizontal">
-                            <Button Click="SetWindowTransparency_Click" Content="Set Transparency">
-                                <interactivity:Interaction.Behaviors>
-                                    <behave:SwallowButtonDoubleTapBehavior />
-                                </interactivity:Interaction.Behaviors>
-                            </Button>
-                            <muxc:NumberBox
-                                LargeChange="20"
-                                Maximum="100"
-                                Minimum="0"
-                                SmallChange="5"
-                                SpinButtonPlacementMode="Inline"
-                                ValidationMode="InvalidInputOverwritten"
-                                Value="{x:Bind Path=Vm.NumberBoxValue, Mode=TwoWay}" />
-
-                        </StackPanel>
-                        <Button Click="RemoveWindowTransparency_Click" Content="Remove Transparency">
+        <Border x:Name="MainContentBorder" Style="{StaticResource KeyboardBorderStyle}">
+            <interactivity:Interaction.Behaviors>
+                <behave:RoundedDropShadowBehavior CornerRadius="10" />
+            </interactivity:Interaction.Behaviors>
+            <Grid Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel
+                    Grid.Column="0"
+                    Margin="5"
+                    VerticalAlignment="Center">
+                    <CheckBox
+                        Command="{x:Bind Vm.ToggleNonClientVisibilityButtonVm.ClickedCmd, Mode=OneWay}"
+                        CommandParameter="{x:Bind Vm.ToggleNonClientVisibilityButtonVm, Mode=OneWay}"
+                        Content="{x:Bind Vm.ToggleNonClientVisibilityButtonVm.DisplayContent, Mode=OneWay}"
+                        IsChecked="{x:Bind Vm.ToggleNonClientVisibilityButtonVm.IsChecked, Mode=TwoWay}"
+                        IsThreeState="False">
+                        <interactivity:Interaction.Behaviors>
+                            <behave:SwallowButtonDoubleTapBehavior />
+                        </interactivity:Interaction.Behaviors>
+                    </CheckBox>
+                    <StackPanel Orientation="Horizontal">
+                        <Button Click="SetWindowTransparency_Click" Content="Set Transparency">
                             <interactivity:Interaction.Behaviors>
                                 <behave:SwallowButtonDoubleTapBehavior />
                             </interactivity:Interaction.Behaviors>
                         </Button>
-                        <Button Click="SizeToContent_Click" Content="Size to Content">
-                            <interactivity:Interaction.Behaviors>
-                                <behave:SwallowButtonDoubleTapBehavior />
-                            </interactivity:Interaction.Behaviors>
-                        </Button>
+                        <muxc:NumberBox
+                            LargeChange="20"
+                            Maximum="100"
+                            Minimum="0"
+                            SmallChange="5"
+                            SpinButtonPlacementMode="Inline"
+                            ValidationMode="InvalidInputOverwritten"
+                            Value="{x:Bind Path=Vm.NumberBoxValue, Mode=TwoWay}" />
+
                     </StackPanel>
-                </Grid>
-            </Border>
-        </Grid>
+                    <Button Click="RemoveWindowTransparency_Click" Content="Remove Transparency">
+                        <interactivity:Interaction.Behaviors>
+                            <behave:SwallowButtonDoubleTapBehavior />
+                        </interactivity:Interaction.Behaviors>
+                    </Button>
+                    <Button Click="SizeToContent_Click" Content="Size to Content">
+                        <interactivity:Interaction.Behaviors>
+                            <behave:SwallowButtonDoubleTapBehavior />
+                        </interactivity:Interaction.Behaviors>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </Border>
     </Grid>
 </Page>

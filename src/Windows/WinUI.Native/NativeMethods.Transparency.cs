@@ -32,7 +32,8 @@ namespace WinUI.Native
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// This function is currently just a point of insertion for my experiments with Transparency.
+        /// This function is currently just a point of insertion for my experiments with Transparency. DO
+        /// NOT CALL IT AND EXPECT ANYTHING!
         /// </summary>
         ///
         /// <param name="hwnd"> The hwnd. </param>
