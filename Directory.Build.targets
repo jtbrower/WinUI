@@ -5,6 +5,7 @@
   the csproj files are imported. -->
 <Project>
 
+  <!-- Make sure the executables never get NuGet Packed. -->
   <PropertyGroup Condition=" '$(OutputType)' == 'WinExe' Or '$(OutputType)' == 'Exe' ">
     <!-- Exes are not packed. -->
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -13,24 +14,49 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Set icon location for nuget packages. -->
-    <None Include="$(MSBuildThisFileDirectory)\icon.ico" Visible="true" Pack="true" PackagePath=""/>
+    <!-- 
+    Pull in a custom icon from a single source so all assemblies can use the same one.  That way
+    you only have to change it in one place.
+    -->
+    <Content Include="$(MSBuildThisFileDirectory)\icon.ico" Visible="true" Pack="true" PackagePath=""/>
   </ItemGroup>
 
+
+  <!-- 
+    The following few sections will automatically pull in images as resources.
+  -->
+
   <!-- If there is an Image dir -->
-  <ItemGroup Condition=" Exists('$(ProjectDir)\Image\')">
-    <Resource Include="Image\*.png" />
-    <Resource Include="Image\*.jpg" />
+  <ItemGroup Condition=" Exists('$(ProjectDir)\Image\') ">
+    <Content Include="Image\*.png" />
+    <Content Include="Image\*.jpg" />
+    <Content Include="Image\*.ico" />
   </ItemGroup >
   <!-- If there is an Images dir -->
-  <ItemGroup Condition=" Exists('$(ProjectDir)\Images\')">
-    <Resource Include="Images\*.png" />
-    <Resource Include="Images\*.jpg" />
+  <ItemGroup Condition=" Exists('$(ProjectDir)\Images\') ">
+    <Content Include="Images\*.png" />
+    <Content Include="Images\*.jpg" />
   </ItemGroup >
   <!-- If there is an Img dir -->
-  <ItemGroup Condition=" Exists('$(ProjectDir)\Img\')">
-    <Resource Include="Img\*.png" />
-    <Resource Include="Img\*.jpg" />
+  <ItemGroup Condition=" Exists('$(ProjectDir)\Img\' )">
+    <Content Include="Img\*.png" />
+    <Content Include="Img\*.jpg" />
+  </ItemGroup >
+  <ItemGroup>
+    <Content Include="*.png" />
+    <Content Include="*.jpg" />
+    <Content Include="*.ico" />
   </ItemGroup >
 
+  <!-- 
+    Visual Studio WinUI has a bad habit of polluting the csproj files with a bunch of junk.  
+    I keep seeing an issue where I know a file is in the directory but suddenly it is gone.
+    For some reason it adds a "<None Remove..." entry while not re-adding it back in. By
+    placing this here, it tends to leave your csproj alone when it comes to xaml files.  
+    -->
+  <ItemGroup>
+    <Page Update="*.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
 </Project>

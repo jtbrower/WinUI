@@ -15,26 +15,6 @@
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="8.0.0-preview2" />
     <PackageReference Include="PInvoke.User32" Version="0.6.49" />
   </ItemGroup>
-  <ItemGroup>
-    <None Remove="ExtWindow.xaml" />
-    <None Remove="MainPage.xaml" />
-    <None Remove="TitleBar.xaml" />
-    <None Remove="WindowRoot.xaml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Page Update="MainPage.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="ExtWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="WindowRoot.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Update="TitleBar.xaml">
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\WinUI.Native\WinUI.Native.csproj" />
