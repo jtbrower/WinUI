@@ -117,8 +117,8 @@ namespace WinUI.CustomControls
                     $"About Changing Transparency to {Vm.NumberBoxValue}",
                     $"A MainWindow Transparency of {Vm.NumberBoxValue} could make it impossible to close the MainWindow without a debugger.  Are you sure you want to continue?")) { return; }
             }
-            _mainWindow.Handle.MakeTransparent_WorkInProgress();
-           // _mainWindow.SetTransparency(Vm.NumberBoxValue);
+           
+            _mainWindow.SetTransparency(Vm.NumberBoxValue);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
