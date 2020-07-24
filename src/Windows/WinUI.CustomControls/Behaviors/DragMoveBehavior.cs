@@ -40,6 +40,37 @@ namespace WinUI.CustomControls.Behaviors
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
+        /// Gets or sets a value indicating whether we allow drag on maximized window.
+        /// </summary>
+        ///
+        /// <value> True if allow drag on maximized window, false if not. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public bool AllowDragOnMaximizedWindow
+        {
+            get => (bool)GetValue(AllowDragOnMaximizedWindowProperty);
+            set => SetValue(AllowDragOnMaximizedWindowProperty, value);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The shadow size property. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static readonly DependencyProperty AllowDragOnMaximizedWindowProperty =
+            DependencyProperty.Register(
+                nameof(AllowDragOnMaximizedWindow), typeof(bool),
+                typeof(DragMoveBehavior),
+                new PropertyMetadata(false, (sender, args) =>
+                {
+                    if (!(args.NewValue is bool allowDrag)) return;
+                    //DragMove logic will be null when first created.  For that reason, the initial state is set
+                    // in the loaded event.
+                    if (!(sender is DragMoveBehavior dragMoveBehavior && dragMoveBehavior._dragMoveLogic is not null)) return;
+                    dragMoveBehavior._dragMoveLogic.AllowDragOnMaximizedWindow = allowDrag;
+                }));
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
         /// Using the Pythagorean Theorem, we calculate the distance moved by a mouse and then throttle
         /// the calls to move a Window until it has reached this distance.
         /// </summary>
@@ -90,7 +121,10 @@ namespace WinUI.CustomControls.Behaviors
             // how to do that.
             var windowHandle = GetActiveWindow();
 
-            _dragMoveLogic = new DragMoveLogic(windowHandle);
+            _dragMoveLogic = new DragMoveLogic(windowHandle)
+            {
+                AllowDragOnMaximizedWindow = AllowDragOnMaximizedWindow
+            };
             _dragMoveLogic.AttachDragMoveHandlers(AssociatedObject);
         }
 
@@ -159,12 +193,20 @@ namespace WinUI.CustomControls.Behaviors
             private readonly IntPtr _windowHandle;
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////
+            /// <summary>   True to allow, false to suppress the drag on maximized window. </summary>
+            ///
+            /// <value> True if allow drag on maximized window, false if not. </value>
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            internal bool AllowDragOnMaximizedWindow { get; set; }
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
             /// <summary>
-            /// Initializes a new instance of the WinUI.CustomControls.DragMoveBehavior.DragMoveLogic
-            /// class.
+            /// Initializes a new instance of the
+            /// WinUI.CustomControls.Behaviors.DragMoveBehavior.DragMoveLogic class.
             /// </summary>
             ///
-            /// <param name="windowHandle"> Handle of the window. </param>
+            /// <param name="windowHandle">                 Handle of the window. </param>
             ////////////////////////////////////////////////////////////////////////////////////////////////////
 
             public DragMoveLogic(IntPtr windowHandle)
@@ -182,6 +224,20 @@ namespace WinUI.CustomControls.Behaviors
             private void PointerPressed(object sender, PointerRoutedEventArgs e)
             {
                 if (_windowContent == null) return;
+
+                //One side effect of providing DragMove is that when using touch, the interaction with the
+                // Window can accidentally cause the DragMove to fire.  This can be pretty annoying and it 
+                // will confuse the end user.  For example, if they double tap on a slight angle, that 
+                // double tap can turn into a DragMove when the end user expected the Window to either Maximize
+                // or Restore.
+                //
+                // The applications that I develop are usually full-screen KIOSK apps.  When the Window is 
+                // full-screen I do not want any interaction to cause the Window to move.  This reduces
+                // the amount of misinterpreted DragMoves that can occur.  There are other approaches that
+                // I can combine with this so consider this an area for growth when needed.  I have provided
+                // the _allowDragOnMaximizedWindow flag for you to make your own decision on whether to
+                // allow drag on maximized Windows.
+                if (!AllowDragOnMaximizedWindow && _windowHandle.IsMaximized()) return;
 
                 //Save the id of the pointer we will be tracking.
                 _idOfCapturedPointer = e.Pointer.PointerId;
@@ -237,7 +293,7 @@ namespace WinUI.CustomControls.Behaviors
                 //Throttle DragMove operations to reduce CPU by using the Pythagorean Theorem to calculate 
                 // distance moved.
                 var distance = (int)Math.Sqrt(dX * dX + dY * dY);
-                if(distance < C_DragMoveWhenDistanceIsThisManyPixels)return;
+                if (distance < C_DragMoveWhenDistanceIsThisManyPixels) return;
 
                 //Save for next time
                 _priorContactX = x;
@@ -294,7 +350,6 @@ namespace WinUI.CustomControls.Behaviors
                 y = windowRect.top + deviceY + nonClientHeight;
 
             }
-
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////
             /// <summary>   Attach drag move handlers. </summary>

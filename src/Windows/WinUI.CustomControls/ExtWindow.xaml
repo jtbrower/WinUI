@@ -11,20 +11,11 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     <!--
-        NOTE : I need to update these notes!  JTB
     
         Warning : When using the drag move feature, it attaches to the Window's Content.  If the content does not
         have a color assigned, it will not register pointer down events.
         
-        Size is set to stretch so we can use as much space as possible for dragging.
-        
-        **Bug/Issue/Misunderstanding?**
-        Note that the ContentRoot custom control will not work in code behind for some odd reason.  Only
-        in XAML.  I am guessing this is a WinUI Preview Version 1 bug or a Jason Brower bug!  However, i just
-        couldn't instantiate any custom class that inherits from a Panel/Grid.  I have not tried other
-        custom controls to see if the problem extends beyond a Grid/Panel class.  To test this out I subclassed
-        Grid then instantiated an instance and added it as the Window.Content.  This led to exceptions, but
-        when I replaced the custom Grid class with a normal Grid, it worked fine.
+        Size is set to stretch so we can use as much space as possible for both dragging and point down events.
     -->
     <Grid
         x:Name="RootContainer"
@@ -38,7 +29,8 @@
             the generic type for a Behavior.
         -->
         <interactivity:Interaction.Behaviors>
-            <behave:DragMoveBehavior />
+            <!-- Do not let the DragMove happen on a Maximized Window-->
+            <behave:DragMoveBehavior AllowDragOnMaximizedWindow="False"/>
         </interactivity:Interaction.Behaviors>
     </Grid>
 </Window>
