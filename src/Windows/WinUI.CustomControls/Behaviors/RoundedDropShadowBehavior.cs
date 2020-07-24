@@ -67,7 +67,7 @@ namespace WinUI.CustomControls.Behaviors
         public static readonly DependencyProperty CornerRadiusProperty =
             DependencyProperty.Register(nameof(CornerRadius),
                 typeof(double),
-                typeof(WindowRoot),
+                typeof(ContentRoot),
                 new PropertyMetadata(0.0));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////

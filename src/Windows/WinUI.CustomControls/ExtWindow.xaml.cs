@@ -84,7 +84,7 @@ namespace WinUI.CustomControls
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public EnumWindowState _currentWindowState = EnumWindowState.Other;
+        public EnumWindowState _cachedWindowState = EnumWindowState.Other;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets the handle. </summary>
@@ -114,30 +114,57 @@ namespace WinUI.CustomControls
         /// Initializes a new instance of the WinUI.CustomControls.ExtWindow class.
         /// </summary>
         ///
-        /// <param name="windowRoot">   The window root. </param>
+        /// <param name="contentRoot">   The window root. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public ExtWindow(WindowRoot windowRoot) : this()
+        public ExtWindow(ContentRoot contentRoot) : this()
         {
             InitializeComponent();
 
-            if (windowRoot.Vm != null)
+            //ContentRoot is the top level representation of the customizable client content.
+            ContentRoot = contentRoot;
+
+            //Grab the handle and remove the TitleBar and border
+            Handle = this.GetHandle();
+            Handle.HideWin32NonClientArea();
+
+            //If the content has a TitelBar then assign the event handlers for the buttons
+            var titleBarVm = contentRoot?.Vm?.TitleBarVm;
+            if (titleBarVm != null)
             {
-                var tb = windowRoot.Vm.TitleBarVm;
-                tb.CloseWindowCmd = new DelegateCmd(Close);
-                tb.MinimizeWindowCmd = new DelegateCmd(Minimize);
-                tb.MaximizeWindowCmd = new DelegateCmd(Maximize);
-                tb.RestoreWindowCmd = new DelegateCmd(Restore);
+                titleBarVm.CloseWindowCmd = new DelegateCmd(Close);
+                titleBarVm.MinimizeWindowCmd = new DelegateCmd(Minimize);
+                titleBarVm.MaximizeWindowCmd = new DelegateCmd(Maximize);
+                titleBarVm.RestoreWindowCmd = new DelegateCmd(Restore);
             }
 
-            RootGrid = windowRoot;
-            WindowGrid.Children.Add(windowRoot);
+            WindowStateChanged += ExtWindow_WindowStateChanged;
 
-            Handle = this.GetHandle();
-            RootGrid.Loaded += RootGrid_Loaded;
-            RootGrid.Unloaded += RootGrid_Unloaded;
-            HideWin32NonClientArea();
+
+            RootContainer.Children.Add(ContentRoot);
+            RootContainer.DoubleTapped += ContentRoot_DoubleTapped;
+
+
+            ContentRoot.Loaded += ContentRoot_Loaded;
+            ContentRoot.Unloaded += ContentRoot_Unloaded;
+
+            
             SizeChanged += ExtWindow_SizeChanged;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Extent window state changed. </summary>
+        ///
+        /// <param name="sender">   Source of the event. </param>
+        /// <param name="e">        An EnumWindowState to process. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void ExtWindow_WindowStateChanged(object? sender, EnumWindowState e)
+        {
+            //If there is a TitleBar then assure the IsMaximized flag is updated.
+            var titleBar = ContentRoot?.Vm?.TitleBarVm;
+            if(titleBar == null)return;
+            titleBar.IsMaximized = e == EnumWindowState.Maximized;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -146,7 +173,7 @@ namespace WinUI.CustomControls
         /// <value> The root grid. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public WindowRoot RootGrid { get; }
+        public ContentRoot ContentRoot { get; }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Event handler. Called by ExtWindow for size changed events. </summary>
@@ -157,16 +184,12 @@ namespace WinUI.CustomControls
 
         private void ExtWindow_SizeChanged(object sender, WindowSizeChangedEventArgs args)
         {
-            var windowState = GetWindowState();
-
-            if (RootGrid.Vm != null)
-                RootGrid.Vm.TitleBarVm.IsMaximized = windowState == EnumWindowState.Maximized;
-
-            if (WindowStateChanged == null) return;
-            //Note that I am checking again for null on the event handler to assure
-            // nothing un-subscribed since I requested the state.  Unlikely but thats
-            // how threading issues are born.
-            if (_currentWindowState != windowState) WindowStateChanged?.Invoke(this, windowState);
+            //The Window size changed, if this also means a state change (for example, from Minimized to
+            // Maximized) then we fire the vent handler.
+            var currentWindowState = GetWindowState();
+            if(_cachedWindowState == currentWindowState)return;
+            _cachedWindowState = currentWindowState;
+            WindowStateChanged?.Invoke(this, _cachedWindowState);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -209,26 +232,26 @@ namespace WinUI.CustomControls
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by RootGrid for unloaded events. </summary>
+        /// <summary>   Event handler. Called by ContentRoot for unloaded events. </summary>
         ///
         /// <param name="sender">   Source of the event. </param>
         /// <param name="e">        Routed event information. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void RootGrid_Unloaded(object sender, RoutedEventArgs e)
+        private void ContentRoot_Unloaded(object sender, RoutedEventArgs e)
         {
             if (_displayInformation == null) return;
             _displayInformation.DpiChanged -= DisplayInfo_DpiChanged;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by RootGrid for loaded events. </summary>
+        /// <summary>   Event handler. Called by ContentRoot for loaded events. </summary>
         ///
         /// <param name="sender">   Source of the event. </param>
         /// <param name="e">        Routed event information. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void RootGrid_Loaded(object sender, RoutedEventArgs e)
+        private void ContentRoot_Loaded(object sender, RoutedEventArgs e)
         {
             _displayInformation = DisplayInformation.GetForCurrentView();
             _displayInformation.DpiChanged += DisplayInfo_DpiChanged;
@@ -244,12 +267,12 @@ namespace WinUI.CustomControls
 
         private double? GetDpiScale()
         {
-            if (RootGrid.XamlRoot == null)
+            if (ContentRoot.XamlRoot == null)
             {
-                Debug.WriteLine($"{nameof(GetDpiScale)} called before {nameof(RootGrid)}.XamlRoot was available.");
+                Debug.WriteLine($"{nameof(GetDpiScale)} called before {nameof(ContentRoot)}.XamlRoot was available.");
                 return null;
             }
-            return (RootGrid.XamlRoot.RasterizationScale * 96.0) / User32.GetDpiForWindow(Handle);
+            return (ContentRoot.XamlRoot.RasterizationScale * 96.0) / User32.GetDpiForWindow(Handle);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -285,21 +308,39 @@ namespace WinUI.CustomControls
 
             ScaleContentForDpi();
 
-            //When the non-client area such as the TitleBar is auto-scaled by the framework, it will either
-            // leave extra space or require more.  Keep an eye on this call, I noticed that resizing the
-            // window was causing recursive DPI changed events, but recent design changes might have 
-            // affected it because it works fine now.
-            SizeToContent();
+            //Lesson Learned : note that we recommend using the custom TitleBar or your own version of it
+            // instead of the built-in Win32 Window TitleBar and Border.  Trying to properly handle DPI
+            // changed events while also using the Win32 TitleBar, brings on more corner case risk than
+            // what it is worth.  The primary problem is the fact that when you have an application that
+            // is DPI Aware and the framework automatically scales the TitelBar for you, it will shrink 
+            // and expand, causing your client area to either not have enough space (when you are using
+            // our SizeToContent feature its most noticeable) or you will have slightly too much space.
+            //
+            // Initially I thought the solution would be easy.  When the DPI changed and the TitleBar 
+            // scaled under its own power, I would simply resize the Window to either add to or take away
+            // from the total Window size.  However, this causes a pretty nasty bug where the DPI changed
+            // event will keep firing, causing infinite recursion and the only way out of it is a task
+            // manager kill.  If your using Visual Studio when this happens, you won't even have control
+            // over Visual Studio.  It does not always happen, but it can be caused by dragging the 
+            // Window slowly between two Displays where the DPI is different between the two.  For example
+            // you might have one monitor scaled at 150% and the other at 100%.  This is most likely to 
+            // cause it.  
+            //
+            // If you use the custom TitleBar that I provided, you do not need to worry about this
+            // problem because I scale the TitleBar along with the client content so that it's uniform.
+            // Using this approach you will have 100% control over the look and feel of your Window's.
+            // From the content, the border, DropShadow to the TitleBar, you can easily change all  of
+            // it and scale it on a DPI change without worrying how the TitleBar scaled.
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by RootGrid for double tapped events. </summary>
+        /// <summary>   Event handler. Called by ContentRoot for double tapped events. </summary>
         ///
         /// <param name="sender">   Source of the event. </param>
         /// <param name="e">        Double tapped routed event information. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void RootGrid_DoubleTapped(object sender, DoubleTappedRoutedEventArgs args)
+        private void ContentRoot_DoubleTapped(object sender, DoubleTappedRoutedEventArgs args)
         {
             if (Handle.IsMaximized())
             {
@@ -322,16 +363,16 @@ namespace WinUI.CustomControls
         /// <seealso cref="WinUI.CustomControls.IExtWindow.XamlRoot"/>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public XamlRoot XamlRoot => RootGrid.XamlRoot;
+        public XamlRoot XamlRoot => ContentRoot.XamlRoot;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// The Window.Content was redeclared as a new property so we could change the setter to prevent
-        /// an unsuspecting victim from blowing over the top of the WindowRoot that this class
+        /// an unsuspecting victim from blowing over the top of the ContentRoot that this class
         /// depends on.  I will admit, it is slightly wonky because the XAML for the ExtWindow is setting 
-        /// the content to our WindowRoot type.  BTW, I actually didn't want or need the XAML for this
+        /// the content to our ContentRoot type.  BTW, I actually didn't want or need the XAML for this
         /// class but I stumbled upon an odd bug that I need to report.  I was unable to use the custom
-        /// WindowRoot type in this code behind, it through access violations in native code, but if
+        /// ContentRoot type in this code behind, it through access violations in native code, but if
         /// you use the same custom type in XAML it works fine.  I have not encountered anything like that
         /// before.
         /// 
@@ -350,7 +391,7 @@ namespace WinUI.CustomControls
             // event handlers for drag move can be attached to that. If the end user blows away the
             // ExtWindow content it will affect the drag move handlers.  So replacing the Window.Content
             // with this implementation lets me achieve those goals.
-            get => RootGrid.Content;
+            get => ContentRoot.Content;
             set => SetContent(value);
         }
 
@@ -373,12 +414,12 @@ namespace WinUI.CustomControls
                     verticalContentAlignment = control.VerticalContentAlignment;
                 }
 
-                RootGrid.HorizontalAlignment = clientsContent.HorizontalAlignment;
-                RootGrid.VerticalAlignment = clientsContent.VerticalAlignment;
-                RootGrid.HorizontalContentAlignment = horizontalContentAlignment;
-                RootGrid.VerticalContentAlignment = verticalContentAlignment;
+                ContentRoot.HorizontalAlignment = clientsContent.HorizontalAlignment;
+                ContentRoot.VerticalAlignment = clientsContent.VerticalAlignment;
+                ContentRoot.HorizontalContentAlignment = horizontalContentAlignment;
+                ContentRoot.VerticalContentAlignment = verticalContentAlignment;
             }
-            RootGrid.Content = clientsContent;
+            ContentRoot.Content = clientsContent;
         }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
@@ -395,7 +436,7 @@ namespace WinUI.CustomControls
 
         private void ScaleWindowContent(double scaleAt)
         {
-            RootGrid.ScaleContent(scaleAt);
+            ContentRoot.ScaleContent(scaleAt);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -408,14 +449,14 @@ namespace WinUI.CustomControls
 
         public void SizeToContent()
         {
-            if (!RootGrid.TrueDesiredSize.HasValue)
+            if (!ContentRoot.TrueDesiredSize.HasValue)
             {
-                Debug.WriteLine($"{nameof(SizeToContent)} called before {nameof(RootGrid.TrueDesiredSize)} had a value.  Unable to resize.");
+                Debug.WriteLine($"{nameof(SizeToContent)} called before {nameof(ContentRoot.TrueDesiredSize)} had a value.  Unable to resize.");
                 return;
             }
 
             //This value tells us the truth about how much space is needed to fully render the content in the grid.
-            var sizeRequired = RootGrid.TrueDesiredSize.Value;
+            var sizeRequired = ContentRoot.TrueDesiredSize.Value;
 
             //If it lied to us then don't use it :)
             if (sizeRequired.Width <= 0 || sizeRequired.Height <= 0)
@@ -425,8 +466,8 @@ namespace WinUI.CustomControls
             }
 
             //Convert to device units
-            var clientHeightInDevicePixels = RootGrid.DipToDevice(sizeRequired.Height);
-            var clientWidthInDevicePixels = RootGrid.DipToDevice(sizeRequired.Width);
+            var clientHeightInDevicePixels = ContentRoot.DipToDevice(sizeRequired.Height);
+            var clientWidthInDevicePixels = ContentRoot.DipToDevice(sizeRequired.Width);
 
             //Now we need to calculate the non-client area of the Window.  This is only important when a Window has a border and or a
             // TitleBar (or menu).  In other words, if the HideNonClientArea method has been called on the Window then the nonClientSize
@@ -623,20 +664,20 @@ namespace WinUI.CustomControls
 
         private void ChangeCustomNonClientAreaVisibility(bool isVisible)
         {
-            if (RootGrid.Vm == null) return;
+            if (ContentRoot.Vm == null) return;
 
             //If the current state matches the requested leave.
-            if (RootGrid.Vm.TitleBarVm.IsVisible == isVisible) return;
+            if (ContentRoot.Vm.TitleBarVm.IsVisible == isVisible) return;
 
             //Removing or showing the DropShadow is somewhat similar to removing or showing the Win32 
             // Window border
             if (isVisible)
-                RootGrid.ShowDropShadow();
+                ContentRoot.ShowDropShadow();
             else
-                RootGrid.HideDropShadow();
+                ContentRoot.HideDropShadow();
 
 
-            RootGrid.Vm.TitleBarVm.IsVisible = isVisible;
+            ContentRoot.Vm.TitleBarVm.IsVisible = isVisible;
 
             //Force the content to recompute its space requirements
             base.Content?.UpdateLayout();

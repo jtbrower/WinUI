@@ -82,8 +82,8 @@ namespace WinUI.DemoApp
                         }, "Show Non-Client Area", true)
                 };
             });
-            serviceCollection.AddTransient<WindowRoot>();
-            serviceCollection.AddTransient<WindowRootVm>();
+            serviceCollection.AddTransient<ContentRoot>();
+            serviceCollection.AddTransient<ContentRootVm>();
             serviceCollection.AddTransient<TitleBar>();
             serviceCollection.AddTransient(s => new TitleBarVm
             {

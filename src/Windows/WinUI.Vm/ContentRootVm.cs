@@ -21,7 +21,7 @@
 // SOFTWARE.
 namespace WinUI.Vm
 {
-    public class WindowRootVm : PropChangeBase
+    public class ContentRootVm : PropChangeBase
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The title bar view model. </summary>
@@ -38,12 +38,12 @@ namespace WinUI.Vm
         public TitleBarVm TitleBarVm { get => _titleBarVm; set => SetProperty(ref _titleBarVm, value); }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Initializes a new instance of the WinUI.Vm.WindowRootVm class. </summary>
+        /// <summary>   Initializes a new instance of the WinUI.Vm.ContentRootVm class. </summary>
         ///
         /// <param name="titleBarVm">   The title bar view model. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public WindowRootVm(TitleBarVm titleBarVm)
+        public ContentRootVm(TitleBarVm titleBarVm)
         {
             _titleBarVm = titleBarVm;
         }

@@ -39,7 +39,7 @@
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <Image x:Name="IconImage" Height="32" Width="32"  Source="icon.ico"/>
+            <Image x:Name="IconImage" Height="32" Width="32" Margin="5"  Source="icon.ico"/>
             <TextBlock
                 Grid.Column="1"
                 Margin="5"

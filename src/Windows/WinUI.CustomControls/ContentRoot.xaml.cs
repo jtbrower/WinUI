@@ -32,15 +32,15 @@ namespace WinUI.CustomControls
     /// <content>   Container for window contents. This class cannot be inherited. </content>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public sealed partial class WindowRoot : LayoutTransformControl
+    public sealed partial class ContentRoot : LayoutTransformControl
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The view model property. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public static readonly DependencyProperty VmProperty = DependencyProperty.Register(nameof(Vm),
-            typeof(WindowRootVm),
-            typeof(WindowRoot),
+            typeof(ContentRootVm),
+            typeof(ContentRoot),
             new PropertyMetadata(null));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,9 +49,9 @@ namespace WinUI.CustomControls
         /// <value> The view model. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public WindowRootVm? Vm
+        public ContentRootVm? Vm
         {
-            get => GetValue(VmProperty) as WindowRootVm;
+            get => GetValue(VmProperty) as ContentRootVm;
             set => SetValue(VmProperty, value);
         }
 
@@ -61,7 +61,7 @@ namespace WinUI.CustomControls
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public WindowRoot()
+        public ContentRoot()
         {
             InitializeComponent();
         }
@@ -85,16 +85,16 @@ namespace WinUI.CustomControls
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Initializes a new instance of the WinUI.CustomControls.WindowRoot class. </summary>
+        /// <summary>   Initializes a new instance of the WinUI.CustomControls.ContentRoot class. </summary>
         ///
-        /// <param name="windowRootVm"> The window root view model. </param>
+        /// <param name="contentRootVm"> The window root view model. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public WindowRoot(WindowRootVm windowRootVm)
+        public ContentRoot(ContentRootVm contentRootVm)
         {
             InitializeComponent();
 
-            Vm = windowRootVm;
+            Vm = contentRootVm;
         }
 
 
@@ -104,7 +104,7 @@ namespace WinUI.CustomControls
 
         public static readonly DependencyProperty ContentProperty =
             DependencyProperty.Register(nameof(Content),
-                typeof(FrameworkElement), typeof(WindowRoot), new PropertyMetadata(null, ContentPropertyChanged));
+                typeof(FrameworkElement), typeof(ContentRoot), new PropertyMetadata(null, ContentPropertyChanged));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets or sets the view model. </summary>
@@ -127,16 +127,16 @@ namespace WinUI.CustomControls
 
         static void ContentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (!(d is WindowRoot windowRoot)) return;
-            foreach (var child in windowRoot.ChildGrid.Children.Where(c => !c.Equals(windowRoot.TitleBarInstance)))
+            if (!(d is ContentRoot contentRoot)) return;
+            foreach (var child in contentRoot.ChildGrid.Children.Where(c => !c.Equals(contentRoot.TitleBarInstance)))
             {
-                windowRoot.ChildGrid.Children.Remove(child);
+                contentRoot.ChildGrid.Children.Remove(child);
             }
 
             if (!(e.NewValue is UIElement uiElement)) return;
 
             uiElement.SetValue(Grid.RowProperty, 1);
-            windowRoot.ChildGrid.Children.Add(uiElement);
+            contentRoot.ChildGrid.Children.Add(uiElement);
         }
 
 
