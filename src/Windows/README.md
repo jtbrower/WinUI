@@ -27,7 +27,6 @@
 * I have Nullable enabled on all projects to enforce clean coding practices.  See Directory.Build.props, this is where it is enabled for all projects.
 
 # Known Issues
-* I am now seeing a Flaky DPI change Happening that is going to drive me mad.  Sometimes it happens, sometimes it does not.  I First noticed it after NativeMethods refactor but do not know if that was the cause. e6de79b3 might be more stable!
 * `<PackageReference Include=\"Microsoft.Windows.CsWinRT Version=\"0.1.0-prerelease.200629.3\" />` was added to the DemoApp to avoid a compatibility issue between .Net5 preview 6 and WinUI
 * "Warning	WMC9999	Type universe cannot resolve assembly: WinRT.Runtime, Version=0.1.0.2153, Culture=neutral, PublicKeyToken=null.	WinUI.DemoApp"
 * The Debug window shows 5 'WinRT transform error' exceptions that are swallowed on app start
@@ -35,7 +34,6 @@
 * The Debug Window warns that ActualWidthProperty is not found on Canvas.  I thought that maybe creating a property path, I should switch to just "ActualWidth"; even though the error goes away, it breaks the drop shadow and can't be correct.
 
 # TODO
-* Add an icon to the custom TitleBar
 * Change Cursor on DragMove operation
 * When you set the Window transparency all of the Window content becomes transparent too.  I need to figure out how to handle this.
 * I have not gone through the trouble to use ICommands for all of the buttons (or disable buttons that are not applicable to a given state like remove window transparency when there isn't any).
