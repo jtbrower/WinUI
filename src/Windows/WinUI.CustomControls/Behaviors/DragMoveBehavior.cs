@@ -71,12 +71,74 @@ namespace WinUI.CustomControls.Behaviors
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// Using the Pythagorean Theorem, we calculate the distance moved by a mouse and then throttle
-        /// the calls to move a Window until it has reached this distance.
+        /// Gets or sets the millisecond delay before drag move can begin.  This is the amount of time
+        /// that must pass from the PointerDown event until the Window is actually moved.  Increasing this
+        /// delay helps to prevent converting touch and mouse interactions into DragMove events that were 
+        /// intended to be single presses.
         /// </summary>
+        ///
+        /// <value> The millisecond delay before drag move can begin. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        const int C_DragMoveWhenDistanceIsThisManyPixels = 5;
+        public int MillisecondDelayBeforeDragMoveCanBegin
+        {
+            get { return (int)GetValue(MillisecondDelayBeforeDragMoveCanBeginProperty); }
+            set { SetValue(MillisecondDelayBeforeDragMoveCanBeginProperty, value); }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The millisecond delay before drag move can begin property. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static readonly DependencyProperty MillisecondDelayBeforeDragMoveCanBeginProperty =
+            DependencyProperty.Register(
+                nameof(MillisecondDelayBeforeDragMoveCanBegin), 
+                typeof(int), 
+                typeof(DragMoveBehavior),
+                new PropertyMetadata(50, (sender, args) =>
+                {
+                    if (!(args.NewValue is int delay)) return;
+                    //DragMove logic will be null when first created.  For that reason, the initial state is set
+                    // in the loaded event.
+                    if (!(sender is DragMoveBehavior dragMoveBehavior && dragMoveBehavior._dragMoveLogic is not null)) return;
+                    dragMoveBehavior._dragMoveLogic.MillisecondDelayBeforeDragMoveCanBegin = delay;
+                }));
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// Gets or sets the distance in pixels change before drag move can begin.  Using the Pythagorean
+        /// Theorem to calculate the distance in pixels, it is compared to and must be at or above this
+        /// value before the DragMove operation will begin.  Increasing this value conserves CPU cycles
+        /// and deadens the sensitivity.  It is used in conjunction with the
+        /// <see cref="MillisecondDelayBeforeDragMoveCanBegin" /> property.
+        /// </summary>
+        ///
+        /// <value> The distance in pixels change before drag move can begin. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public int DistanceInPixelsChangeBeforeDragMoveCanBegin
+        {
+            get { return (int)GetValue(DistanceInPixelsChangeBeforeDragMoveCanBeginProperty); }
+            set { SetValue(DistanceInPixelsChangeBeforeDragMoveCanBeginProperty, value); }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The distance in pixels change before drag move can begin property. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static readonly DependencyProperty DistanceInPixelsChangeBeforeDragMoveCanBeginProperty =
+            DependencyProperty.Register(
+                nameof(DistanceInPixelsChangeBeforeDragMoveCanBegin), 
+                typeof(int), 
+                typeof(DragMoveBehavior),
+                new PropertyMetadata(6, (sender, args) =>
+                {
+                    if (!(args.NewValue is int pixelCount)) return;
+                    //DragMove logic will be null when first created.  For that reason, the initial state is set
+                    // in the loaded event.
+                    if (!(sender is DragMoveBehavior dragMoveBehavior && dragMoveBehavior._dragMoveLogic is not null)) return;
+                    dragMoveBehavior._dragMoveLogic.DistanceInPixelsChangeBeforeDragMoveCanBegin = pixelCount;
+                }));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The drag move logic. </summary>
@@ -123,7 +185,9 @@ namespace WinUI.CustomControls.Behaviors
 
             _dragMoveLogic = new DragMoveLogic(windowHandle)
             {
-                AllowDragOnMaximizedWindow = AllowDragOnMaximizedWindow
+                AllowDragOnMaximizedWindow = AllowDragOnMaximizedWindow,
+                MillisecondDelayBeforeDragMoveCanBegin = MillisecondDelayBeforeDragMoveCanBegin,
+                DistanceInPixelsChangeBeforeDragMoveCanBegin=DistanceInPixelsChangeBeforeDragMoveCanBegin
             };
             _dragMoveLogic.AttachDragMoveHandlers(AssociatedObject);
         }
@@ -193,6 +257,32 @@ namespace WinUI.CustomControls.Behaviors
             private readonly IntPtr _windowHandle;
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////
+            /// <summary>   The tick when pointer pressed. </summary>
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            private DateTime? _timeWhenPointerPressed;
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            /// <summary>   The milliseconds after pointer pressed required before drag move. </summary>
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            internal int MillisecondDelayBeforeDragMoveCanBegin { get; set; } = 50;
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            /// <summary>   Gets or sets the distance in pixels change before drag move can begin. </summary>
+            ///
+            /// <value> The distance in pixels change before drag move can begin. </value>
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            internal int DistanceInPixelsChangeBeforeDragMoveCanBegin { get; set; } = 5;
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            /// <summary>   True if has met time threshold to begin drag move, false if not. </summary>
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            private bool _hasMetTimeThresholdToBeginDragMove;
+
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
             /// <summary>   True to allow, false to suppress the drag on maximized window. </summary>
             ///
             /// <value> True if allow drag on maximized window, false if not. </value>
@@ -223,6 +313,9 @@ namespace WinUI.CustomControls.Behaviors
 
             private void PointerPressed(object sender, PointerRoutedEventArgs e)
             {
+                _hasMetTimeThresholdToBeginDragMove = false;
+                _timeWhenPointerPressed = DateTime.Now;
+
                 if (_windowContent == null) return;
 
                 //One side effect of providing DragMove is that when using touch, the interaction with the
@@ -242,11 +335,10 @@ namespace WinUI.CustomControls.Behaviors
                 //Save the id of the pointer we will be tracking.
                 _idOfCapturedPointer = e.Pointer.PointerId;
 
-                //Capture it for dragging
-                _windowContent.CapturePointer(e.Pointer);
-
                 //Calculate the current contact location.
-                GetCurrentContactPosition(e, out _priorContactX, out _priorContactY);
+                GetCurrentContactPosition(e, out var x, out var y);
+                _priorContactX = x;
+                _priorContactY = y;
             }
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -265,7 +357,8 @@ namespace WinUI.CustomControls.Behaviors
                 if (capturedPointerId.Value != e.Pointer.PointerId) return;
 
                 //Release capture
-                _windowContent?.ReleasePointerCapture(e.Pointer);
+                _timeWhenPointerPressed = null;
+                _hasMetTimeThresholdToBeginDragMove = false;
                 _idOfCapturedPointer = null;
             }
 
@@ -278,10 +371,26 @@ namespace WinUI.CustomControls.Behaviors
 
             private void PointerMoved(object sender, PointerRoutedEventArgs e)
             {
-                //Make sure we are tracking this pointer for dragging
+                if (!_timeWhenPointerPressed.HasValue) return;
+
+                //Grab the pointer Id that we use to drag so we do not confuse it with another one.
                 var capturedPointerId = _idOfCapturedPointer;
                 if (!capturedPointerId.HasValue) return;
                 if (capturedPointerId.Value != e.Pointer.PointerId) return;
+
+                if (!_hasMetTimeThresholdToBeginDragMove)
+                {
+                    // This helps throttle movement from the initial PointerPressed event.  On touch screens,
+                    //  people are usually not touching directly downward upon the screen.  It's often on a
+                    //  slight angle and that slight angle can accidentally cause the DragMove event to fire
+                    //  when they were not intending to do so.  This assures that enough time has passed
+                    //  before the DragMove begins.
+                    var diff = DateTime.Now.Subtract(_timeWhenPointerPressed.Value);
+                    if (diff.TotalMilliseconds < MillisecondDelayBeforeDragMoveCanBegin)
+                        return;
+
+                    _hasMetTimeThresholdToBeginDragMove = true;
+                }
 
                 //Calculate the capture location.
                 GetCurrentContactPosition(e, out var x, out var y);
@@ -290,10 +399,10 @@ namespace WinUI.CustomControls.Behaviors
                 var dX = x - _priorContactX;
                 var dY = y - _priorContactY;
 
-                //Throttle DragMove operations to reduce CPU by using the Pythagorean Theorem to calculate 
-                // distance moved.
+                //We met a time threshold to begin the move, but now we check to see if the distance threshold
+                // has been met.
                 var distance = (int)Math.Sqrt(dX * dX + dY * dY);
-                if (distance < C_DragMoveWhenDistanceIsThisManyPixels) return;
+                if (distance < DistanceInPixelsChangeBeforeDragMoveCanBegin) return;
 
                 //Save for next time
                 _priorContactX = x;
@@ -304,7 +413,10 @@ namespace WinUI.CustomControls.Behaviors
             }
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////
-            /// <summary>   Calculates the contact position. </summary>
+            /// <summary>
+            /// Calculates the contact position. This works with a mouse pointer AND touch.  You might be
+            /// tempted to call User32.GetCursorPos() but it will not work with touch.
+            /// </summary>
             ///
             /// <param name="e">    Pointer routed event information. </param>
             /// <param name="x">    [out] an int to fill in. </param>
@@ -348,7 +460,6 @@ namespace WinUI.CustomControls.Behaviors
                 x = windowRect.left + deviceX + nonClientWidth;
                 //Same story for the Y axis.
                 y = windowRect.top + deviceY + nonClientHeight;
-
             }
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////

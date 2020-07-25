@@ -30,7 +30,7 @@
         -->
         <interactivity:Interaction.Behaviors>
             <!-- Do not let the DragMove happen on a Maximized Window-->
-            <behave:DragMoveBehavior AllowDragOnMaximizedWindow="False"/>
+            <behave:DragMoveBehavior AllowDragOnMaximizedWindow="False" />
         </interactivity:Interaction.Behaviors>
     </Grid>
 </Window>
