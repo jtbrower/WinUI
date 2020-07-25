@@ -132,7 +132,7 @@ namespace WinUI.CustomControls
             Handle.HideWin32NonClientArea();
 
             //If the content has a TitelBar then assign the event handlers for the buttons
-            var titleBarVm = contentRoot?.Vm?.TitleBarVm;
+            var titleBarVm = ContentRoot.Vm?.TitleBarVm;
             if (titleBarVm != null)
             {
                 titleBarVm.CloseWindowCmd = new DelegateCmd(Close);
