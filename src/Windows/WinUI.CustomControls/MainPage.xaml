@@ -83,17 +83,9 @@
                         CommandParameter="{x:Bind Vm.ToggleNonClientVisibilityButtonVm, Mode=OneWay}"
                         Content="{x:Bind Vm.ToggleNonClientVisibilityButtonVm.DisplayContent, Mode=OneWay}"
                         IsChecked="{x:Bind Vm.ToggleNonClientVisibilityButtonVm.IsChecked, Mode=TwoWay}"
-                        IsThreeState="False">
-                        <interactivity:Interaction.Behaviors>
-                            <behave:SwallowButtonDoubleTapBehavior />
-                        </interactivity:Interaction.Behaviors>
-                    </CheckBox>
+                        IsThreeState="False"/>
                     <StackPanel Orientation="Horizontal">
-                        <Button Click="SetWindowTransparency_Click" Content="Set Transparency">
-                            <interactivity:Interaction.Behaviors>
-                                <behave:SwallowButtonDoubleTapBehavior />
-                            </interactivity:Interaction.Behaviors>
-                        </Button>
+                        <Button Click="SetWindowTransparency_Click" Content="Set Transparency"/>
                         <muxc:NumberBox
                             LargeChange="20"
                             Maximum="100"
@@ -104,16 +96,8 @@
                             Value="{x:Bind Path=Vm.NumberBoxValue, Mode=TwoWay}" />
 
                     </StackPanel>
-                    <Button Click="RemoveWindowTransparency_Click" Content="Remove Transparency">
-                        <interactivity:Interaction.Behaviors>
-                            <behave:SwallowButtonDoubleTapBehavior />
-                        </interactivity:Interaction.Behaviors>
-                    </Button>
-                    <Button Click="SizeToContent_Click" Content="Size to Content">
-                        <interactivity:Interaction.Behaviors>
-                            <behave:SwallowButtonDoubleTapBehavior />
-                        </interactivity:Interaction.Behaviors>
-                    </Button>
+                    <Button Click="RemoveWindowTransparency_Click" Content="Remove Transparency"/>
+                    <Button Click="SizeToContent_Click" Content="Size to Content" />
                 </StackPanel>
             </Grid>
         </Border>

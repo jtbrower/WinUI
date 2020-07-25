@@ -30,6 +30,9 @@ namespace WinUI.CustomControls
     using WinUI.Vm;
     using PInvoke;
     using Microsoft.UI.Xaml.Input;
+    using Microsoft.UI.Xaml.Media;
+    using System.Linq;
+    using Microsoft.UI.Xaml.Controls.Primitives;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>
@@ -148,7 +151,7 @@ namespace WinUI.CustomControls
             ContentRoot.Loaded += ContentRoot_Loaded;
             ContentRoot.Unloaded += ContentRoot_Unloaded;
 
-            
+
             SizeChanged += ExtWindow_SizeChanged;
         }
 
@@ -163,7 +166,7 @@ namespace WinUI.CustomControls
         {
             //If there is a TitleBar then assure the IsMaximized flag is updated.
             var titleBar = ContentRoot?.Vm?.TitleBarVm;
-            if(titleBar == null)return;
+            if (titleBar == null) return;
             titleBar.IsMaximized = e == EnumWindowState.Maximized;
         }
 
@@ -187,7 +190,7 @@ namespace WinUI.CustomControls
             //The Window size changed, if this also means a state change (for example, from Minimized to
             // Maximized) then we fire the vent handler.
             var currentWindowState = GetWindowState();
-            if(_cachedWindowState == currentWindowState)return;
+            if (_cachedWindowState == currentWindowState) return;
             _cachedWindowState = currentWindowState;
             WindowStateChanged?.Invoke(this, _cachedWindowState);
         }
@@ -342,6 +345,15 @@ namespace WinUI.CustomControls
 
         private void ContentRoot_DoubleTapped(object sender, DoubleTappedRoutedEventArgs args)
         {
+            //Grab the position that was double tapped and see if there are any types in the path of 
+            // type ButtonBase.  If so then do not allow the double tap of a button to turn into 
+            // a Window Maximize or Restore because its confusing to the end user.
+            var doubleTapPosition = args.GetPosition(ContentRoot);
+
+            //This method already checks for IsHitTestVisible by default.
+            var uiElementsUnderPosition = VisualTreeHelper.FindElementsInHostCoordinates(doubleTapPosition, ContentRoot);
+            if (uiElementsUnderPosition.Any(e => e.GetType().IsSubclassOf(typeof(ButtonBase)))) return;
+
             if (Handle.IsMaximized())
             {
                 Handle.RestoreWindow();
