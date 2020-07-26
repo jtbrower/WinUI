@@ -25,27 +25,13 @@
   <!-- 
     The following few sections will automatically pull in images as resources.
   -->
-
-  <!-- If there is an Image dir -->
-  <ItemGroup Condition=" Exists('$(ProjectDir)\Image\') ">
-    <Content Include="Image\*.png" />
-    <Content Include="Image\*.jpg" />
-    <Content Include="Image\*.ico" />
-  </ItemGroup >
-  <!-- If there is an Images dir -->
-  <ItemGroup Condition=" Exists('$(ProjectDir)\Images\') ">
-    <Content Include="Images\*.png" />
-    <Content Include="Images\*.jpg" />
-  </ItemGroup >
-  <!-- If there is an Img dir -->
-  <ItemGroup Condition=" Exists('$(ProjectDir)\Img\' )">
-    <Content Include="Img\*.png" />
-    <Content Include="Img\*.jpg" />
-  </ItemGroup >
   <ItemGroup>
-    <Content Include="*.png" />
-    <Content Include="*.jpg" />
-    <Content Include="*.ico" />
+    <Content Include="**\*.png" />
+    <Content Include="**\*.jpg" />
+    <Content Include="**\*.ico" />
+    <!-- The above wildcards will also pull in items from bin and obj, so this excludes those.  -->
+    <Content Remove="bin\**\*" />
+    <Content Remove="obj\**\*" />      
   </ItemGroup >
 
   <!-- 
@@ -55,8 +41,10 @@
     placing this here, it tends to leave your csproj alone when it comes to xaml files.  
     -->
   <ItemGroup>
-    <Page Update="*.xaml">
+    <Page Update="**\*.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <Generator>XamlIntelliSenseFileGenerator</Generator>
+      <CopyToOutputDirectory>Never</CopyToOutputDirectory>      
     </Page>
   </ItemGroup>
 </Project>

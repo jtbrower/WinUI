@@ -14,8 +14,6 @@
     xmlns:muxc="using:Microsoft.UI.Xaml.Controls"
     mc:Ignorable="d">
     <Page.Resources>
-        <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" FalseValue="Collapsed" />
-
         <!--  Button style just so I can keep them the same width and apply a small margin.  -->
         <Style TargetType="Button">
             <Setter Property="MinWidth" Value="200" />

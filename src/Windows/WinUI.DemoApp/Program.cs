@@ -21,12 +21,13 @@
 // SOFTWARE.
 namespace WinUI.DemoApp
 {
-    using Microsoft.UI.Xaml;
     using Microsoft.Extensions.DependencyInjection;
     using WinUI.CustomControls;
     using WinUI.Vm;
     using System;
     using System.Diagnostics;
+    using Microsoft.UI.Xaml;
+    using WinRT;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>   A program. </summary>
@@ -63,10 +64,10 @@ namespace WinUI.DemoApp
             serviceCollection.AddSingleton<ExtWindow>();
             serviceCollection.AddSingleton<IExtWindow>(s => s.GetRequiredService<ExtWindow>());
             serviceCollection.AddSingleton<IPlatform>(s => s.GetRequiredService<ExtWindow>());
-
+            serviceCollection.AddSingleton<App>();
             serviceCollection.AddScoped<IDialogService, DialogService>();
             serviceCollection.AddTransient<MainPage>();
-            serviceCollection.AddTransient<MainPageVm>(s =>
+            serviceCollection.AddTransient(s =>
             {
                 var window = s.GetRequiredService<ExtWindow>();
                 return new MainPageVm(s.GetRequiredService<IDialogService>())
@@ -82,15 +83,15 @@ namespace WinUI.DemoApp
                         }, "Show Non-Client Area", true)
                 };
             });
-            serviceCollection.AddTransient<ContentRoot>();
-            serviceCollection.AddTransient<ContentRootVm>();
-            serviceCollection.AddTransient<TitleBar>();
+            serviceCollection.AddTransient<WindowVm>();
             serviceCollection.AddTransient(s => new TitleBarVm
             {
                 Title = "WinUI Desktop Demo",
+
             });
             return serviceCollection.BuildServiceProvider();
         }
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets the current. </summary>
         ///
@@ -109,7 +110,7 @@ namespace WinUI.DemoApp
 #pragma warning restore IDE0060 // Remove unused parameter
         {
             WinRT.ComWrappersSupport.InitializeComWrappers();
-            Application.Start(ApplicationInitializationCallback);
+            Microsoft.UI.Xaml.Application.Start(ApplicationInitializationCallback);
             ServiceProvider?.Dispose();
         }
 
@@ -119,7 +120,7 @@ namespace WinUI.DemoApp
         /// <param name="p">    A variable-length parameters list containing p. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        static void ApplicationInitializationCallback(ApplicationInitializationCallbackParams p)
+        static void ApplicationInitializationCallback(Microsoft.UI.Xaml.ApplicationInitializationCallbackParams p)
         {
             try
             {
@@ -128,7 +129,7 @@ namespace WinUI.DemoApp
                 //Yes, this is actually how this callback works.  You really don't even need to
                 // save the application instance, you just instantiate it.  I am saving it here
                 // out of clarity.  Declaring an object in space just feels different.
-                _application = new App(ServiceProvider);
+                _application = ServiceProvider.GetRequiredService<App>();
             }
             catch (Exception e)
             {

@@ -67,7 +67,7 @@ namespace WinUI.CustomControls.Behaviors
         public static readonly DependencyProperty CornerRadiusProperty =
             DependencyProperty.Register(nameof(CornerRadius),
                 typeof(double),
-                typeof(ContentRoot),
+                typeof(RoundedDropShadowBehavior),
                 new PropertyMetadata(0.0));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////

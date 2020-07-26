@@ -32,5 +32,6 @@
             <!-- Do not let the DragMove happen on a Maximized Window-->
             <behave:DragMoveBehavior AllowDragOnMaximizedWindow="False" />
         </interactivity:Interaction.Behaviors>
+        <local:WindowView x:Name="WindowViewInstance"/>
     </Grid>
 </Window>

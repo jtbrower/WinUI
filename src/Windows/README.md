@@ -48,3 +48,4 @@
 # To Save you Time
 * You cannot create a DependencyProperty on the Window class because it is not a DependencyObject
 * Do not try to create a DependencyProperty with a IntPtr type.  It will throw exceptions.
+* Including a resource dictionary that has a backing C# file is included like ```<namespace:YouDictionaryName />``` and not how one is normally included.

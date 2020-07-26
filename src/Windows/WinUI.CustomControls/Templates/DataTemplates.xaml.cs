@@ -19,33 +19,28 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace WinUI.Vm
+
+namespace WinUI.CustomControls.Templates
 {
-    public class ContentRootVm : PropChangeBase
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <content>   A data templates. This class cannot be inherited. </content>
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public sealed partial class DataTemplates : Microsoft.UI.Xaml.ResourceDictionary
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   The title bar view model. </summary>
+        /// <summary>
+        /// Initializes a new instance of the WinUI.CustomControls.Templates.DataTemplates class.
+        /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private TitleBarVm _titleBarVm;
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Gets or sets the title bar view model. </summary>
-        ///
-        /// <value> The title bar view model. </value>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public TitleBarVm TitleBarVm { get => _titleBarVm; set => SetProperty(ref _titleBarVm, value); }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Initializes a new instance of the WinUI.Vm.ContentRootVm class. </summary>
-        ///
-        /// <param name="titleBarVm">   The title bar view model. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public ContentRootVm(TitleBarVm titleBarVm)
+        public DataTemplates()
         {
-            _titleBarVm = titleBarVm;
+            //Note that if you ever run into a case where you are not hitting this breakpoint its probably
+            // because you included the library as a typical ResourceDictionary which is NOT correct.
+            // You would include this like your are defining an instance of it.  See below.
+            // <namespace:DataTemplates />
+            InitializeComponent();
         }
     }
 }

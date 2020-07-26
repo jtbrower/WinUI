@@ -23,7 +23,6 @@ namespace WinUI.CustomControls
 {
     using Microsoft.UI.Xaml;
     using Microsoft.Toolkit.Uwp.UI.Controls;
-    using System.Linq;
     using Windows.Foundation;
     using WinUI.Vm;
     using Microsoft.UI.Xaml.Controls;
@@ -32,15 +31,15 @@ namespace WinUI.CustomControls
     /// <content>   Container for window contents. This class cannot be inherited. </content>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public sealed partial class ContentRoot : LayoutTransformControl
+    public sealed partial class WindowView : LayoutTransformControl
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The view model property. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public static readonly DependencyProperty VmProperty = DependencyProperty.Register(nameof(Vm),
-            typeof(ContentRootVm),
-            typeof(ContentRoot),
+            typeof(WindowVm),
+            typeof(WindowView),
             new PropertyMetadata(null));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -49,9 +48,9 @@ namespace WinUI.CustomControls
         /// <value> The view model. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public ContentRootVm? Vm
+        public WindowVm? Vm
         {
-            get => GetValue(VmProperty) as ContentRootVm;
+            get => GetValue(VmProperty) as WindowVm;
             set => SetValue(VmProperty, value);
         }
 
@@ -61,9 +60,15 @@ namespace WinUI.CustomControls
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public ContentRoot()
+        public WindowView()
         {
             InitializeComponent();
+
+            //I don't like binding to statics like this so I pulled it out of the DataTemplate Selector
+            // and brought it up close to the top where it could more easily be injected.  I started by
+            // creating an interface called IApplicationStatics but I learned that it actually exists!
+            // So I will just leave it at this for now.
+            TypeNameDataTemplateSelector.FallbackResourceDictionary = Application.Current?.Resources;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -85,26 +90,12 @@ namespace WinUI.CustomControls
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Initializes a new instance of the WinUI.CustomControls.ContentRoot class. </summary>
-        ///
-        /// <param name="contentRootVm"> The window root view model. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public ContentRoot(ContentRootVm contentRootVm)
-        {
-            InitializeComponent();
-
-            Vm = contentRootVm;
-        }
-
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The content property. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public static readonly DependencyProperty ContentProperty =
             DependencyProperty.Register(nameof(Content),
-                typeof(FrameworkElement), typeof(ContentRoot), new PropertyMetadata(null, ContentPropertyChanged));
+                typeof(FrameworkElement), typeof(WindowView), new PropertyMetadata(null, ContentPropertyChanged));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets or sets the view model. </summary>
@@ -127,21 +118,27 @@ namespace WinUI.CustomControls
 
         static void ContentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (!(d is ContentRoot contentRoot)) return;
-            foreach (var child in contentRoot.ChildGrid.Children.Where(c => !c.Equals(contentRoot.TitleBarInstance)))
+            if (!(d is WindowView windowView)) return;
+
+            //A really complex looking way to remove the single row that is not the TitleBar
+            foreach (var child in windowView.ChildGrid.Children)
             {
-                contentRoot.ChildGrid.Children.Remove(child);
+                var row = (int?)child.GetValue(Grid.RowProperty);
+                if (!row.HasValue || row.Value != 1) continue;
+                windowView.ChildGrid.Children.Remove(child);
             }
 
+            //If null then we already removed it above.
             if (!(e.NewValue is UIElement uiElement)) return;
 
+            //Make sure to set the row and then add it.
             uiElement.SetValue(Grid.RowProperty, 1);
-            contentRoot.ChildGrid.Children.Add(uiElement);
+            windowView.ChildGrid.Children.Add(uiElement);
         }
 
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Size of the infinite. </summary>
+        /// <summary>   Size ofwindowViewite. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         private static readonly Size _infiniteSize = new Size(double.PositiveInfinity, double.PositiveInfinity);

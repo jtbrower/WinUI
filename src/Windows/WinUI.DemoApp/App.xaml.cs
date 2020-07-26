@@ -25,18 +25,20 @@ namespace WinUI.DemoApp
     using Microsoft.UI.Xaml;
     using Microsoft.Extensions.DependencyInjection;
     using WinUI.CustomControls;
+    using WinUI.Vm;
+    using System;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>   An application. </content>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public partial class App : Application
+    public partial class App
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The service provider. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private readonly ServiceProvider _serviceProvider;
+        private readonly IServiceProvider _serviceProvider;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Initializes a new instance of the WinUI.DemoApp.App class. </summary>
@@ -44,7 +46,7 @@ namespace WinUI.DemoApp
         /// <param name="paramters">    A variable-length parameters list containing parameters. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public App(ServiceProvider serviceProvider)
+        public App(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
             InitializeComponent();
@@ -72,6 +74,7 @@ namespace WinUI.DemoApp
 
             //Create a window and set the page.
             var window = _serviceProvider.GetRequiredService<ExtWindow>();
+            window.SetWindowVm(_serviceProvider.GetRequiredService<WindowVm>());
             window.Content = _serviceProvider.GetRequiredService<MainPage>();
 
             window.Activate();

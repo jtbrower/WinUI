@@ -101,58 +101,32 @@ namespace WinUI.CustomControls
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// Should not be called by production code, this exists only to please the designer.
-        /// </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-        public ExtWindow()
-#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-        {
-            InitializeComponent();
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>
         /// Initializes a new instance of the WinUI.CustomControls.ExtWindow class.
         /// </summary>
         ///
-        /// <param name="contentRoot">   The window root. </param>
+        /// <param name="windowView">   The window root. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public ExtWindow(ContentRoot contentRoot) : this()
+        public ExtWindow()
         {
             InitializeComponent();
 
-            //ContentRoot is the top level representation of the customizable client content.
-            ContentRoot = contentRoot;
-
-            //Grab the handle and remove the TitleBar and border
+            //Grab the handle and remove the built-in Win32 TitleBar and border
             Handle = this.GetHandle();
             Handle.HideWin32NonClientArea();
 
-            //If the content has a TitelBar then assign the event handlers for the buttons
-            var titleBarVm = ContentRoot.Vm?.TitleBarVm;
-            if (titleBarVm != null)
-            {
-                titleBarVm.CloseWindowCmd = new DelegateCmd(Close);
-                titleBarVm.MinimizeWindowCmd = new DelegateCmd(Minimize);
-                titleBarVm.MaximizeWindowCmd = new DelegateCmd(Maximize);
-                titleBarVm.RestoreWindowCmd = new DelegateCmd(Restore);
-            }
-
             WindowStateChanged += ExtWindow_WindowStateChanged;
 
-
-            RootContainer.Children.Add(ContentRoot);
-            RootContainer.DoubleTapped += ContentRoot_DoubleTapped;
-
-
-            ContentRoot.Loaded += ContentRoot_Loaded;
-            ContentRoot.Unloaded += ContentRoot_Unloaded;
-
+            RootContainer.DoubleTapped += RootContainer_DoubleTapped;
+            RootContainer.Loaded += RootContainer_Loaded;
+            RootContainer.Unloaded += RootContainer_Unloaded;
 
             SizeChanged += ExtWindow_SizeChanged;
+        }
+
+        public void SetVm(WindowVm vm)
+        {
+            WindowViewInstance.Vm = vm;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -165,18 +139,10 @@ namespace WinUI.CustomControls
         private void ExtWindow_WindowStateChanged(object? sender, EnumWindowState e)
         {
             //If there is a TitleBar then assure the IsMaximized flag is updated.
-            var titleBar = ContentRoot?.Vm?.TitleBarVm;
+            var titleBar = WindowViewInstance.Vm?.TitleBarVm;
             if (titleBar == null) return;
             titleBar.IsMaximized = e == EnumWindowState.Maximized;
         }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Gets the root grid. </summary>
-        ///
-        /// <value> The root grid. </value>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public ContentRoot ContentRoot { get; }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Event handler. Called by ExtWindow for size changed events. </summary>
@@ -235,26 +201,26 @@ namespace WinUI.CustomControls
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by ContentRoot for unloaded events. </summary>
+        /// <summary>   Event handler. Called by RootContainer for unloaded events. </summary>
         ///
         /// <param name="sender">   Source of the event. </param>
         /// <param name="e">        Routed event information. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void ContentRoot_Unloaded(object sender, RoutedEventArgs e)
+        private void RootContainer_Unloaded(object sender, RoutedEventArgs e)
         {
             if (_displayInformation == null) return;
             _displayInformation.DpiChanged -= DisplayInfo_DpiChanged;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by ContentRoot for loaded events. </summary>
+        /// <summary>   Event handler. Called by RootContainer for loaded events. </summary>
         ///
         /// <param name="sender">   Source of the event. </param>
         /// <param name="e">        Routed event information. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void ContentRoot_Loaded(object sender, RoutedEventArgs e)
+        private void RootContainer_Loaded(object sender, RoutedEventArgs e)
         {
             _displayInformation = DisplayInformation.GetForCurrentView();
             _displayInformation.DpiChanged += DisplayInfo_DpiChanged;
@@ -270,12 +236,12 @@ namespace WinUI.CustomControls
 
         private double? GetDpiScale()
         {
-            if (ContentRoot.XamlRoot == null)
+            if (WindowViewInstance.XamlRoot == null)
             {
-                Debug.WriteLine($"{nameof(GetDpiScale)} called before {nameof(ContentRoot)}.XamlRoot was available.");
+                Debug.WriteLine($"{nameof(GetDpiScale)} called before {nameof(WindowView)}.XamlRoot was available.");
                 return null;
             }
-            return (ContentRoot.XamlRoot.RasterizationScale * 96.0) / User32.GetDpiForWindow(Handle);
+            return (WindowViewInstance.XamlRoot.RasterizationScale * 96.0) / User32.GetDpiForWindow(Handle);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -337,21 +303,21 @@ namespace WinUI.CustomControls
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by ContentRoot for double tapped events. </summary>
+        /// <summary>   Event handler. Called by RootContainer for double tapped events. </summary>
         ///
         /// <param name="sender">   Source of the event. </param>
-        /// <param name="e">        Double tapped routed event information. </param>
+        /// <param name="args">     Double tapped routed event information. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void ContentRoot_DoubleTapped(object sender, DoubleTappedRoutedEventArgs args)
+        private void RootContainer_DoubleTapped(object sender, DoubleTappedRoutedEventArgs args)
         {
             //Grab the position that was double tapped and see if there are any types in the path of 
             // type ButtonBase.  If so then do not allow the double tap of a button to turn into 
             // a Window Maximize or Restore because its confusing to the end user.
-            var doubleTapPosition = args.GetPosition(ContentRoot);
+            var doubleTapPosition = args.GetPosition(WindowViewInstance);
 
             //This method already checks for IsHitTestVisible by default.
-            var uiElementsUnderPosition = VisualTreeHelper.FindElementsInHostCoordinates(doubleTapPosition, ContentRoot);
+            var uiElementsUnderPosition = VisualTreeHelper.FindElementsInHostCoordinates(doubleTapPosition, WindowViewInstance);
             if (uiElementsUnderPosition.Any(e => e.GetType().IsSubclassOf(typeof(ButtonBase)))) return;
 
             if (Handle.IsMaximized())
@@ -375,16 +341,16 @@ namespace WinUI.CustomControls
         /// <seealso cref="WinUI.CustomControls.IExtWindow.XamlRoot"/>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public XamlRoot XamlRoot => ContentRoot.XamlRoot;
+        public XamlRoot XamlRoot => WindowViewInstance.XamlRoot;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// The Window.Content was redeclared as a new property so we could change the setter to prevent
-        /// an unsuspecting victim from blowing over the top of the ContentRoot that this class
+        /// an unsuspecting victim from blowing over the top of the WindowView that this class
         /// depends on.  I will admit, it is slightly wonky because the XAML for the ExtWindow is setting 
-        /// the content to our ContentRoot type.  BTW, I actually didn't want or need the XAML for this
+        /// the content to our WindowView type.  BTW, I actually didn't want or need the XAML for this
         /// class but I stumbled upon an odd bug that I need to report.  I was unable to use the custom
-        /// ContentRoot type in this code behind, it through access violations in native code, but if
+        /// WindowView type in this code behind, it through access violations in native code, but if
         /// you use the same custom type in XAML it works fine.  I have not encountered anything like that
         /// before.
         /// 
@@ -403,7 +369,7 @@ namespace WinUI.CustomControls
             // event handlers for drag move can be attached to that. If the end user blows away the
             // ExtWindow content it will affect the drag move handlers.  So replacing the Window.Content
             // with this implementation lets me achieve those goals.
-            get => ContentRoot.Content;
+            get => WindowViewInstance.Content;
             set => SetContent(value);
         }
 
@@ -426,12 +392,12 @@ namespace WinUI.CustomControls
                     verticalContentAlignment = control.VerticalContentAlignment;
                 }
 
-                ContentRoot.HorizontalAlignment = clientsContent.HorizontalAlignment;
-                ContentRoot.VerticalAlignment = clientsContent.VerticalAlignment;
-                ContentRoot.HorizontalContentAlignment = horizontalContentAlignment;
-                ContentRoot.VerticalContentAlignment = verticalContentAlignment;
+                WindowViewInstance.HorizontalAlignment = clientsContent.HorizontalAlignment;
+                WindowViewInstance.VerticalAlignment = clientsContent.VerticalAlignment;
+                WindowViewInstance.HorizontalContentAlignment = horizontalContentAlignment;
+                WindowViewInstance.VerticalContentAlignment = verticalContentAlignment;
             }
-            ContentRoot.Content = clientsContent;
+            WindowViewInstance.Content = clientsContent;
         }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
@@ -448,7 +414,7 @@ namespace WinUI.CustomControls
 
         private void ScaleWindowContent(double scaleAt)
         {
-            ContentRoot.ScaleContent(scaleAt);
+            WindowViewInstance.ScaleContent(scaleAt);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -461,14 +427,14 @@ namespace WinUI.CustomControls
 
         public void SizeToContent()
         {
-            if (!ContentRoot.TrueDesiredSize.HasValue)
+            if (!WindowViewInstance.TrueDesiredSize.HasValue)
             {
-                Debug.WriteLine($"{nameof(SizeToContent)} called before {nameof(ContentRoot.TrueDesiredSize)} had a value.  Unable to resize.");
+                Debug.WriteLine($"{nameof(SizeToContent)} called before {nameof(WindowView.TrueDesiredSize)} had a value.  Unable to resize.");
                 return;
             }
 
             //This value tells us the truth about how much space is needed to fully render the content in the grid.
-            var sizeRequired = ContentRoot.TrueDesiredSize.Value;
+            var sizeRequired = WindowViewInstance.TrueDesiredSize.Value;
 
             //If it lied to us then don't use it :)
             if (sizeRequired.Width <= 0 || sizeRequired.Height <= 0)
@@ -478,8 +444,8 @@ namespace WinUI.CustomControls
             }
 
             //Convert to device units
-            var clientHeightInDevicePixels = ContentRoot.DipToDevice(sizeRequired.Height);
-            var clientWidthInDevicePixels = ContentRoot.DipToDevice(sizeRequired.Width);
+            var clientHeightInDevicePixels = WindowViewInstance.DipToDevice(sizeRequired.Height);
+            var clientWidthInDevicePixels = WindowViewInstance.DipToDevice(sizeRequired.Width);
 
             //Now we need to calculate the non-client area of the Window.  This is only important when a Window has a border and or a
             // TitleBar (or menu).  In other words, if the HideNonClientArea method has been called on the Window then the nonClientSize
@@ -676,20 +642,20 @@ namespace WinUI.CustomControls
 
         private void ChangeCustomNonClientAreaVisibility(bool isVisible)
         {
-            if (ContentRoot.Vm == null) return;
+            if (WindowViewInstance.Vm == null) return;
 
             //If the current state matches the requested leave.
-            if (ContentRoot.Vm.TitleBarVm.IsVisible == isVisible) return;
+            if (WindowViewInstance.Vm.TitleBarVm.IsVisible == isVisible) return;
 
             //Removing or showing the DropShadow is somewhat similar to removing or showing the Win32 
             // Window border
             if (isVisible)
-                ContentRoot.ShowDropShadow();
+                WindowViewInstance.ShowDropShadow();
             else
-                ContentRoot.HideDropShadow();
+                WindowViewInstance.HideDropShadow();
 
 
-            ContentRoot.Vm.TitleBarVm.IsVisible = isVisible;
+            WindowViewInstance.Vm.TitleBarVm.IsVisible = isVisible;
 
             //Force the content to recompute its space requirements
             base.Content?.UpdateLayout();
@@ -698,6 +664,47 @@ namespace WinUI.CustomControls
             // that we can remove with this call.  If we are adding the non-client area back in, this call
             // assures it has enough space to render.
             SizeToContent();
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets window view model. </summary>
+        ///
+        /// <returns>   The window view model. </returns>
+        ///
+        /// <seealso cref="IExtWindow.GetWindowVm()"/>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public WindowVm? GetWindowVm()
+        {
+            return WindowViewInstance?.Vm;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Sets window view model. </summary>
+        ///
+        /// <param name="windowVm">    The window view model. </param>
+        ///
+        /// <seealso cref="IExtWindow.SetWindowVm(WindowVm)"/>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void SetWindowVm(WindowVm windowVm)
+        {
+            var windowView = WindowViewInstance;
+            if (windowView == null) return;
+            windowView.Vm = windowVm;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Shows the cursor. </summary>
+        ///
+        /// <param name="makeVisible">  True to show, false to hide the make. </param>
+        ///
+        /// <seealso cref="IExtWindow.ShowCursor(bool)"/>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void ShowCursor(bool makeVisible)
+        {
+            User32.ShowCursor(makeVisible);
         }
     }
 }
