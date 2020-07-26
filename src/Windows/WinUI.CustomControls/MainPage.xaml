@@ -19,7 +19,6 @@
             <Setter Property="MinWidth" Value="200" />
             <Setter Property="Margin" Value="1" />
             <Setter Property="VerticalAlignment" Value="Top" />
-            <Setter Property="CommandParameter" Value="{x:Bind Vm, Mode=OneWay}" />
         </Style>
         <!--
             This is a brush that I use to paint the background of a Virtual Keyboard component that I wrote

@@ -56,12 +56,14 @@ namespace WinUI.Vm
         ///
         /// <param name="clickedCmd">       The 'clicked' command. </param>
         /// <param name="displayContent">   The display content. </param>
+        /// <param name="isEnabled">        (Optional) True if is enabled, false if not. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public ButtonVm(Action<T> clickedCmd, object displayContent)
+        public ButtonVm(Action<T> clickedCmd, object displayContent, bool isEnabled=true)
         {
             ClickedCmd=new DelegateCmd<T>(clickedCmd);
             _displayContent = displayContent;
+            _isEnabled = isEnabled;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////

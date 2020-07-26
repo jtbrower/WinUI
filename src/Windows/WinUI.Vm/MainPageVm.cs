@@ -88,7 +88,7 @@ namespace WinUI.Vm
                 new ButtonVm<MainPageVm>(async mp => await AddWindowTransparencyWithConfirmTask(mp), "Set Transparency");
 
             _removeWindowTransparencyButtonVm =
-                new ButtonVm<MainPageVm>(RemoveWindowTransparency, "Remove Transparency");
+                new ButtonVm<MainPageVm>(RemoveWindowTransparency, "Remove Transparency",false);
 
             _sizeToContentButtonVm =
                 new ButtonVm<MainPageVm>(SizeToContent, "Size to Content");

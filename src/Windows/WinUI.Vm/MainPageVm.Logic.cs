@@ -46,6 +46,7 @@ namespace WinUI.Vm
             //Assure the view didn't pass a null model
             if (mainPage == null) return;
             mainPage.OwnerWindow.RemoveTransparency();
+            mainPage.RemoveWindowTransparencyButtonVm.IsEnabled = false;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,6 +81,7 @@ namespace WinUI.Vm
             if (mainPage == null) return;
 
             var transparencyPercent = mainPage.WindowTransparencyPercent;
+
             if (transparencyPercent > C_RequireConfirmForTransparencyAboveThisAmount)
             {
                 if (!await mainPage.DialogService.ConfirmAsync(
@@ -91,6 +93,7 @@ namespace WinUI.Vm
             }
 
             mainPage.OwnerWindow.SetTransparency(transparencyPercent);
+            mainPage.RemoveWindowTransparencyButtonVm.IsEnabled = transparencyPercent != 0;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
