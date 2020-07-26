@@ -7,14 +7,37 @@
     xmlns:customControls="using:WinUI.CustomControls"
     xmlns:local="using:WinUI.CustomControls.Templates"
     xmlns:vm="using:WinUI.Vm">
+
+    <!-- 
+      NOTICE HOW TO INCLUDE THIS DICTIONARY 
+      Note that this ResourceDictionary has a code behind file that requires you to include
+      this resource dictionary differently than you are probably use to.  Assuming that 
+      "templates" is the namespace pointing to this dictionary you would do the following
+      in your App.xaml
+      
+      NOTE THAT THE FOLLOWING LINE IS CORRECT
+      <templates:DataTemplates />
+      
+      NOTE THAT THE FOLLOWING LINE IS WRONG
+      <ResourceDictionary Source="ms-appx:///WinUI.CustomControls/Templates/DataTemplates.xaml" /> 
+    -->
+    
+    
+    <!-- Converters -->
     <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" FalseValue="Collapsed" />
     <converters:BoolToVisibilityConverter
         x:Key="InverseBoolToVisibilityConverter"
         FalseValue="Visible"
         TrueValue="Collapsed" />
 
+    
+    <!-- 
+      Custom TitleBar DataTemplate
+      I completely remove the Win32 TitleBar and replace it with the content in this template.
+      Hence, if you want to customize your own TitleBar look and remove my company icon you
+      can do it here.
+    -->
     <Color x:Key="TitleBarColor">#0078D4</Color>
-
     <DataTemplate x:Key="TitleBarVm" x:DataType="vm:TitleBarVm">
         <Border
             Background="{StaticResource TitleBarColor}"
@@ -37,12 +60,14 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
+                
                 <Image
                     x:Name="IconImage"
                     Width="32"
                     Height="32"
                     Margin="5"
                     Source="icon.ico" />
+                
                 <TextBlock
                     Grid.Column="1"
                     Margin="5"
@@ -50,28 +75,39 @@
                     FontSize="12"
                     Foreground="White"
                     Text="{x:Bind Title, Mode=OneWay}" />
+                
                 <StackPanel
                     Grid.Column="2"
                     HorizontalAlignment="Right"
                     Orientation="Horizontal">
+                    
                     <Button Command="{x:Bind MinimizeWindowCmd, Mode=OneWay}">
                         <FontIcon Glyph="&#xE921;" />
                     </Button>
+                    
                     <Button
                         Command="{x:Bind MaximizeWindowCmd, Mode=OneWay}"
                         Visibility="{x:Bind IsMaximized, Mode=OneWay, Converter={StaticResource InverseBoolToVisibilityConverter}}">
                         <FontIcon Glyph="&#xE922;" />
                     </Button>
+                    
                     <Button
                         Command="{x:Bind Path=RestoreWindowCmd, Mode=OneWay}"
                         Visibility="{x:Bind IsMaximized, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}">
                         <FontIcon Glyph="&#xE923;" />
                     </Button>
+                    
                     <Button Command="{x:Bind CloseWindowCmd, Mode=OneWay}">
                         <FontIcon Foreground="Red" Glyph="&#xE8BB;" />
                     </Button>
+                    
                 </StackPanel>
             </Grid>
         </Border>
+    </DataTemplate>
+    
+    <!-- The application's main page is DataTemplated here. -->
+    <DataTemplate x:Key="MainPageVm" x:DataType="vm:MainPageVm">
+        <customControls:MainPage Vm="{Binding}" />
     </DataTemplate>
 </ResourceDictionary>

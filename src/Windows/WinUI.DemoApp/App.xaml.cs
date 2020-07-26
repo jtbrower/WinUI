@@ -74,8 +74,13 @@ namespace WinUI.DemoApp
 
             //Create a window and set the page.
             var window = _serviceProvider.GetRequiredService<ExtWindow>();
-            window.SetWindowVm(_serviceProvider.GetRequiredService<WindowVm>());
-            window.Content = _serviceProvider.GetRequiredService<MainPage>();
+
+            //Set the initial page to display by grabbing the View Model which will cause
+            // the DataTemplating system to display the content with a template that we
+            // provided through the App.xaml resources.
+            var windowVm = _serviceProvider.GetRequiredService<WindowVm>();
+            windowVm.ClientsContent = _serviceProvider.GetRequiredService<MainPageVm>();
+            window.SetWindowVm(windowVm);
 
             window.Activate();
 

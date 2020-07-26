@@ -46,24 +46,10 @@ namespace WinUI.CustomControls
         /// <value> The view model. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public MainPageVm Vm
+        public MainPageVm? Vm
         {
-            //The only reason this shows up is because I have to keep the constructor for the designer 
-            // so that when WinUI does work with a designer someday it will be there.
-#pragma warning disable CS8603 // Possible null reference return.
             get => GetValue(VmProperty) as MainPageVm;
-#pragma warning restore CS8603 // Possible null reference return.
-            private set => SetValue(VmProperty, value);
-        }
-
-        //Note that this is only needed for the Designer which always causes headaches with Nullable.  Since
-        // the designer doesn't work with WinUI right now I just make the Constructor private.
-#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-        private MainPage()
-#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-        {
-            //This constructor is to please the designer when one works with WinUI
-            InitializeComponent();
+            set => SetValue(VmProperty, value);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,10 +58,9 @@ namespace WinUI.CustomControls
         /// <param name="vm">   The view model. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public MainPage(MainPageVm vm)
+        public MainPage()
         {
             InitializeComponent();
-            Vm = vm;
         }
     }
 }

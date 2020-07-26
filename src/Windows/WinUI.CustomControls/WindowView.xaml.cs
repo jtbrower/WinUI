@@ -25,7 +25,6 @@ namespace WinUI.CustomControls
     using Microsoft.Toolkit.Uwp.UI.Controls;
     using Windows.Foundation;
     using WinUI.Vm;
-    using Microsoft.UI.Xaml.Controls;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>   Container for window contents. This class cannot be inherited. </content>
@@ -88,54 +87,6 @@ namespace WinUI.CustomControls
         {
             ChildGridDropShadow.ShowDropShadow();
         }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   The content property. </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public static readonly DependencyProperty ContentProperty =
-            DependencyProperty.Register(nameof(Content),
-                typeof(FrameworkElement), typeof(WindowView), new PropertyMetadata(null, ContentPropertyChanged));
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Gets or sets the view model. </summary>
-        ///
-        /// <value> The view model. </value>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public FrameworkElement? Content
-        {
-            get => GetValue(ContentProperty) as FrameworkElement;
-            set => SetValue(ContentProperty, value);
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Content property changed. </summary>
-        ///
-        /// <param name="d">    A DependencyObject to process. </param>
-        /// <param name="e">    Dependency property changed event information. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        static void ContentPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (!(d is WindowView windowView)) return;
-
-            //A really complex looking way to remove the single row that is not the TitleBar
-            foreach (var child in windowView.ChildGrid.Children)
-            {
-                var row = (int?)child.GetValue(Grid.RowProperty);
-                if (!row.HasValue || row.Value != 1) continue;
-                windowView.ChildGrid.Children.Remove(child);
-            }
-
-            //If null then we already removed it above.
-            if (!(e.NewValue is UIElement uiElement)) return;
-
-            //Make sure to set the row and then add it.
-            uiElement.SetValue(Grid.RowProperty, 1);
-            windowView.ChildGrid.Children.Add(uiElement);
-        }
-
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Size ofwindowViewite. </summary>

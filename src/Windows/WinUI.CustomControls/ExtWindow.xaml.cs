@@ -26,7 +26,6 @@ namespace WinUI.CustomControls
     using WinUI.Native;
     using System.Diagnostics;
     using Windows.Graphics.Display;
-    using Microsoft.UI.Xaml.Controls;
     using WinUI.Vm;
     using PInvoke;
     using Microsoft.UI.Xaml.Input;
@@ -123,6 +122,12 @@ namespace WinUI.CustomControls
 
             SizeChanged += ExtWindow_SizeChanged;
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Sets a view model. </summary>
+        ///
+        /// <param name="vm">   The view model. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public void SetVm(WindowVm vm)
         {
@@ -343,62 +348,6 @@ namespace WinUI.CustomControls
 
         public XamlRoot XamlRoot => WindowViewInstance.XamlRoot;
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>
-        /// The Window.Content was redeclared as a new property so we could change the setter to prevent
-        /// an unsuspecting victim from blowing over the top of the WindowView that this class
-        /// depends on.  I will admit, it is slightly wonky because the XAML for the ExtWindow is setting 
-        /// the content to our WindowView type.  BTW, I actually didn't want or need the XAML for this
-        /// class but I stumbled upon an odd bug that I need to report.  I was unable to use the custom
-        /// WindowView type in this code behind, it through access violations in native code, but if
-        /// you use the same custom type in XAML it works fine.  I have not encountered anything like that
-        /// before.
-        /// 
-        /// So there are at least two reasons why I took control over the Window.Content.  One was to 
-        /// apply a DragMove() handler to it and the other was because I needed a custom Grid where I 
-        /// could calculate the true size needed to fit the contents of the grid so that I could provide
-        /// the WPF.SizeToContent feature.
-        /// </summary>
-        ///
-        /// <value> The content. </value>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        new public FrameworkElement? Content
-        {
-            // The reason why I use a Grid is so that it will stretch out to fill the entire Window and the
-            // event handlers for drag move can be attached to that. If the end user blows away the
-            // ExtWindow content it will affect the drag move handlers.  So replacing the Window.Content
-            // with this implementation lets me achieve those goals.
-            get => WindowViewInstance.Content;
-            set => SetContent(value);
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Sets a content. </summary>
-        ///
-        /// <param name="clientsContent">   The clients content. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private void SetContent(FrameworkElement? clientsContent)
-        {
-            //Determine what to use for the content alignment.
-            if (clientsContent != null)
-            {
-                var horizontalContentAlignment = clientsContent.HorizontalAlignment;
-                var verticalContentAlignment = clientsContent.VerticalAlignment;
-                if (clientsContent is Control control)
-                {
-                    horizontalContentAlignment = control.HorizontalContentAlignment;
-                    verticalContentAlignment = control.VerticalContentAlignment;
-                }
-
-                WindowViewInstance.HorizontalAlignment = clientsContent.HorizontalAlignment;
-                WindowViewInstance.VerticalAlignment = clientsContent.VerticalAlignment;
-                WindowViewInstance.HorizontalContentAlignment = horizontalContentAlignment;
-                WindowViewInstance.VerticalContentAlignment = verticalContentAlignment;
-            }
-            WindowViewInstance.Content = clientsContent;
-        }
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// Note that this gives me the power to handle DPI changes as the end user moves this window

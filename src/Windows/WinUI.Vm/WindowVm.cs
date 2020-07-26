@@ -36,6 +36,12 @@ namespace WinUI.Vm
         private IExtWindow _ownerWindow;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The clients content. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private object? _clientsContent;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Initializes a new instance of the WinUI.Vm.WindowVm class. </summary>
         ///
         /// <param name="titleBarVm">   The title bar view model. </param>
@@ -61,6 +67,13 @@ namespace WinUI.Vm
 
         public IExtWindow OwnerWindow { get => _ownerWindow; set => SetProperty(ref _ownerWindow, value); }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets the clients content. </summary>
+        ///
+        /// <value> The clients content. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public object? ClientsContent { get => _clientsContent; set => SetProperty(ref _clientsContent, value); }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets or sets the title bar view model. </summary>
@@ -80,6 +93,5 @@ namespace WinUI.Vm
         {
             _ownerWindow.ShowCursor(shouldShow);
         }
-
     }
 }
