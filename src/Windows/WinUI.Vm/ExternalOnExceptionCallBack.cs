@@ -53,9 +53,13 @@ namespace WinUI.Vm
 
         public static void TryNotifyOfException(Exception e)
         {
-            if (OnExceptionAction == null)
+            //There are two checks we should do here.  The null check does not need an explanation, but
+            // checking OnExceptionAction == TryNotifyOfException should be noted because it prevents 
+            // a recursive situation, should the caller ever set the OnExceptionAction to 
+            // this function.
+            if (OnExceptionAction == null || OnExceptionAction == TryNotifyOfException)
             {
-                Console.WriteLine(e.ToString());
+                Debug.WriteLine(e.ToString());
 #if DEBUG
                 if (Debugger.IsAttached)
                     Debugger.Break();
@@ -66,7 +70,7 @@ namespace WinUI.Vm
                 }
                 ExceptionDispatchInfo.Capture(e.InnerException ?? e).Throw();
             }
-            OnExceptionAction.Invoke(e);
+            else OnExceptionAction.Invoke(e);
         }
     }
 }

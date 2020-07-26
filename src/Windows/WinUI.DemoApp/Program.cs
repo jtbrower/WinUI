@@ -22,10 +22,13 @@
 namespace WinUI.DemoApp
 {
     using Microsoft.Extensions.DependencyInjection;
-    using WinUI.CustomControls;
-    using WinUI.Vm;
     using System;
     using System.Diagnostics;
+    using WinUI.Vm;
+
+#if !DEBUG
+    using System.Runtime.ExceptionServices;
+#endif
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>   A program. </summary>
@@ -34,7 +37,12 @@ namespace WinUI.DemoApp
     public static class Program
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   The service provider. </summary>
+        /// <summary>
+        /// If you prefer to use a static ServiceLocator then this is what you want to use.  Otherwise,
+        /// its best to try and get as much as you can from automatic constructor injection.
+        /// </summary>
+        ///
+        /// <value> The service provider. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         internal static ServiceProvider? ServiceProvider { get; private set; }
@@ -49,33 +57,6 @@ namespace WinUI.DemoApp
 #pragma warning restore IDE0052 // Remove unread private members
 #pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Initializes the services. </summary>
-        ///
-        /// <returns>   A ServiceProvider. </returns>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private static ServiceProvider InitializeServices()
-        {
-            var serviceCollection = new ServiceCollection();
-
-            serviceCollection.AddSingleton<ExtWindow>();
-            serviceCollection.AddSingleton<IExtWindow>(s => s.GetRequiredService<ExtWindow>());
-            serviceCollection.AddSingleton<WindowVm>();
-            serviceCollection.AddSingleton<IPlatform>(s => s.GetRequiredService<ExtWindow>());
-            serviceCollection.AddSingleton<App>();
-
-            serviceCollection.AddScoped<IDialogService, DialogService>();
-            serviceCollection.AddScoped<MainPage>();
-            serviceCollection.AddScoped<MainPageVm>();
-
-            serviceCollection.AddScoped(s => new TitleBarVm
-            {
-                Title = "WinUI Desktop Demo",
-
-            });
-            return serviceCollection.BuildServiceProvider();
-        }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets the current. </summary>
@@ -91,12 +72,24 @@ namespace WinUI.DemoApp
         /// <param name="args"> An array of command-line argument strings. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 #pragma warning disable IDE0060 // Remove unused parameter
-        static void Main(string[] args)
+        private static void Main(string[] args)
 #pragma warning restore IDE0060 // Remove unused parameter
         {
             WinRT.ComWrappersSupport.InitializeComWrappers();
+
+            //If you are new to WinUI, coming from WPF like me, you will probably be a bit confused how this 
+            // initializer works.  Merely declaring an instance of an Application is all that is required.
+            // I could have placed all of this logic in "Main" itself, so be aware that you can just use
+            // a simple lambda if you wish.
             Microsoft.UI.Xaml.Application.Start(ApplicationInitializationCallback);
+
+            //Assure all services that implement IDisposable get a chance to run their dispose logic.
             ServiceProvider?.Dispose();
+
+            //Not really needed, but I tend to do things like this out of good habit, plus some 
+            // testing scenarios can cause abnormal control flow.
+            ServiceProvider = null;
+            Current = null;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -105,11 +98,34 @@ namespace WinUI.DemoApp
         /// <param name="p">    A variable-length parameters list containing p. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        static void ApplicationInitializationCallback(Microsoft.UI.Xaml.ApplicationInitializationCallbackParams p)
+        private static void ApplicationInitializationCallback(Microsoft.UI.Xaml.ApplicationInitializationCallbackParams p)
         {
             try
             {
-                ServiceProvider = InitializeServices();
+                #region Logging explanation for the Developer
+                //This deserves explanation.  Although I generally try to avoid static variables, I also like
+                // to avoid as much cross-assembly coupling as possible.  When exceptions occur inside of 
+                // an assembly that is not the main executable, I sometimes avoid coupling the assembly to 
+                // a specific logging interface because it can bleed throughout the entire program.  Everyone
+                // has their favorite logger and I like to give them the easiest method of integrating their
+                // own choice.  I do that by providing a single point of entry for the entire assembly where
+                // they can handle exceptions and logging how they wish.  If you do not set this Action, the
+                // default one will be used.  The default logs to the console, calls Debugger.Break if the 
+                // debugger is attached and then rethrows the original exception.
+                // 
+                // If you plan to use this, you should check to see if it is actually called.  I like to
+                // provide this class but don't always need to use it.
+                // 
+                // Uncomment this line and replace it with your own choice or just leave it at its default.
+                //ExternalOnExceptionCallBack.OnExceptionAction = e=> { Debug.WriteLine(e);};
+                #endregion
+
+                //Add services and build the provider.
+                ServiceProvider = new ServiceCollection()
+                    .AddServices()
+                    .AddViewModels()
+                    .AddViews()
+                    .BuildServiceProvider();
 
                 //Yes, this is actually how this callback works.  You really don't even need to
                 // save the application instance, you just instantiate it.  I am saving it here
@@ -118,7 +134,17 @@ namespace WinUI.DemoApp
             }
             catch (Exception e)
             {
+#if DEBUG
                 Debug.WriteLine(e);
+
+                //Never leave a Debugger.Break in a release build because it isn't compiled out 
+                // of the code like a Debug.WriteLine call is.  Unless the framework has been
+                // changed, this will cause additional exceptions and obfuscate the real problem.
+                if (Debugger.IsAttached) Debugger.Break();
+#else
+                //Try to rethrow the original exception
+                ExceptionDispatchInfo.Capture(e.InnerException ?? e).Throw();
+#endif
             }
         }
     }
