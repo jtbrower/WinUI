@@ -75,7 +75,13 @@ namespace WinUI.DemoApp
         private static void Main(string[] args)
 #pragma warning restore IDE0060 // Remove unused parameter
         {
-            WinRT.ComWrappersSupport.InitializeComWrappers();
+
+            //Note that I still do not know if I need this line.  I adopted it when I was 
+            // trying to find out how to start a WinUI desktop application from a Main method like this.
+            // I found that Scott Jones from Microsoft had this call in his example.  So far I have not 
+            // needed it, but I am leaving it here as a reminder of random stuff to try when I have some
+            // problem that has sucked my brain clean of any solutions.  
+            //WinRT.ComWrappersSupport.InitializeComWrappers();
 
             //If you are new to WinUI, coming from WPF like me, you will probably be a bit confused how this 
             // initializer works.  Merely declaring an instance of an Application is all that is required.
