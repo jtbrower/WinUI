@@ -1,5 +1,11 @@
 # Requirements
-* Uses .Net5.0, initial version was/is preview 6 but check to see if that is the current version
+Note that the WinUI team has indicated a version of the .Net 5.0 prelease that is lower than what I use in these projects.  Right now I am at preview 7 and that's why the global.json tries to use that version.
+
+I prefer to live on the bleeding edge of the latest .Net preview builds and I have a lot of internal code that does this.  Since I need the WinUI libraries I write to work with the latest previews, that's what I have used here.
+
+If you add more features to what I have done and you come upon something that doesn't quite work, consider if you are using the recommended .Net version prior to reporting a WinUI bug.
+
+* Uses .Net5.0, preview 7 but check to see if that is the current version.  See global.json.  I didn't pin it to a specific version because projects won't load for you if you do not have it.
 * Uses WinUI Preview 2, again check to make sure that is the current version
 * Uses Microsoft's dependency injection container and attempts to fully decouple that app from static refs
 * WinUI requires a Desktop app to be packaged and compiled to a specific platform (not AnyCpu). For that reason, I removed AnyCpu from projects but Visual Studio insists on placing it back in the solution.  Do not use AnyCpu.

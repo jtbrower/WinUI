@@ -22,7 +22,7 @@
     Direct reference is a required workaround that I got from Scott Jones.  Once the COM API changes 
     have been accounted for in related WinUI packages, you can probably remove this.
     -->
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0-preview.6.20305.6" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0-preview.7.20364.11" />
     <PackageReference Include="Microsoft.WinUI" Version="3.0.0-preview2.200713.0" />
     <PackageReference Include="Microsoft.VCRTForwarders.140" Version="1.0.6" />
     <PackageReference Include="Microsoft.WinUI" Version="3.0.0-preview2.200713.0" />
