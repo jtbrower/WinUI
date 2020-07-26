@@ -26,10 +26,12 @@ namespace WinUI.Vm
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>   A ViewModel for the button. </summary>
     ///
+    /// <typeparam name="T">    Generic type parameter. </typeparam>
+    ///
     /// <seealso cref="WinUI.Vm.PropChangeBase"/>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public class ButtonVm : PropChangeBase
+    public class ButtonVm<T> : PropChangeBase
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The display content. </summary>
@@ -50,24 +52,25 @@ namespace WinUI.Vm
         private bool _isEnabled = true;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Initializes a new instance of the WinUI.Vm.ButtonVm class. </summary>
+        /// <summary>   Initializes a new instance of the WinUI.Vm.ButtonVm{T} class. </summary>
         ///
+        /// <param name="clickedCmd">       The 'clicked' command. </param>
         /// <param name="displayContent">   The display content. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public ButtonVm(Action clickedCmd, object displayContent)
+        public ButtonVm(Action<T> clickedCmd, object displayContent)
         {
-            ClickedCmd=new DelegateCmd(clickedCmd);
+            ClickedCmd=new DelegateCmd<T>(clickedCmd);
             _displayContent = displayContent;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Gets or sets the 'clicked' command. </summary>
+        /// <summary>   Gets the 'clicked' command. </summary>
         ///
         /// <value> The 'clicked' command. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public DelegateCmd ClickedCmd { get; }
+        public DelegateCmd<T> ClickedCmd { get; }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets or sets the display content. </summary>

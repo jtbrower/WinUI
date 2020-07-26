@@ -27,33 +27,132 @@ namespace WinUI.Vm
     /// <seealso cref="WinUI.Vm.PropChangeBase"/>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public class MainPageVm : PropChangeBase
+    public sealed partial class MainPageVm : PropChangeBase
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Number of box values. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private int _numberBoxValue;
-        private ToggleButtonVm? _toggleNonClientVisibilityButtonVm;
+        private int _windowTransparencyPercent;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The toggle non client visibility button view model. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private ToggleButtonVm<MainPageVm> _toggleNonClientVisibilityButtonVm;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The size to content button view model. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private ButtonVm<MainPageVm> _sizeToContentButtonVm;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The add window transparency button view model. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private ButtonVm<MainPageVm> _addWindowTransparencyButtonVm;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The remove window transparency button view model. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private ButtonVm<MainPageVm> _removeWindowTransparencyButtonVm;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The window that owns this item. </summary>
+        ///
+        /// <value> The owner window. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private IExtWindow OwnerWindow { get; }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Initializes a new instance of the WinUI.Vm.MainPageVm class. </summary>
         ///
         /// <param name="dialogService">    The dialog service. </param>
+        /// <param name="ownerWindow">      The window that owns this item. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public MainPageVm(IDialogService dialogService)
+        public MainPageVm(
+            IDialogService dialogService,
+            IExtWindow ownerWindow)
         {
+            OwnerWindow = ownerWindow;
             DialogService = dialogService;
+
+            _toggleNonClientVisibilityButtonVm =
+                new ToggleButtonVm<MainPageVm>(ToggleNonClientVisibility, "Show Non-Client Area", true);
+
+            _addWindowTransparencyButtonVm =
+                new ButtonVm<MainPageVm>(async mp => await AddWindowTransparencyWithConfirmTask(mp), "Set Transparency");
+
+            _removeWindowTransparencyButtonVm =
+                new ButtonVm<MainPageVm>(RemoveWindowTransparency, "Remove Transparency");
+
+            _sizeToContentButtonVm =
+                new ButtonVm<MainPageVm>(SizeToContent, "Size to Content");
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Gets or sets the number of box values. </summary>
+        /// <summary>   Gets or sets the remove window transparency button view model. </summary>
         ///
-        /// <value> The total number of box value. </value>
+        /// <value> The remove window transparency button view model. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public int NumberBoxValue { get => _numberBoxValue; set => SetProperty(ref _numberBoxValue, value); }
+        public ButtonVm<MainPageVm> RemoveWindowTransparencyButtonVm
+        {
+            get => _removeWindowTransparencyButtonVm;
+            set => SetProperty(ref _removeWindowTransparencyButtonVm, value);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets the size to content button view model. </summary>
+        ///
+        /// <value> The size to content button view model. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public ButtonVm<MainPageVm> SizeToContentButtonVm
+        {
+            get => _sizeToContentButtonVm;
+            set => SetProperty(ref _sizeToContentButtonVm, value);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets the add window transparency button view model. </summary>
+        ///
+        /// <value> The add window transparency button view model. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public ButtonVm<MainPageVm> AddWindowTransparencyButtonVm
+        {
+            get => _addWindowTransparencyButtonVm;
+            set => SetProperty(ref _addWindowTransparencyButtonVm, value);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets the toggle non client visibility button view model. </summary>
+        ///
+        /// <value> The toggle non client visibility button view model. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public ToggleButtonVm<MainPageVm> ToggleNonClientVisibilityButtonVm
+        {
+            get => _toggleNonClientVisibilityButtonVm;
+            set => SetProperty(ref _toggleNonClientVisibilityButtonVm, value);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets the window transparency percent. </summary>
+        ///
+        /// <value> The window transparency percent. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public int WindowTransparencyPercent
+        {
+            get => _windowTransparencyPercent;
+            set => SetProperty(ref _windowTransparencyPercent, value);
+        }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets the dialog service. </summary>
@@ -63,16 +162,5 @@ namespace WinUI.Vm
 
         public IDialogService DialogService { get; }
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Gets or sets the toggle non client visibility button view model. </summary>
-        ///
-        /// <value> The toggle non client visibility button view model. </value>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public ToggleButtonVm? ToggleNonClientVisibilityButtonVm
-        {
-            get => _toggleNonClientVisibilityButtonVm;
-            set => SetProperty(ref _toggleNonClientVisibilityButtonVm, value);
-        }
     }
 }

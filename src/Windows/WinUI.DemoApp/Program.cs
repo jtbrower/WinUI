@@ -63,28 +63,15 @@ namespace WinUI.DemoApp
 
             serviceCollection.AddSingleton<ExtWindow>();
             serviceCollection.AddSingleton<IExtWindow>(s => s.GetRequiredService<ExtWindow>());
+            serviceCollection.AddSingleton<WindowVm>();
             serviceCollection.AddSingleton<IPlatform>(s => s.GetRequiredService<ExtWindow>());
             serviceCollection.AddSingleton<App>();
-            serviceCollection.AddScoped<IDialogService, DialogService>();
-            serviceCollection.AddTransient<MainPage>();
-            serviceCollection.AddTransient(s =>
-            {
-                var window = s.GetRequiredService<ExtWindow>();
-                return new MainPageVm(s.GetRequiredService<IDialogService>())
-                {
-                    ToggleNonClientVisibilityButtonVm = new ToggleButtonVm(
-                        self =>
-                        {
-                            if (self.IsChecked)
-                                window.ShowCustomNonClientArea();
-                            else
-                                s.GetRequiredService<ExtWindow>().HideCustomNonClientArea();
 
-                        }, "Show Non-Client Area", true)
-                };
-            });
-            serviceCollection.AddTransient<WindowVm>();
-            serviceCollection.AddTransient(s => new TitleBarVm
+            serviceCollection.AddScoped<IDialogService, DialogService>();
+            serviceCollection.AddScoped<MainPage>();
+            serviceCollection.AddScoped<MainPageVm>();
+
+            serviceCollection.AddScoped(s => new TitleBarVm
             {
                 Title = "WinUI Desktop Demo",
 

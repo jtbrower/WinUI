@@ -21,11 +21,10 @@
 // SOFTWARE.
 namespace WinUI.CustomControls
 {
-    using WinUI.Native;
     using Microsoft.UI.Xaml;
     using Microsoft.UI.Xaml.Controls;
     using WinUI.Vm;
-
+ 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>   A main page. This class cannot be inherited. </content>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -57,12 +56,6 @@ namespace WinUI.CustomControls
             private set => SetValue(VmProperty, value);
         }
 
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   The main window for the entire application. </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private readonly IExtWindow _mainWindow;
-
         //Note that this is only needed for the Designer which always causes headaches with Nullable.  Since
         // the designer doesn't work with WinUI right now I just make the Constructor private.
 #pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
@@ -76,64 +69,13 @@ namespace WinUI.CustomControls
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Initializes a new instance of the WinUI.CustomControls.MainPage class. </summary>
         ///
-        /// <param name="vm">       The view model. </param>
-        /// <param name="window">   The window. </param>
+        /// <param name="vm">   The view model. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public MainPage(MainPageVm vm, IExtWindow window)
+        public MainPage(MainPageVm vm)
         {
             InitializeComponent();
             Vm = vm;
-            _mainWindow = window;
         }
-
-        //It's annoying when this warning is applied to event handler parameters.
-#pragma warning disable IDE0060 // Remove unused parameter
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by ShrinkToContent for click events./ </summary>
-        ///
-        /// <param name="sender">   Source of the event. </param>
-        /// <param name="e">        Routed event information. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public void SizeToContent_Click(object sender, RoutedEventArgs e)
-        {
-            _mainWindow.SizeToContent();
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by SetWindowTransparency for click events. </summary>
-        ///
-        /// <param name="sender">   Source of the event. </param>
-        /// <param name="e">        Routed event information. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public async void SetWindowTransparency_Click(object sender, RoutedEventArgs e)
-        {
-            if (Vm.NumberBoxValue > 50)
-            {
-                if (!await Vm.DialogService.ConfirmAsync(
-                    $"About Changing Transparency to {Vm.NumberBoxValue}",
-                    $"A MainWindow Transparency of {Vm.NumberBoxValue} could make it impossible to close the MainWindow without a debugger.  Are you sure you want to continue?")) { return; }
-            }
-           
-            _mainWindow.SetTransparency(Vm.NumberBoxValue);
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by RemoveWindowTransparency for click events. </summary>
-        ///
-        /// <param name="sender">   Source of the event. </param>
-        /// <param name="e">        Routed event information. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public void RemoveWindowTransparency_Click(object sender, RoutedEventArgs e)
-        {
-            _mainWindow.RemoveTransparency();
-        }
-
-        //Ignoring this because they are applying it to event handlers too!
-#pragma warning restore IDE0060 // Remove unused parameter
     }
 }

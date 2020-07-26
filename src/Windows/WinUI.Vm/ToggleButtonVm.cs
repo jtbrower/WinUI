@@ -22,16 +22,19 @@
 namespace WinUI.Vm
 {
     using System;
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>   A ViewModel for the toggle button. </summary>
+    ///
+    /// <typeparam name="T">    Generic type parameter. </typeparam>
     ///
     /// <seealso cref="WinUI.Vm.PropChangeBase"/>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public class ToggleButtonVm : PropChangeBase
+    public class ToggleButtonVm<T> : PropChangeBase
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Initializes a new instance of the WinUI.Vm.ToggleButtonVm class. </summary>
+        /// <summary>   Initializes a new instance of the WinUI.Vm.ToggleButtonVm{T} class. </summary>
         ///
         /// <param name="toggledAction">    The toggled action. </param>
         /// <param name="displayContent">   The display content. </param>
@@ -39,7 +42,7 @@ namespace WinUI.Vm
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public ToggleButtonVm(
-            Action<ToggleButtonVm> toggledAction, 
+            Action<T> toggledAction, 
             object displayContent, 
             bool isChecked = false)
         {
@@ -47,7 +50,7 @@ namespace WinUI.Vm
             _isChecked = isChecked;
             _displayContent = displayContent;
 
-            ClickedCmd = new DelegateCmd<ToggleButtonVm>(toggledAction);
+            ClickedCmd = new DelegateCmd<T>(toggledAction);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -92,7 +95,7 @@ namespace WinUI.Vm
         /// <value> The 'clicked' command. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public DelegateCmd<ToggleButtonVm> ClickedCmd { get; }
+        public DelegateCmd<T> ClickedCmd { get; }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets or sets the display content. </summary>

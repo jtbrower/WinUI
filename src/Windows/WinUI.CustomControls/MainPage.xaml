@@ -19,6 +19,7 @@
             <Setter Property="MinWidth" Value="200" />
             <Setter Property="Margin" Value="1" />
             <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="CommandParameter" Value="{x:Bind Vm, Mode=OneWay}" />
         </Style>
         <!--
             This is a brush that I use to paint the background of a Virtual Keyboard component that I wrote
@@ -67,23 +68,33 @@
             <interactivity:Interaction.Behaviors>
                 <behave:RoundedDropShadowBehavior CornerRadius="10" />
             </interactivity:Interaction.Behaviors>
+            
             <Grid Margin="5">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
+                
                 <StackPanel
                     Grid.Column="0"
                     Margin="5"
                     VerticalAlignment="Center">
+                    
                     <CheckBox
                         Command="{x:Bind Vm.ToggleNonClientVisibilityButtonVm.ClickedCmd, Mode=OneWay}"
-                        CommandParameter="{x:Bind Vm.ToggleNonClientVisibilityButtonVm, Mode=OneWay}"
+                        CommandParameter="{x:Bind Vm, Mode=OneWay}"
                         Content="{x:Bind Vm.ToggleNonClientVisibilityButtonVm.DisplayContent, Mode=OneWay}"
                         IsChecked="{x:Bind Vm.ToggleNonClientVisibilityButtonVm.IsChecked, Mode=TwoWay}"
-                        IsThreeState="False"/>
+                        IsThreeState="False" />
+                    
                     <StackPanel Orientation="Horizontal">
-                        <Button Click="SetWindowTransparency_Click" Content="Set Transparency"/>
+                        
+                        <Button
+                        Command="{x:Bind Vm.AddWindowTransparencyButtonVm.ClickedCmd, Mode=OneWay}"
+                        CommandParameter="{x:Bind Vm, Mode=OneWay}"
+                        Content="{x:Bind Vm.AddWindowTransparencyButtonVm.DisplayContent, Mode=OneWay}"
+                        IsEnabled="{x:Bind Vm.AddWindowTransparencyButtonVm.IsEnabled, Mode=OneWay}" />
+
                         <muxc:NumberBox
                             LargeChange="20"
                             Maximum="100"
@@ -91,11 +102,21 @@
                             SmallChange="5"
                             SpinButtonPlacementMode="Inline"
                             ValidationMode="InvalidInputOverwritten"
-                            Value="{x:Bind Path=Vm.NumberBoxValue, Mode=TwoWay}" />
+                            Value="{x:Bind Path=Vm.WindowTransparencyPercent, Mode=TwoWay}" />
 
                     </StackPanel>
-                    <Button Click="RemoveWindowTransparency_Click" Content="Remove Transparency"/>
-                    <Button Click="SizeToContent_Click" Content="Size to Content" />
+                    
+                    <Button
+                        Command="{x:Bind Vm.RemoveWindowTransparencyButtonVm.ClickedCmd, Mode=OneWay}"
+                        CommandParameter="{x:Bind Vm, Mode=OneWay}"
+                        Content="{x:Bind Vm.RemoveWindowTransparencyButtonVm.DisplayContent, Mode=OneWay}"
+                        IsEnabled="{x:Bind Vm.RemoveWindowTransparencyButtonVm.IsEnabled, Mode=OneWay}" />
+                    
+                    <Button
+                        Command="{x:Bind Vm.SizeToContentButtonVm.ClickedCmd, Mode=OneWay}"
+                        CommandParameter="{x:Bind Vm, Mode=OneWay}"
+                        Content="{x:Bind Vm.SizeToContentButtonVm.DisplayContent, Mode=OneWay}"
+                        IsEnabled="{x:Bind Vm.SizeToContentButtonVm.IsEnabled, Mode=OneWay}" />
                 </StackPanel>
             </Grid>
         </Border>

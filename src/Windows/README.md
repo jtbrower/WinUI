@@ -1,3 +1,10 @@
+# Requirements
+* Uses .Net5.0, initial version was/is preview 6 but check to see if that is the current version
+* Uses WinUI Preview 2, again check to make sure that is the current version
+* Uses Microsoft's dependency injection container and attempts to fully decouple that app from static refs
+* WinUI requires a Desktop app to be packaged and compiled to a specific platform (not AnyCpu). For that reason, I removed AnyCpu from projects but Visual Studio insists on placing it back in the solution.  Do not use AnyCpu.
+* I have Nullable enabled on all projects to enforce clean coding practices.  See Directory.Build.props, this is where it is enabled for all projects.
+
 # Running the code in Visual Studio
 * Set the WinUI.DemoApp.Package as the startup project.
 * Select either x64 or x86 as the platform
@@ -7,8 +14,10 @@
 * Sometimes Visual Studio puts an AnyCPU platform back into the solution.  Don't use it.
 
 # Current Features and What you can Learn
+I will try to take more time in the future to document why some of these features took a bit of work.
+
 * Provides a class called ExtWindow that mimics some WPF Windowing features.
-* Provide double tap to maximize and Minimize a Window
+* Provide double tap to maximize and Minimize a Window, while ignoring DoubleTaps on Buttons
 * Provide a behavior that with one line of code will place a shadow around a control.  Unlike the UWP DropShadowPanel, it can have rounded corners.
 * A behavior that Swallows double clicks so they are not triggered by buttons. Please see SwallowButtonDoubleTapBehavior.cs
 * Provide Window DragMove Behavior like the TitleBar normally provides.  Works with the Mouse and Touch, see DragMoveBehavior.cs
@@ -18,13 +27,6 @@
 * Provide a SizeToContent feature like WPF provides.  Capable of sizing up and down to fit client space requirements; great for border-less windows but still works with border.
 * Maximize, Restore, Minimize, change Window size and move it to a new location.
 * Ability to automatically scale the ExtWindow content upon a DPI change.
-
-# Requirements
-* Uses .Net5.0, initial version was/is preview 6 but check to see if that is the current version
-* Uses WinUI Preview 2, again check to make sure that is the current version
-* Uses Microsoft's dependency injection container and attempts to fully decouple that app from static refs
-* WinUI requires a Desktop app to be packaged and compiled to a specific platform (not AnyCpu). For that reason, I removed AnyCpu from projects but Visual Studio insists on placing it back in the solution.  Do not use AnyCpu.
-* I have Nullable enabled on all projects to enforce clean coding practices.  See Directory.Build.props, this is where it is enabled for all projects.
 
 # Known Issues
 * `<PackageReference Include=\"Microsoft.Windows.CsWinRT Version=\"0.1.0-prerelease.200629.3\" />` was added to the DemoApp to avoid a compatibility issue between .Net5 preview 6 and WinUI
@@ -36,7 +38,7 @@
 # TODO
 * Change Cursor on DragMove operation
 * When you set the Window transparency all of the Window content becomes transparent too.  I need to figure out how to handle this.
-* I have not gone through the trouble to use ICommands for all of the buttons (or disable buttons that are not applicable to a given state like remove window transparency when there isn't any).
+* Modify Window and related Views/View Models to make it mimic an Adorner
 * When I resize the Window on startup, it is not a smooth transition because I currently have to call Window.Activate and then resize directly after.
 
 ## Known Visual Studio or Project Issues
@@ -48,4 +50,4 @@
 # To Save you Time
 * You cannot create a DependencyProperty on the Window class because it is not a DependencyObject
 * Do not try to create a DependencyProperty with a IntPtr type.  It will throw exceptions.
-* Including a resource dictionary that has a backing C# file is included like ```<namespace:YouDictionaryName />``` and not how one is normally included.
+* Including a resource dictionary that has a backing C# file is included like ```<namespace:YouDictionaryName />``` and not how one is normally included. 
