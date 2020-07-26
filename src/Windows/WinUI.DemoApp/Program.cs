@@ -26,8 +26,6 @@ namespace WinUI.DemoApp
     using WinUI.Vm;
     using System;
     using System.Diagnostics;
-    using Microsoft.UI.Xaml;
-    using WinRT;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>   A program. </summary>

@@ -46,6 +46,8 @@ namespace WinUI.Vm
             //Assure the view didn't pass a null model
             if (mainPage == null) return;
             mainPage.OwnerWindow.RemoveTransparency();
+
+            //Disable the button now that we have removed transparency.
             mainPage.RemoveWindowTransparencyButtonVm.IsEnabled = false;
         }
 
@@ -93,6 +95,8 @@ namespace WinUI.Vm
             }
 
             mainPage.OwnerWindow.SetTransparency(transparencyPercent);
+
+            //If more than zero percent transparent then enable the button to remove transparency.
             mainPage.RemoveWindowTransparencyButtonVm.IsEnabled = transparencyPercent != 0;
         }
 
