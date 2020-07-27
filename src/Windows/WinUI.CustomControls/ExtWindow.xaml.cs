@@ -32,6 +32,8 @@ namespace WinUI.CustomControls
     using Microsoft.UI.Xaml.Media;
     using System.Linq;
     using Microsoft.UI.Xaml.Controls.Primitives;
+    using System.ComponentModel;
+    using System.Runtime.CompilerServices;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>
@@ -42,7 +44,7 @@ namespace WinUI.CustomControls
     /// <seealso cref="WinUI.CustomControls.IPlatform"/>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public sealed partial class ExtWindow : IExtWindow, IPlatform
+    public sealed partial class ExtWindow : IExtWindow, IPlatform, INotifyPropertyChanged
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   True to automatically DPI content scaling. </summary>
@@ -110,6 +112,12 @@ namespace WinUI.CustomControls
         {
             InitializeComponent();
 
+            //I don't like binding to statics like this so I pulled it out of the DataTemplate Selector
+            // and brought it up close to the top where it could more easily be injected.  I started by
+            // creating an interface called IApplicationStatics but I learned that it actually exists!
+            // So I will just leave it at this for now.
+            TypeNameDataTemplateSelector.FallbackResourceDictionary = Application.Current?.Resources;
+
             //Grab the handle and remove the built-in Win32 TitleBar and border
             Handle = this.GetHandle();
             Handle.HideWin32NonClientArea();
@@ -124,29 +132,66 @@ namespace WinUI.CustomControls
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Sets a view model. </summary>
-        ///
-        /// <param name="vm">   The view model. </param>
+        /// <summary>   Occurs when a property value changes. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        public event PropertyChangedEventHandler? PropertyChanged;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The view model. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public void SetVm(WindowVm vm)
+        private WindowVm? _vm;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets the view model. </summary>
+        ///
+        /// <value> The view model. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public WindowVm? Vm
         {
-            WindowViewInstance.Vm = vm;
+            //Notice that our Window's view model cannot be a DependencyProperty because a WinUI Window is
+            // not a DependencyObject.  For  that reason we must using INotifyPropertyChanged.
+            get { return _vm; }
+            set
+            {
+                if(_vm == value)return;
+                _vm = value;
+                OnPropertyChanged();                
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Executes the property changed action. </summary>
+        ///
+        /// <param name="propertyName"> (Optional) Name of the property. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void OnPropertyChanged([CallerMemberName] string? propertyName = null)
+        {
+            var handler = PropertyChanged;
+            if (handler == null) return;
+            //Lock to prevent garbage collection before we invoke
+            lock (handler)
+            {
+                var e = new PropertyChangedEventArgs(propertyName);
+                handler(this, e);
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Extent window state changed. </summary>
         ///
         /// <param name="sender">   Source of the event. </param>
-        /// <param name="e">        An EnumWindowState to process. </param>
+        /// <param name="state">        An EnumWindowState to process. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void ExtWindow_WindowStateChanged(object? sender, EnumWindowState e)
+        private void ExtWindow_WindowStateChanged(object? sender, EnumWindowState state)
         {
             //If there is a TitleBar then assure the IsMaximized flag is updated.
-            var titleBar = WindowViewInstance.Vm?.TitleBarVm;
+            var titleBar = Vm?.TitleBarVm;
             if (titleBar == null) return;
-            titleBar.IsMaximized = e == EnumWindowState.Maximized;
+            titleBar.IsMaximized = state == EnumWindowState.Maximized;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -241,12 +286,12 @@ namespace WinUI.CustomControls
 
         private double? GetDpiScale()
         {
-            if (WindowViewInstance.XamlRoot == null)
+            if (ClientContentControl.XamlRoot == null)
             {
                 Debug.WriteLine($"{nameof(GetDpiScale)} called before {nameof(WindowView)}.XamlRoot was available.");
                 return null;
             }
-            return (WindowViewInstance.XamlRoot.RasterizationScale * 96.0) / User32.GetDpiForWindow(Handle);
+            return (ClientContentControl.XamlRoot.RasterizationScale * 96.0) / User32.GetDpiForWindow(Handle);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -319,10 +364,10 @@ namespace WinUI.CustomControls
             //Grab the position that was double tapped and see if there are any types in the path of 
             // type ButtonBase.  If so then do not allow the double tap of a button to turn into 
             // a Window Maximize or Restore because its confusing to the end user.
-            var doubleTapPosition = args.GetPosition(WindowViewInstance);
+            var doubleTapPosition = args.GetPosition(RootContainer);
 
             //This method already checks for IsHitTestVisible by default.
-            var uiElementsUnderPosition = VisualTreeHelper.FindElementsInHostCoordinates(doubleTapPosition, WindowViewInstance);
+            var uiElementsUnderPosition = VisualTreeHelper.FindElementsInHostCoordinates(doubleTapPosition, ClientContentControl);
             if (uiElementsUnderPosition.Any(e => e.GetType().IsSubclassOf(typeof(ButtonBase)))) return;
 
             if (Handle.IsMaximized())
@@ -346,7 +391,7 @@ namespace WinUI.CustomControls
         /// <seealso cref="WinUI.CustomControls.IExtWindow.XamlRoot"/>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public XamlRoot XamlRoot => WindowViewInstance.XamlRoot;
+        public XamlRoot XamlRoot => RootContainer.XamlRoot;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
@@ -363,7 +408,12 @@ namespace WinUI.CustomControls
 
         private void ScaleWindowContent(double scaleAt)
         {
-            WindowViewInstance.ScaleContent(scaleAt);
+            if (Vm == null)
+            {
+                Debug.WriteLine($"{nameof(ScaleWindowContent)} found {nameof(ExtWindow)}.{nameof(Vm)} is null.  Unable to scale.");
+                return;
+            }
+            Vm.ScaleContent(scaleAt);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -376,25 +426,21 @@ namespace WinUI.CustomControls
 
         public void SizeToContent()
         {
-            if (!WindowViewInstance.TrueDesiredSize.HasValue)
+            if(Vm == null)
             {
-                Debug.WriteLine($"{nameof(SizeToContent)} called before {nameof(WindowView.TrueDesiredSize)} had a value.  Unable to resize.");
+                Debug.WriteLine($"{nameof(SizeToContent)} found {nameof(ExtWindow)}.{nameof(Vm)} is null.  Unable to resize.");
                 return;
             }
 
-            //This value tells us the truth about how much space is needed to fully render the content in the grid.
-            var sizeRequired = WindowViewInstance.TrueDesiredSize.Value;
-
-            //If it lied to us then don't use it :)
-            if (sizeRequired.Width <= 0 || sizeRequired.Height <= 0)
+            if (Vm.RequiredHeight <= 0 || Vm.RequiredHeight == double.PositiveInfinity || Vm.RequiredWidth <= 0 || Vm.RequiredWidth == double.PositiveInfinity)
             {
-                Debug.WriteLine($"An attempt to resize the Window with a (Width x Height) of {sizeRequired.Width}x{sizeRequired.Height}.");
+                Debug.WriteLine($"{nameof(SizeToContent)} found {nameof(Vm.RequiredWidth)}x{nameof(Vm.RequiredHeight)} = {Vm.RequiredWidth}x{Vm.RequiredHeight}.  Unable to resize.");
                 return;
             }
 
             //Convert to device units
-            var clientHeightInDevicePixels = WindowViewInstance.DipToDevice(sizeRequired.Height);
-            var clientWidthInDevicePixels = WindowViewInstance.DipToDevice(sizeRequired.Width);
+            var clientHeightInDevicePixels = ClientContentControl.DipToDevice(Vm.RequiredHeight);
+            var clientWidthInDevicePixels = ClientContentControl.DipToDevice(Vm.RequiredWidth);
 
             //Now we need to calculate the non-client area of the Window.  This is only important when a Window has a border and or a
             // TitleBar (or menu).  In other words, if the HideNonClientArea method has been called on the Window then the nonClientSize
@@ -591,56 +637,24 @@ namespace WinUI.CustomControls
 
         private void ChangeCustomNonClientAreaVisibility(bool isVisible)
         {
-            if (WindowViewInstance.Vm == null) return;
+            if (Vm == null) return;
 
             //If the current state matches the requested leave.
-            if (WindowViewInstance.Vm.TitleBarVm.IsVisible == isVisible) return;
+            if (Vm.TitleBarVm.IsVisible == isVisible) return;
 
             //Removing or showing the DropShadow is somewhat similar to removing or showing the Win32 
             // Window border
-            if (isVisible)
-                WindowViewInstance.ShowDropShadow();
-            else
-                WindowViewInstance.HideDropShadow();
+            Vm.ShowDropShadow(isVisible);
 
-
-            WindowViewInstance.Vm.TitleBarVm.IsVisible = isVisible;
+            Vm.TitleBarVm.IsVisible = isVisible;
 
             //Force the content to recompute its space requirements
-            base.Content?.UpdateLayout();
+            Content?.UpdateLayout();
 
             //If we hid the non-client area then there will be extra empty space around the Window's Content
             // that we can remove with this call.  If we are adding the non-client area back in, this call
             // assures it has enough space to render.
             SizeToContent();
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Gets window view model. </summary>
-        ///
-        /// <returns>   The window view model. </returns>
-        ///
-        /// <seealso cref="IExtWindow.GetWindowVm()"/>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public WindowVm? GetWindowVm()
-        {
-            return WindowViewInstance?.Vm;
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Sets window view model. </summary>
-        ///
-        /// <param name="windowVm">    The window view model. </param>
-        ///
-        /// <seealso cref="IExtWindow.SetWindowVm(WindowVm)"/>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public void SetWindowVm(WindowVm windowVm)
-        {
-            var windowView = WindowViewInstance;
-            if (windowView == null) return;
-            windowView.Vm = windowVm;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////

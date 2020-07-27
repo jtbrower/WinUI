@@ -39,7 +39,70 @@ namespace WinUI.CustomControls
         public static readonly DependencyProperty VmProperty = DependencyProperty.Register(nameof(Vm),
             typeof(WindowVm),
             typeof(WindowView),
-            new PropertyMetadata(null));
+            new PropertyMetadata(null, (sender, args) =>
+            {
+                if (!(sender is WindowView windowView)) return;
+
+                AttachViewModelEventHandlers(windowView,args);
+
+            }));
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Attach view model event handlers. </summary>
+        ///
+        /// <param name="windowView">   The window view. </param>
+        /// <param name="args">         Dependency property changed event information. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private static void AttachViewModelEventHandlers(WindowView windowView, DependencyPropertyChangedEventArgs args)
+        {
+            //We listen to a couple event handlers on the view model that fire when this WindowView class
+            // needs to perform an action such as Showing/Hiding the DropShadow or scaling content.
+            if (args.OldValue is WindowVm oldWindowVm)
+            {
+                //We need to remove the handlers or else we could cause a memory leak.
+                oldWindowVm.DropShadowVisibilityChangeRequested -= windowView.WindowVm_DropShadowVisibilityChangeRequested;
+                oldWindowVm.ScaleContentRequested -= windowView.WindowVm_ScaleContentRequested;
+            }
+            if (args.NewValue is WindowVm newWindowVm)
+            {
+                //Just in case we somehow have handlers attached, remove them first.  No exceptions are thrown 
+                // if we were not attached.
+                newWindowVm.DropShadowVisibilityChangeRequested -= windowView.WindowVm_DropShadowVisibilityChangeRequested;
+                newWindowVm.ScaleContentRequested -= windowView.WindowVm_ScaleContentRequested;
+
+                //Attach
+                newWindowVm.DropShadowVisibilityChangeRequested += windowView.WindowVm_DropShadowVisibilityChangeRequested;
+                newWindowVm.ScaleContentRequested += windowView.WindowVm_ScaleContentRequested;
+            }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Window view model scale content requested. </summary>
+        ///
+        /// <param name="sender">   The sender. </param>
+        /// <param name="scaleAt">  The scale at. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void WindowVm_ScaleContentRequested(object? _, double scaleAt)
+        {
+            ScaleContent(scaleAt);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Window view model drop shadow visibility change requested. </summary>
+        ///
+        /// <param name="sender">       The sender. </param>
+        /// <param name="isVisible">    True if is visible, false if not. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void WindowVm_DropShadowVisibilityChangeRequested(object? _, bool isVisible)
+        {
+            if (isVisible)
+                ChildGridDropShadow.ShowDropShadow();
+            else 
+                ChildGridDropShadow.HideDropShadow();
+        }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets or sets the view model. </summary>
@@ -55,7 +118,7 @@ namespace WinUI.CustomControls
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// This constructor should not be used in production.  It exists to please the Designer
+        /// This constructor should not be used in production.  It exists to please the Designer.
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -107,14 +170,59 @@ namespace WinUI.CustomControls
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>
-        /// If given infinity during a MeasureOverride, the grid desires this Size of space.
-        /// </summary>
-        ///
-        /// <value> The size desired if given Positive Infinity to measure within. </value>
+        /// <summary>   The required height property. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public Size? TrueDesiredSize { get; private set; }
+        public static readonly DependencyProperty RequiredHeightProperty =
+            DependencyProperty.Register(nameof(RequiredHeight),
+                typeof(double),
+                typeof(WindowView),
+                new PropertyMetadata(0, (sender, args) =>
+                {
+                    if (!(sender is WindowView windowView)) return;
+                    if (windowView.Vm == null) return;
+                    windowView.Vm.RequiredHeight = args.NewValue == null ? 0 : (double)args.NewValue;
+                }));
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets the height of the required. </summary>
+        ///
+        /// <value> The height of the required. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public double RequiredHeight
+        {
+            get => (double)GetValue(RequiredHeightProperty);
+            set => SetValue(RequiredHeightProperty, value);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets the width of the required. </summary>
+        ///
+        /// <value> The width of the required. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public double RequiredWidth
+        {
+            get { return (double)GetValue(RequiredWidthProperty); }
+            set { SetValue(RequiredWidthProperty, value); }
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The required width property. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static readonly DependencyProperty RequiredWidthProperty =
+            DependencyProperty.Register(
+                nameof(RequiredWidth),
+                typeof(double),
+                typeof(WindowView),
+                new PropertyMetadata(0, (sender, args) =>
+                {
+                    if (!(sender is WindowView windowView)) return;
+                    if (windowView.Vm == null) return;
+                    windowView.Vm.RequiredWidth = args.NewValue == null ? 0 : (double)args.NewValue;
+                }));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
@@ -138,8 +246,15 @@ namespace WinUI.CustomControls
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            //Use infinity to assure it returns the real space needs.
-            TrueDesiredSize = base.MeasureOverride(_infiniteSize);
+            //Use infinity to assure it returns the real space needs.  We then set our custom dependency 
+            // property values so we know how much space to allocate when we resize the window to fit 
+            // the content.  Note that using the DesiredSize property will not tell you the correct 
+            // answer.
+            var trueDesiredSize = base.MeasureOverride(_infiniteSize);
+            SetValue(RequiredHeightProperty, trueDesiredSize.Height);
+            SetValue(RequiredWidthProperty, trueDesiredSize.Width);
+
+            //Now allow everything to determine what they actually want to ask for.
             return base.MeasureOverride(availableSize);
         }
     }

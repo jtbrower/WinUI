@@ -18,8 +18,7 @@
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" FalseValue="Collapsed" />
         <local:TypeNameDataTemplateSelector
             x:Key="TypeNameDataTemplateSelector"
-            x:Name="TypeNameDataTemplateSelector"
-            FallbackResourceDictionary="{x:Bind app:Application.Current.Resources}" />
+            x:Name="TypeNameDataTemplateSelector"/>
     </controls:LayoutTransformControl.Resources>
     <controls:LayoutTransformControl.Transform>
         <!--  This ScaleTransform is used in the code behind to scale content when the DPI changes.  -->
@@ -73,7 +72,7 @@
                     Content="{x:Bind Path=Vm.TitleBarVm, Mode=OneWay}"
                     ContentTemplateSelector="{StaticResource TypeNameDataTemplateSelector}"
                     Visibility="{x:Bind Path=Vm.TitleBarVm.IsVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
-                
+
                 <!-- 
                   This will display the content that the caller wants to show.  If you create a new view and a view model, you just
                   need to make sure that there is an existing DataTemplate so that when you set this to show your view model it 
@@ -85,7 +84,7 @@
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Content="{x:Bind Path=Vm.ClientsContent, Mode=OneWay}"
-                    ContentTemplateSelector="{StaticResource TypeNameDataTemplateSelector}" />                
+                    ContentTemplateSelector="{StaticResource TypeNameDataTemplateSelector}" />
             </Grid>
         </Grid>
     </controls:LayoutTransformControl.Child>

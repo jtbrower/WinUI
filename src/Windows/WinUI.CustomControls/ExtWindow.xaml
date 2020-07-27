@@ -8,6 +8,7 @@
     xmlns:media="using:Microsoft.UI.Xaml.Media"    
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"    
     xmlns:local="using:WinUI.CustomControls"
+    xmlns:app="using:Microsoft.UI.Xaml"    
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     <!--
@@ -22,6 +23,11 @@
         HorizontalAlignment="Stretch"
         VerticalAlignment="Stretch"
         Background="Transparent">
+        <Grid.Resources>
+            <local:TypeNameDataTemplateSelector
+            x:Key="TypeNameDataTemplateSelector"                
+            x:Name="TypeNameDataTemplateSelector" />
+        </Grid.Resources>
         <!--
             For those developers who come from a WPF background like myself, the reason that I attach the
             DragMoveBehavior to a class that is some sort of "Panel" rather than the Window itself is due
@@ -32,6 +38,12 @@
             <!-- Do not let the DragMove happen on a Maximized Window-->
             <behave:DragMoveBehavior AllowDragOnMaximizedWindow="False" />
         </interactivity:Interaction.Behaviors>
-        <local:WindowView x:Name="WindowViewInstance"/>
+
+        <ContentControl
+                    x:Name="ClientContentControl"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Content="{x:Bind Path=Vm, Mode=OneWay}"
+                    ContentTemplateSelector="{StaticResource TypeNameDataTemplateSelector}" />
     </Grid>
 </Window>
