@@ -44,18 +44,28 @@ I will try to take more time in the future to document why some of these feature
 * The Debug Window warns that ActualHeightProperty is not found on Canvas.  Same as above.
 
 ## DPI Changed Issue
-Every once in a rare, impossible to repeat intentionally, DPI Change the measurement that is captured to determine that true size
-to render the control is not the true size and when the window resizes its either too much or not enough space.  I could probably
-work around this by forcing the WindowView to call MeasureOveride anytime the RequiredWidth/RequiredHeight properties are 
-requested.  This would be a waste of CPU cycles though because the ExtWindow and its children would have to re-calculate required
-size every time it was requested rather than using the cached value that is naturally set when MeasureOverride is called by the
-framework.  I have seen the problem happen twice in about several hundred runs.  That's already enough to warrant a resolution.
+Once in a while I would see during startup that if I forced a DPI change to occur, my design was not properly scaling.  I thought
+at first that this was related to timing in calculating the Window size needed to fully display its content, but I was wrong.
+It happened again moments ago and I found that the DPI changed event was not firing.  
+
+So I decided to cut out the middleman for that DPI Changed event and process it by directly sniffing for the message on 
+the WndProc loop.  I will keep an eye on this to see if I ever see that problem again.  Its going to be a tough
+one to intentionally cause so I doubt I will log an issue unless it also happens with the Win32 msg loop.
+
+## Mouse Drag Capture Issue
+On rare occasions the relationship between the mouse pointer and the Window seems to indicate that the Window has 
+mouse capture because the DragMove behavior is causing the Window to move even when the left mouse button is not
+pressed.  Oddly I don't even capture the mouse in my own code, I didn't find it to be necessary so I figured that
+I would remove it so that there would be zero risk that somehow it would remain captured and cause a problem
+like I am seeing infrequently.  Maybe I need to capture and release?  I have a feeling that it is related to 
+using the debugger.  
 
 # TODO
 * Change Cursor on DragMove operation
 * When you set the Window transparency all of the Window content becomes transparent too.  I need to figure out how to handle this.
 * Modify Window and related Views/View Models to make it mimic an Adorner
 * When I resize the Window on startup, it is not a smooth transition because I currently have to call Window.Activate and then resize directly after.
+* The WindowHookManager has a static dictionary ApplicationsHookedWindows that needs to be converted to a thread safe concurrent type.
 
 ## Known Visual Studio or Project Issues
 * MSB4181 regarding CompileXaml task returned false but did not log and error warning keeps showing up.

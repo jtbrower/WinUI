@@ -18,8 +18,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WinUI.Native\WinUI.Native.csproj" />
-    <ProjectReference Include="..\WinUI.Vm\WinUI.Vm.csproj" />
+    <ProjectReference Include="..\WinUI.Native\Oceanside.Win32.Native.csproj" />
+    <ProjectReference Include="..\WinUI.Vm\Oceanside.WinUI.Base.Vm.csproj" />
   </ItemGroup>
 
 </Project>

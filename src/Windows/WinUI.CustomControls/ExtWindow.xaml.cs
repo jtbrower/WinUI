@@ -72,15 +72,6 @@ namespace WinUI.CustomControls
         private double? _dpiScaleOnLoaded;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>
-        /// Information describing the display that needs to be saved so the DPI changed handler can be
-        /// detached.
-        /// </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private DisplayInformation? _displayInformation;
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Occurs when Window State Changed. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -118,6 +109,18 @@ namespace WinUI.CustomControls
 
         public ExtWindow()
         {
+            //Grab the handle and remove the built-in Win32 TitleBar and border
+            Handle = this.GetHandle();
+
+            //This is how you hook WndProc using the helper classes.  The helper classes will unhook
+            // when you close the Window.  Note that since the Window is already created, you are not
+            // going to receive the WM_CREATE or WM_NCCREATE messages.
+            _wndProcCallback = new WindowHookManager.WndProcCallback(WndProcCallback);
+            WindowHookManager.AddWndProcCallback(Handle, _wndProcCallback);
+
+            //NOTE that I hooked before calling InitializeComponent in an attempt to assure the custom
+            // hook receives all messages possible.  Under the covers, I don't know if this call causes
+            // any WndProc messages, but we don't want to miss them if it does.
             InitializeComponent();
 
             //I don't like binding to statics like this so I pulled it out of the DataTemplate Selector
@@ -126,21 +129,14 @@ namespace WinUI.CustomControls
             // So I will just leave it at this for now.
             TypeNameDataTemplateSelector.FallbackResourceDictionary = Application.Current?.Resources;
 
-            //Grab the handle and remove the built-in Win32 TitleBar and border
-            Handle = this.GetHandle();
+            //Get rid of the built-in titlebar and Window border
             Handle.HideWin32NonClientArea();
-
-            //This is how you hook WndProc using the helper classes.  The helper classes will unhook
-            // when you close the Window.
-            _wndProcCallback = new WindowHookManager.WndProcCallback(WndProcCallback);
-            WindowHookManager.AddWndProcCallback(Handle, _wndProcCallback);
 
             //A custom handler we fire when minimized/maximized and other states are entered.
             WindowStateChanged += ExtWindow_WindowStateChanged;
 
             RootContainer.DoubleTapped += RootContainer_DoubleTapped;
             RootContainer.Loaded += RootContainer_Loaded;
-            RootContainer.Unloaded += RootContainer_Unloaded;
 
             SizeChanged += ExtWindow_SizeChanged;
         }
@@ -155,9 +151,22 @@ namespace WinUI.CustomControls
 
         private bool WndProcCallback(ref WindowHookManager.HookMessage message)
         {
-            //Debug.WriteLine(message.Msg);
-            
-            //If you do not handle the message then return false
+            switch (message.HookMsgType)
+            {
+                case WindowHookManager.HookMsgType.DPICHANGED:
+                    //Note that if the method is enabled and handles scaling, I am afraid to return
+                    // true because the originally installed WndProc will not be called and I don't
+                    // know what effect that will have regarding a DPI change.  Considering that 
+                    // this entire class removes the window border and TitleBar, there shouldn't be
+                    // any issue related to returning false and allowing other listeners to be 
+                    // notified.
+                    _ = ScaleContentForDpiIfEnabled();
+                    break;
+            }
+
+            //If you do not handle the message then return false.  There may be times when you handle the 
+            // message and still need to return false so that other custom callbacks as well as the 
+            // original WndProc that was attached to the Window can be called.
             return false;
         }
 
@@ -185,9 +194,9 @@ namespace WinUI.CustomControls
             get { return _vm; }
             set
             {
-                if(_vm == value)return;
+                if (_vm == value) return;
                 _vm = value;
-                OnPropertyChanged();                
+                OnPropertyChanged();
             }
         }
 
@@ -281,19 +290,6 @@ namespace WinUI.CustomControls
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Event handler. Called by RootContainer for unloaded events. </summary>
-        ///
-        /// <param name="sender">   Source of the event. </param>
-        /// <param name="e">        Routed event information. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private void RootContainer_Unloaded(object sender, RoutedEventArgs e)
-        {
-            if (_displayInformation == null) return;
-            _displayInformation.DpiChanged -= DisplayInfo_DpiChanged;
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Event handler. Called by RootContainer for loaded events. </summary>
         ///
         /// <param name="sender">   Source of the event. </param>
@@ -302,8 +298,6 @@ namespace WinUI.CustomControls
 
         private void RootContainer_Loaded(object sender, RoutedEventArgs e)
         {
-            _displayInformation = DisplayInformation.GetForCurrentView();
-            _displayInformation.DpiChanged += DisplayInfo_DpiChanged;
             //The current scale is captured and used as a comparison for the times when the DPI changes.
             _dpiScaleOnLoaded = GetDpiScale();
         }
@@ -325,38 +319,14 @@ namespace WinUI.CustomControls
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Scale content for DPI. </summary>
+        /// <summary>   Scale content for DPI if enabled. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void ScaleContentForDpi()
+        private bool ScaleContentForDpiIfEnabled()
         {
-            var scale = GetDpiScale();
-            //I saw this hit infinity once when closing a window, it caused an exception.  
-            if (
-                !scale.HasValue || double.IsInfinity(scale.Value) || scale <= 0 ||
-                scale == _dpiScaleOnLoaded)
-            {
-                scale = 1.0;
-            }
-            ScaleWindowContent(scale.Value);
-        }
+            if (!_autoDpiContentScaling) return false;
 
-        //It's annoying when this warning is applied to event handler parameters.
-#pragma warning disable IDE0060 // Remove unused parameter
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Displays an information DPI changed. </summary>
-        ///
-        /// <param name="sender">   Source of the event. </param>
-        /// <param name="args">     The arguments. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private void DisplayInfo_DpiChanged(DisplayInformation sender, object args)
-        {
-            if (!_autoDpiContentScaling) return;
-
-            ScaleContentForDpi();
-
+            //Relationship between Win32 TitleBar and trying to properly Scale the Window Size
             //Lesson Learned : note that we recommend using the custom TitleBar or your own version of it
             // instead of the built-in Win32 Window TitleBar and Border.  Trying to properly handle DPI
             // changed events while also using the Win32 TitleBar, brings on more corner case risk than
@@ -379,7 +349,38 @@ namespace WinUI.CustomControls
             // problem because I scale the TitleBar along with the client content so that it's uniform.
             // Using this approach you will have 100% control over the look and feel of your Window's.
             // From the content, the border, DropShadow to the TitleBar, you can easily change all  of
-            // it and scale it on a DPI change without worrying how the TitleBar scaled.
+            // it and scale it on a DPI change without worrying how the TitleBar scaled.            
+
+            var scale = GetDpiScale();
+            //I saw this hit infinity once when closing a window, it caused an exception.  
+            if (
+                !scale.HasValue || double.IsInfinity(scale.Value) || scale <= 0 ||
+                scale == _dpiScaleOnLoaded)
+            {
+                scale = 1.0;
+            }
+            ScaleWindowContent(scale.Value);
+
+            return true;
+        }
+
+        //It's annoying when this warning is applied to event handler parameters.
+#pragma warning disable IDE0060 // Remove unused parameter
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Displays an information DPI changed. </summary>
+        ///
+        /// <param name="sender">   Source of the event. </param>
+        /// <param name="args">     The arguments. </param>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private void DisplayInfo_DpiChanged(DisplayInformation sender, object args)
+        {
+
+            if (!_autoDpiContentScaling) return;
+            ScaleContentForDpiIfEnabled();
+
+
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -456,7 +457,7 @@ namespace WinUI.CustomControls
 
         public void SizeToContent()
         {
-            if(Vm == null)
+            if (Vm == null)
             {
                 Debug.WriteLine($"{nameof(SizeToContent)} found {nameof(ExtWindow)}.{nameof(Vm)} is null.  Unable to resize.");
                 return;

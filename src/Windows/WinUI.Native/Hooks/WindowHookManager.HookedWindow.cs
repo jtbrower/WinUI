@@ -136,7 +136,7 @@ namespace WinUI.Native.Hooks
                 lock (_callbacksLocker)
                 {
                     RegisteredWndProcCallbacks.Add(callback);
-                    _isDeActivated = true;
+                    _isDeActivated = false;
                 }
                 WindowHandle = handle;
 
@@ -266,7 +266,10 @@ namespace WinUI.Native.Hooks
                 if (msg == HookMsgType.DESTROY) Destroy();
 
                 //Note that this is still called after we call Destroy to unhook this routine because
-                // it needs to receive the DESTROY message or else the window will not close.
+                // it needs to receive the DESTROY message or else the window will not close.  Also
+                // notice that we are sending the values inside  of the local HookMessage rather than
+                // the ones that came into this CustomWndProc.  This lets other callbacks change the
+                // parameter values if needed.
                 return CallWindowProc(_originalWndProc, m.HWnd, (uint)m.HookMsgType, m.WParam, m.LParam);
             }
 

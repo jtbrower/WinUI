@@ -39,9 +39,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\WinUI.CustomControls\WinUI.CustomControls.csproj" />
-    <ProjectReference Include="..\WinUI.Native\WinUI.Native.csproj" />
-    <ProjectReference Include="..\WinUI.Vm\WinUI.Vm.csproj" />
+    <ProjectReference Include="..\WinUI.CustomControls\Oceanside.WinUI.Base.csproj" />
+    <ProjectReference Include="..\WinUI.Native\Oceanside.Win32.Native.csproj" />
+    <ProjectReference Include="..\WinUI.Vm\Oceanside.WinUI.Base.Vm.csproj" />
   </ItemGroup>
 
   <ItemGroup>
