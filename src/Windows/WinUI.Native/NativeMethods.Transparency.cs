@@ -22,7 +22,6 @@
 namespace WinUI.Native
 {
     using System;
-    using PInvoke;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>   A native methods. </content>
@@ -30,25 +29,6 @@ namespace WinUI.Native
 
     public static partial class NativeMethods
     {
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>
-        /// This function is currently just a point of insertion for my experiments with Transparency. DO
-        /// NOT CALL IT AND EXPECT ANYTHING!
-        /// </summary>
-        ///
-        /// <param name="hwnd"> The hwnd. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public static void MakeTransparent_WorkInProgress(this IntPtr hwnd)
-        {
-            #warning THIS IS JUST AN EXPERIMENT AT THIS POINT
-            var extendedStyle = (User32.WindowStylesEx)User32.GetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE);
-            User32.SetWindowLong(hwnd, User32.WindowLongIndexFlags.GWL_EXSTYLE, 
-                User32.SetWindowLongFlags.WS_EX_TRANSPARENT | User32.SetWindowLongFlags.WS_EX_LAYERED | User32.SetWindowLongFlags.WS_POPUP);
-        }
-
-
-        #region Control Transparency of Window and Content
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Sets window transparent. </summary>
         ///
@@ -87,6 +67,5 @@ namespace WinUI.Native
         {
             ClearWindowStyles(windowHandle, GWL_EXSTYLE, WindowStyles.WS_EX_LAYERED);
         }
-        #endregion
     }
 }

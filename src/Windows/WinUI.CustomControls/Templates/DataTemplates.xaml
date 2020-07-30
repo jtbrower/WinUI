@@ -105,11 +105,6 @@
             </Grid>
         </Border>
     </DataTemplate>
-    
-    <!-- The application's main page is DataTemplated here. -->
-    <DataTemplate x:Key="MainPageVm" x:DataType="vm:MainPageVm">
-        <customControls:MainPage Vm="{Binding}" />
-    </DataTemplate>
 
     <DataTemplate x:Key="WindowVm" x:DataType="vm:WindowVm">
         <customControls:WindowView Vm="{Binding}" />

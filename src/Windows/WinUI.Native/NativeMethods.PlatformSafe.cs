@@ -22,7 +22,6 @@
 namespace WinUI.Native
 {
     using System;
-    using System.Runtime.InteropServices;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>
@@ -33,39 +32,18 @@ namespace WinUI.Native
     public static partial class NativeMethods
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   A platform safe. </summary>
+        /// <summary>
+        /// Assures that the correct functions are called when both 64-bit and 32-bit functions exist.
+        /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         private static class PlatformSafe
         {
             ////////////////////////////////////////////////////////////////////////////////////////////////////
-            /// <summary>   Sets window 32. </summary>
-            ///
-            /// <param name="hWnd">         The window. </param>
-            /// <param name="nIndex">       Zero-based index of the. </param>
-            /// <param name="dwNewLong">    The new long. </param>
-            ///
-            /// <returns>   An IntPtr. </returns>
-            ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-            [DllImport("user32.dll", SetLastError = true, EntryPoint = "SetWindowLong")]
-            private static extern IntPtr SetWindow32(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////
-            /// <summary>   Sets window 64. </summary>
-            ///
-            /// <param name="hWnd">         The window. </param>
-            /// <param name="nIndex">       Zero-based index of the. </param>
-            /// <param name="dwNewLong">    The new long. </param>
-            ///
-            /// <returns>   An IntPtr. </returns>
-            ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-            [DllImport("user32.dll", SetLastError = true, EntryPoint = "SetWindowLongPtr")]
-            private static extern IntPtr SetWindow64(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////
-            /// <summary>   Gets a window. </summary>
+            /// <summary>
+            /// Assures that either GetWindowLong or GetWindowLongPtr is called based on either 32-bit or 64-
+            /// bit platform being executed.
+            /// </summary>
             ///
             /// <param name="hWnd">     The window. </param>
             /// <param name="nIndex">   Zero-based index of the. </param>
@@ -81,31 +59,10 @@ namespace WinUI.Native
             }
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////
-            /// <summary>   Gets window long. </summary>
-            ///
-            /// <param name="hWnd">     The window. </param>
-            /// <param name="nIndex">   Zero-based index of the. </param>
-            ///
-            /// <returns>   The window long. </returns>
-            ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-            [DllImport("user32.dll", EntryPoint = "GetWindowLong", SetLastError = true)]
-            private static extern IntPtr GetWindowLong(IntPtr hWnd, int nIndex);
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////
-            /// <summary>   Gets window long pointer. </summary>
-            ///
-            /// <param name="hWnd">     The window. </param>
-            /// <param name="nIndex">   Zero-based index of the. </param>
-            ///
-            /// <returns>   The window long pointer. </returns>
-            ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-            [DllImport("user32.dll", EntryPoint = "GetWindowLongPtr", SetLastError = true)]
-            private static extern IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex);
-
-            ////////////////////////////////////////////////////////////////////////////////////////////////////
-            /// <summary>   Sets a window. </summary>
+            /// <summary>
+            /// Assures that either SetWindowLong or SetWindowLongPtr is called based on either 32-bit or 64-
+            /// bit platform being executed.
+            /// </summary>
             ///
             /// <param name="hWnd">         The window. </param>
             /// <param name="nIndex">       Zero-based index of the. </param>
@@ -117,8 +74,8 @@ namespace WinUI.Native
             internal static IntPtr SetWindow(IntPtr hWnd, int nIndex, IntPtr dwNewLong)
             {
                 return Environment.Is64BitProcess ?
-                    SetWindow64(hWnd, nIndex, dwNewLong) :
-                    SetWindow32(hWnd, nIndex, dwNewLong);
+                    SetWindowLongPtr(hWnd, nIndex, dwNewLong) :
+                    SetWindowLong(hWnd, nIndex, dwNewLong);
             }
         }
     }

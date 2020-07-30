@@ -9,6 +9,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:local="using:WinUI.CustomControls"
+    xmlns:templates="using:WinUI.CustomControls.Templates"    
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:media="using:Microsoft.UI.Xaml.Media"
     xmlns:vm="using:WinUI.Vm"
@@ -16,7 +17,7 @@
     mc:Ignorable="d">
     <controls:LayoutTransformControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" FalseValue="Collapsed" />
-        <local:TypeNameDataTemplateSelector
+        <templates:TypeNameDataTemplateSelector
             x:Key="TypeNameDataTemplateSelector"
             x:Name="TypeNameDataTemplateSelector"/>
     </controls:LayoutTransformControl.Resources>

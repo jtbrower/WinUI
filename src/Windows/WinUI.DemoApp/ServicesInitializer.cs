@@ -24,6 +24,8 @@ namespace WinUI.Vm
     using Microsoft.Extensions.DependencyInjection;
     using WinUI.CustomControls;
     using WinUI.DemoApp;
+    using WinUI.DemoApp.View;
+    using WinUI.DemoApp.Vm;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>   The services initializer. </summary>

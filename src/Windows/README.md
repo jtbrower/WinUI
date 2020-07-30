@@ -33,6 +33,7 @@ I will try to take more time in the future to document why some of these feature
 * Provide a SizeToContent feature like WPF provides.  Capable of sizing up and down to fit client space requirements; great for border-less windows but still works with border.
 * Maximize, Restore, Minimize, change Window size and move it to a new location.
 * Ability to automatically scale the ExtWindow content upon a DPI change.
+* Hook into WndProc to handle native window messages
 
 # Known Issues
 * `<PackageReference Include=\"Microsoft.Windows.CsWinRT Version=\"0.1.0-prerelease.200629.3\" />` was added to the DemoApp to avoid a compatibility issue between .Net5 preview 6 and WinUI
@@ -40,6 +41,15 @@ I will try to take more time in the future to document why some of these feature
 * The Debug window shows 5 'WinRT transform error' exceptions that are swallowed on app start
 * Debug Window shows a 'mincore\com\oleaut32\dispatch\ups.cpp(2122)\OLEAUT32.dll' library not registered error.
 * The Debug Window warns that ActualWidthProperty is not found on Canvas.  I thought that maybe creating a property path, I should switch to just "ActualWidth"; even though the error goes away, it breaks the drop shadow and can't be correct.
+* The Debug Window warns that ActualHeightProperty is not found on Canvas.  Same as above.
+
+## DPI Changed Issue
+Every once in a rare, impossible to repeat intentionally, DPI Change the measurement that is captured to determine that true size
+to render the control is not the true size and when the window resizes its either too much or not enough space.  I could probably
+work around this by forcing the WindowView to call MeasureOveride anytime the RequiredWidth/RequiredHeight properties are 
+requested.  This would be a waste of CPU cycles though because the ExtWindow and its children would have to re-calculate required
+size every time it was requested rather than using the cached value that is naturally set when MeasureOverride is called by the
+framework.  I have seen the problem happen twice in about several hundred runs.  That's already enough to warrant a resolution.
 
 # TODO
 * Change Cursor on DragMove operation

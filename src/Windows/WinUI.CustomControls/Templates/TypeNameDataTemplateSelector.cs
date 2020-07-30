@@ -19,7 +19,8 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace WinUI.CustomControls
+
+namespace WinUI.CustomControls.Templates
 {
     using Microsoft.UI.Xaml;
     using Microsoft.UI.Xaml.Controls;
@@ -28,7 +29,7 @@ namespace WinUI.CustomControls
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>   A type name data template selector. This class cannot be inherited. </summary>
     ///
-    /// <seealso cref="Microsoft.UI.Xaml.Controls.DataTemplateSelector"/>
+    /// <seealso cref="DataTemplateSelector"/>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public sealed class TypeNameDataTemplateSelector : DataTemplateSelector

@@ -2,23 +2,29 @@
     x:Class="WinUI.DemoApp.App"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:templates="using:WinUI.CustomControls.Templates">
+    xmlns:localtemplates="using:WinUI.DemoApp.Templates"
+    xmlns:templates="using:WinUI.CustomControls.Templates"
+    xmlns:view="using:WinUI.DemoApp.View"
+    xmlns:vm="using:WinUI.DemoApp.Vm">
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
                 <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
 
-                <!-- 
-                Please note that when including a dictionary that has a code behind file you MUST
-                include the dictionary as if you were defining an instance of it directly.  This
-                can take a couple days off your life if you make this mistake.  
+                <!--
+                    Please note that when including a dictionary that has a code behind file you MUST
+                    include the dictionary as if you were defining an instance of it directly.  This
+                    can take a couple days off your life if you make this mistake.
                 -->
 
-                <!-- NOTE THAT THE FOLLOWING LINE IS CORRECT -->
+                <!--  NOTE THAT THE FOLLOWING LINE IS CORRECT  -->
                 <templates:DataTemplates />
 
-                <!-- NOTE THAT THE FOLLOWING LINE IS WRONG -->
+                <!--  NOTE THAT THE FOLLOWING LINE IS WRONG  -->
                 <!-- <ResourceDictionary Source="ms-appx:///WinUI.CustomControls/Templates/DataTemplates.xaml" /> -->
+
+                <!--  Add the local DataTemplates  -->
+                <localtemplates:DataTemplates />
 
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>

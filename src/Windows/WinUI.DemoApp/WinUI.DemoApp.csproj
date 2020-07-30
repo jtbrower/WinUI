@@ -34,6 +34,8 @@
 
   <ItemGroup>
     <None Remove="App.xaml" />
+    <None Remove="MainPage.xaml" />
+    <None Remove="Templates\DataTemplates.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -45,6 +47,9 @@
   <ItemGroup>
     <Page Update="App.xaml">
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Update="Templates\DataTemplates.xaml">
+      <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
 

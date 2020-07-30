@@ -24,8 +24,71 @@ namespace WinUI.Native
     using System;
     using System.Runtime.InteropServices;
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <content>   A native methods. </content>
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
     public static partial class NativeMethods
     {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets current thread identifier. </summary>
+        ///
+        /// <returns>   The current thread identifier. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        [DllImport(Kernel32, ExactSpelling = true)]
+        public static extern uint GetCurrentThreadId();
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   This function should only be used on 32-bit platforms. </summary>
+        ///
+        /// <param name="hWnd">         The window. </param>
+        /// <param name="nIndex">       Zero-based index of the. </param>
+        /// <param name="dwNewLong">    The new long. </param>
+        ///
+        /// <returns>   An IntPtr. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        [DllImport(User32, SetLastError = true)]
+        private static extern IntPtr SetWindowLong(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   This function should only be used on 64-bit platforms. </summary>
+        ///
+        /// <param name="hWnd">         The window. </param>
+        /// <param name="nIndex">       Zero-based index of the. </param>
+        /// <param name="dwNewLong">    The new long. </param>
+        ///
+        /// <returns>   An IntPtr. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        [DllImport(User32, SetLastError = true)]
+        private static extern IntPtr SetWindowLongPtr(IntPtr hWnd, int nIndex, IntPtr dwNewLong);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   This function should only be used on 32-bit platforms. </summary>
+        ///
+        /// <param name="hWnd">     The window. </param>
+        /// <param name="nIndex">   Zero-based index of the. </param>
+        ///
+        /// <returns>   The window long. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        [DllImport(User32, SetLastError = true)]
+        private static extern IntPtr GetWindowLong(IntPtr hWnd, int nIndex);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   This function should only be used on 64-bit platforms. </summary>
+        ///
+        /// <param name="hWnd">     The window. </param>
+        /// <param name="nIndex">   Zero-based index of the. </param>
+        ///
+        /// <returns>   The window long pointer. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        [DllImport(User32, SetLastError = true)]
+        private static extern IntPtr GetWindowLongPtr(IntPtr hWnd, int nIndex);
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Sets layered window attributes. </summary>
         ///
@@ -37,7 +100,7 @@ namespace WinUI.Native
         /// <returns>   True if it succeeds, false if it fails. </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        [DllImport("user32.dll")]
+        [DllImport(User32, SetLastError = true)]
         private static extern bool SetLayeredWindowAttributes(IntPtr hwnd, uint crKey, byte bAlpha, uint dwFlags);
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -53,7 +116,7 @@ namespace WinUI.Native
         /// <returns>   True if it succeeds, false if it fails. </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        [DllImport("user32.dll", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         public static extern bool MoveWindow(IntPtr hWnd, int X, int Y, int nWidth, int nHeight, bool bRepaint);
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -65,7 +128,7 @@ namespace WinUI.Native
         /// <returns>   True if it succeeds, false if it fails. </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        [DllImport("user32.dll", SetLastError = true)]
+        [DllImport(User32, SetLastError = true)]
         private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
     }
 }

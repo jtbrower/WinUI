@@ -21,7 +21,7 @@
 // SOFTWARE.
 using System.Threading.Tasks;
 
-namespace WinUI.Vm
+namespace WinUI.DemoApp.Vm
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>   A ViewModel for the main page. This class cannot be inherited. </content>

@@ -19,6 +19,18 @@
     <GenerateAssemblyInfo>true</GenerateAssemblyInfo>
     <RestoreProjectStyle>PackageReference</RestoreProjectStyle>
 
+    <!--
+      Keep an eye on this one.  There was a warning coming from the WinUI Microsoft.UI.Xaml.Markup.Compiler.props that
+      "GenerateLibraryLayout is not needed for including Xaml files when the Pack target is ran" because it results in access
+      file copies.  Upon further investigation I was not setting either of the bools GenerateLibraryLayout or 
+      IncludeXamlFilesInNugetPackage that needed to be true for the warning to show.  If you follow the directions and set
+      GenerateLibraryLayout to false, you will see errors regarding duplicate files.  If you set 
+      IncludeXamlFilesInNugetPackage to false it builds as expected without the warnings.  I don't think the 
+      IncludeXamlFilesInNugetPackage is needed unless we begin packaging the libs into NuGets, but this long comment
+      will remain in any file that sets this to false.
+    -->
+    <IncludeXamlFilesInNugetPackage>false</IncludeXamlFilesInNugetPackage>
+  
   </PropertyGroup>
 
   <PropertyGroup>

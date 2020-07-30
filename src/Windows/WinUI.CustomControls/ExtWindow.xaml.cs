@@ -24,16 +24,18 @@ namespace WinUI.CustomControls
     using Microsoft.UI.Xaml;
     using System;
     using WinUI.Native;
+    using WinUI.Native.Hooks;
     using System.Diagnostics;
     using Windows.Graphics.Display;
     using WinUI.Vm;
-    using PInvoke;
+    using static PInvoke.User32;
     using Microsoft.UI.Xaml.Input;
     using Microsoft.UI.Xaml.Media;
     using System.Linq;
     using Microsoft.UI.Xaml.Controls.Primitives;
     using System.ComponentModel;
     using System.Runtime.CompilerServices;
+    using PInvoke;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>
@@ -46,6 +48,12 @@ namespace WinUI.CustomControls
 
     public sealed partial class ExtWindow : IExtWindow, IPlatform, INotifyPropertyChanged
     {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The window procedure callback. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private readonly WindowHookManager.WndProcCallback _wndProcCallback;
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   True to automatically DPI content scaling. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,6 +130,12 @@ namespace WinUI.CustomControls
             Handle = this.GetHandle();
             Handle.HideWin32NonClientArea();
 
+            //This is how you hook WndProc using the helper classes.  The helper classes will unhook
+            // when you close the Window.
+            _wndProcCallback = new WindowHookManager.WndProcCallback(WndProcCallback);
+            WindowHookManager.AddWndProcCallback(Handle, _wndProcCallback);
+
+            //A custom handler we fire when minimized/maximized and other states are entered.
             WindowStateChanged += ExtWindow_WindowStateChanged;
 
             RootContainer.DoubleTapped += RootContainer_DoubleTapped;
@@ -129,6 +143,22 @@ namespace WinUI.CustomControls
             RootContainer.Unloaded += RootContainer_Unloaded;
 
             SizeChanged += ExtWindow_SizeChanged;
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Callback, called when the window procedure. </summary>
+        ///
+        /// <param name="message">  [in,out] The message. </param>
+        ///
+        /// <returns>   An int. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private bool WndProcCallback(ref WindowHookManager.HookMessage message)
+        {
+            //Debug.WriteLine(message.Msg);
+            
+            //If you do not handle the message then return false
+            return false;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -231,17 +261,17 @@ namespace WinUI.CustomControls
             // or put the method here.
             try
             {
-                var windowPlacement = User32.GetWindowPlacement(Handle);
+                var windowPlacement = GetWindowPlacement(Handle);
                 var showStyle = windowPlacement.showCmd;
 
-                if (showStyle == User32.WindowShowStyle.SW_MINIMIZE ||
-                    showStyle == User32.WindowShowStyle.SW_FORCEMINIMIZE ||
-                    showStyle == User32.WindowShowStyle.SW_SHOWMINIMIZED ||
-                    showStyle == User32.WindowShowStyle.SW_SHOWMINNOACTIVE) return EnumWindowState.Minimized;
+                if (showStyle == WindowShowStyle.SW_MINIMIZE ||
+                    showStyle == WindowShowStyle.SW_FORCEMINIMIZE ||
+                    showStyle == WindowShowStyle.SW_SHOWMINIMIZED ||
+                    showStyle == WindowShowStyle.SW_SHOWMINNOACTIVE) return EnumWindowState.Minimized;
 
 
-                if (showStyle == User32.WindowShowStyle.SW_MAXIMIZE ||
-                    showStyle == User32.WindowShowStyle.SW_SHOWMAXIMIZED) return EnumWindowState.Maximized;
+                if (showStyle == WindowShowStyle.SW_MAXIMIZE ||
+                    showStyle == WindowShowStyle.SW_SHOWMAXIMIZED) return EnumWindowState.Maximized;
             }
             catch (Exception e)
             {
@@ -291,7 +321,7 @@ namespace WinUI.CustomControls
                 Debug.WriteLine($"{nameof(GetDpiScale)} called before {nameof(WindowView)}.XamlRoot was available.");
                 return null;
             }
-            return (ClientContentControl.XamlRoot.RasterizationScale * 96.0) / User32.GetDpiForWindow(Handle);
+            return (ClientContentControl.XamlRoot.RasterizationScale * 96.0) / GetDpiForWindow(Handle);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////

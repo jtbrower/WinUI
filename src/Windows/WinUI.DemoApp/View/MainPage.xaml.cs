@@ -19,38 +19,48 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace WinUI.Native
+namespace WinUI.DemoApp.View
 {
-    public static partial class NativeMethods
+    using Microsoft.UI.Xaml;
+    using Microsoft.UI.Xaml.Controls;
+    using WinUI.DemoApp.Vm;
+ 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    /// <content>   A main page. This class cannot be inherited. </content>
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    public sealed partial class MainPage : Page
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   LWA_ALPHA </summary>
+        /// <summary>   The view model property. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private const int LWA_ALPHA = 0x2;
+        public static readonly DependencyProperty VmProperty = DependencyProperty.Register(nameof(Vm),
+            typeof(MainPageVm),
+            typeof(MainPage),
+            new PropertyMetadata(null));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   GWL_EXSTYLE. </summary>
+        /// <summary>   Gets or sets the view model. </summary>
+        ///
+        /// <value> The view model. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private const int GWL_EXSTYLE = -20;
+        public MainPageVm? Vm
+        {
+            get => GetValue(VmProperty) as MainPageVm;
+            set => SetValue(VmProperty, value);
+        }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   GWL_STYLE </summary>
+        /// <summary>   Initializes a new instance of the WinUI.CustomControls.MainPage class. </summary>
+        ///
+        /// <param name="vm">   The view model. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private const int GWL_STYLE = -16;
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   The kernel 32. </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public const string Kernel32 = "kernel32.dll";
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   The user 32. </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public const string User32 = "user32.dll";
+        public MainPage()
+        {
+            InitializeComponent();
+        }
     }
 }

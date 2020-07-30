@@ -26,6 +26,7 @@ namespace WinUI.DemoApp
     using Microsoft.Extensions.DependencyInjection;
     using WinUI.Vm;
     using System;
+    using WinUI.DemoApp.Vm;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>   An application. </content>
@@ -81,11 +82,21 @@ namespace WinUI.DemoApp
             windowVm.ClientsContent = _serviceProvider.GetRequiredService<MainPageVm>();
             window.Vm = windowVm;
 
+            //Start transparent so we have a chance to resize before its visible.  This does not
+            // fully satisfy my desire to show a Window with a specific size without the need 
+            // for WinUI to show it at a random size first.  More work will come on this, but this
+            // is a rough half-baked work-around until I can get to this area.
+            window.SetTransparency(100);
+
             window.Activate();
 
             //This will have a jarring effect because I have not had time to figure out how to set the size before
             // the window is activated for the first time.
             window.Resize(600, 400);
+
+            //Make the window fully visible by removing the transparency.
+            window.SetTransparency(0);
         }
+
     }
 }

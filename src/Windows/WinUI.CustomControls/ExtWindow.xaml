@@ -8,6 +8,7 @@
     xmlns:media="using:Microsoft.UI.Xaml.Media"    
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"    
     xmlns:local="using:WinUI.CustomControls"
+    xmlns:templates="using:WinUI.CustomControls.Templates"
     xmlns:app="using:Microsoft.UI.Xaml"    
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
@@ -24,7 +25,7 @@
         VerticalAlignment="Stretch"
         Background="Transparent">
         <Grid.Resources>
-            <local:TypeNameDataTemplateSelector
+            <templates:TypeNameDataTemplateSelector
             x:Key="TypeNameDataTemplateSelector"                
             x:Name="TypeNameDataTemplateSelector" />
         </Grid.Resources>

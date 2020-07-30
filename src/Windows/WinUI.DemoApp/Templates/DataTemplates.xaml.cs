@@ -19,47 +19,27 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-namespace WinUI.CustomControls
+
+namespace WinUI.DemoApp.Templates
 {
-    using Microsoft.UI.Xaml;
-    using Microsoft.UI.Xaml.Controls;
-    using WinUI.Vm;
- 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    /// <content>   A main page. This class cannot be inherited. </content>
+    /// <content>   A data templates. This class cannot be inherited. </content>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public sealed partial class MainPage : Page
+    public sealed partial class DataTemplates : Microsoft.UI.Xaml.ResourceDictionary
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   The view model property. </summary>
+        /// <summary>
+        /// Initializes a new instance of the WinUI.CustomControls.Templates.DataTemplates class.
+        /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public static readonly DependencyProperty VmProperty = DependencyProperty.Register(nameof(Vm),
-            typeof(MainPageVm),
-            typeof(MainPage),
-            new PropertyMetadata(null));
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Gets or sets the view model. </summary>
-        ///
-        /// <value> The view model. </value>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public MainPageVm? Vm
+        public DataTemplates()
         {
-            get => GetValue(VmProperty) as MainPageVm;
-            set => SetValue(VmProperty, value);
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Initializes a new instance of the WinUI.CustomControls.MainPage class. </summary>
-        ///
-        /// <param name="vm">   The view model. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public MainPage()
-        {
+            //Note that if you ever run into a case where you are not hitting this breakpoint its probably
+            // because you included the library as a typical ResourceDictionary which is NOT correct.
+            // You would include this like your are defining an instance of it.  See below.
+            // <namespace:DataTemplates />
             InitializeComponent();
         }
     }

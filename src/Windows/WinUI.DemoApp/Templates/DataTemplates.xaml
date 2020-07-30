@@ -1,0 +1,26 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    x:Class="WinUI.DemoApp.Templates.DataTemplates"    
+    xmlns:view="using:WinUI.DemoApp.View"
+    xmlns:vm="using:WinUI.DemoApp.Vm">
+
+    <!-- 
+      NOTICE HOW TO INCLUDE THIS DICTIONARY 
+      Note that this ResourceDictionary has a code behind file that requires you to include
+      this resource dictionary differently than you are probably use to.  Assuming that 
+      "templates" is the namespace pointing to this dictionary you would do the following
+      in your App.xaml
+      
+      NOTE THAT THE FOLLOWING LINE IS CORRECT
+      <templates:DataTemplates />
+      
+      NOTE THAT THE FOLLOWING LINE IS WRONG
+      <ResourceDictionary Source="ms-appx:///WinUI.CustomControls/Templates/DataTemplates.xaml" /> 
+    -->
+    
+    <!-- The application's main page is DataTemplated here. -->
+    <DataTemplate x:Key="MainPageVm" x:DataType="vm:MainPageVm">
+        <view:MainPage Vm="{Binding}" />
+    </DataTemplate>
+</ResourceDictionary>
