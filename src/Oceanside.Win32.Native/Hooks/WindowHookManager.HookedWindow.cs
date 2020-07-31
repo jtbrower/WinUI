@@ -204,7 +204,7 @@ namespace WinUI.Native.Hooks
                 {
                     if (RegisteredWndProcCallbacks.Contains(callback))
                     {
-                        RegisteredWndProcCallbacks.Remove(callback);
+                        _ = RegisteredWndProcCallbacks.Remove(callback);
                         _isDeActivated = !RegisteredWndProcCallbacks.Any();
                         return;
                     }
@@ -316,7 +316,7 @@ namespace WinUI.Native.Hooks
                 ClearAllCallbacks();
 
                 //Return the original WndProc procedure.
-                SetWindowLongPtr(WindowHandle, WindowLongIndexFlags.GWL_WNDPROC, _originalWndProc);
+                _ = SetWindowLongPtr(WindowHandle, WindowLongIndexFlags.GWL_WNDPROC, _originalWndProc);
 
                 //Notify the hook manager that this instance should no longer be tracked in its static 
                 // application-wide hooked windows dictionary because the Window is closed.

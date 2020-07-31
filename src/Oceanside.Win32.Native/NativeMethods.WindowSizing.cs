@@ -89,7 +89,7 @@ namespace WinUI.Native
                 WriteGlobalErrorMsgIfSet();
                 return;
             }
-            MoveWindow(windowHandle, r.left + x, r.top + y, r.GetWidth(), r.GetHeight(), true);
+            _ = MoveWindow(windowHandle, r.left + x, r.top + y, r.GetWidth(), r.GetHeight(), true);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -107,7 +107,7 @@ namespace WinUI.Native
                 WriteGlobalErrorMsgIfSet();
                 return;
             }
-            MoveWindow(windowHandle, r.left, r.top, r.GetWidth() - x, r.GetHeight() - y, true);
+            _ = MoveWindow(windowHandle, r.left, r.top, r.GetWidth() - x, r.GetHeight() - y, true);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -127,7 +127,7 @@ namespace WinUI.Native
             var height = (int)(r.GetHeight() * percent);
             var width = (int)(r.GetWidth() * percent);
             Debug.WriteLine($"Size {width},{height}");
-            MoveWindow(windowHandle, r.left, r.top, width, height, true);
+            _ = MoveWindow(windowHandle, r.left, r.top, width, height, true);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -150,7 +150,7 @@ namespace WinUI.Native
                 // maximized state and it crosses between two monitors that cause a DPI change.  It will cause
                 // infinite recursive DPI changed events to fire to the point your only option to kill the app
                 // is with the task manager.
-                PI.ShowWindow(windowHandle, PI.WindowShowStyle.SW_SHOWNORMAL);
+                _ = PI.ShowWindow(windowHandle, PI.WindowShowStyle.SW_SHOWNORMAL);
             }
             //Using SWP_NOMOVE causes the location coordinates (0,0) to be ignored.
             if (!PI.SetWindowPos(windowHandle, IntPtr.Zero, 0, 0, x, y, PI.SetWindowPosFlags.SWP_NOZORDER | PI.SetWindowPosFlags.SWP_NOMOVE))

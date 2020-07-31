@@ -92,7 +92,7 @@ namespace WinUI.Native
 
         public static void MaximizeWindow(this IntPtr windowHandle)
         {
-            ShowWindow(windowHandle, (int)EnumWindowShowStates.Maximized);
+            _ = ShowWindow(windowHandle, (int)EnumWindowShowStates.Maximized);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -103,7 +103,7 @@ namespace WinUI.Native
 
         public static void MinimizeWindow(this IntPtr windowHandle)
         {
-            ShowWindow(windowHandle, (int)EnumWindowShowStates.Minimized);
+            _ = ShowWindow(windowHandle, (int)EnumWindowShowStates.Minimized);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -114,7 +114,7 @@ namespace WinUI.Native
 
         public static void RestoreWindow(this IntPtr windowHandle)
         {
-            ShowWindow(windowHandle, (int)EnumWindowShowStates.Restore);
+            _ = ShowWindow(windowHandle, (int)EnumWindowShowStates.Restore);
         }
     }
 }

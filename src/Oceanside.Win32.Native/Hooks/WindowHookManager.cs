@@ -84,7 +84,7 @@ namespace WinUI.Native.Hooks
         {
             if (!(sender is HookedWindow hookedWindow)) return;
             if (ApplicationsHookedWindows.ContainsKey(hookedWindow.WindowHandle))
-                ApplicationsHookedWindows.Remove(hookedWindow.WindowHandle);
+                _ = ApplicationsHookedWindows.Remove(hookedWindow.WindowHandle);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,7 +123,7 @@ namespace WinUI.Native.Hooks
                 //Remove the event handler so we are not notified of a disposal we already know about.
                 hook.OnClosed -= HookedWindow_OnDestroyed;
                 hook.ClearAllCallbacks();
-                ApplicationsHookedWindows.Remove(hook.WindowHandle);
+                _ = ApplicationsHookedWindows.Remove(hook.WindowHandle);
             }
         }
         #endregion

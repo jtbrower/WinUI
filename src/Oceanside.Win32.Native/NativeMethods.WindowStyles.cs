@@ -21,10 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System;
-
 namespace WinUI.Native
 {
+    using System;
+
     public static partial class NativeMethods
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -97,10 +97,9 @@ namespace WinUI.Native
             var desiredStyle = PlatformSafe.GetWindow(windowHandle, index);
             WriteLineIf(GetLastWin32ErrorMessage(out var msg), msg);
 
-            if (IntPtr.Size == 4)
-                desiredStyle = new IntPtr(unchecked(desiredStyle.ToInt32() & ~(int)styles));
-            else
-                desiredStyle = new IntPtr(unchecked(desiredStyle.ToInt64() & ~(int)styles));
+            desiredStyle = IntPtr.Size == 4
+                ? new IntPtr(unchecked(desiredStyle.ToInt32() & ~(int)styles))
+                : new IntPtr(unchecked(desiredStyle.ToInt64() & ~(int)styles));
 
             var success = IntPtr.Zero != PlatformSafe.SetWindow(windowHandle, index, desiredStyle);
             WriteLineIf(!success, LastWin32ErrorMessage);
