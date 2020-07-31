@@ -1,5 +1,6 @@
 ﻿// MIT License
 //
+// Copyright (C) 2020 Oceanside Software Corporation (R)  Prosper, TX
 // Author  : Jason T. Brower
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -19,6 +20,7 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
+
 namespace WinUI.Vm
 {
     using System.Windows.Input;

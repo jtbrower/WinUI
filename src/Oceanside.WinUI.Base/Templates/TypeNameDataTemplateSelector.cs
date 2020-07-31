@@ -1,5 +1,6 @@
 ﻿// MIT License
 //
+// Copyright (C) 2020 Oceanside Software Corporation (R)  Prosper, TX
 // Author  : Jason T. Brower
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
