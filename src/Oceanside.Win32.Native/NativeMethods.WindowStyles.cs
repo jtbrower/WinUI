@@ -19,7 +19,6 @@
 // LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
-using Microsoft.UI.Xaml;
 using System;
 
 namespace WinUI.Native
@@ -117,19 +116,17 @@ namespace WinUI.Native
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   A Window extension method that shows the window 32 non client area. </summary>
+        /// <summary>
+        /// A Window extension method that shows the window 32 non client area. WARNING YOU NEED TO CALL
+        /// Window.Activate after calling this method.
+        /// </summary>
         ///
-        /// <param name="window">       The window to act on. </param>
         /// <param name="windowHandle"> Handle of the window. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public static void ShowWin32NonClientArea(this Window window, IntPtr windowHandle)
+        public static void ShowWin32NonClientArea(this IntPtr windowHandle)
         {
             SetWindowStyles(windowHandle, GWL_STYLE, WindowStyles.WS_OVERLAPPEDWINDOW);
-
-            //If you do not call this then the window won't have any content showing and it will not be
-            // usable.
-            window.Activate();
         }
     }
 }

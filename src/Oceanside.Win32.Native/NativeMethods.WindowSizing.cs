@@ -23,7 +23,6 @@ namespace WinUI.Native
 {
     using System;
     using System.Diagnostics;
-    using Windows.Foundation;
     using PI=PInvoke.User32;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -38,17 +37,19 @@ namespace WinUI.Native
         /// located.
         /// </summary>
         ///
-        /// <param name="hWnd">             The window. </param>
-        /// <param name="nonClientSize">    [out] Size of the non client area in Physical Pixels or
-        ///                                 device units. </param>
+        /// <param name="hWnd">     The window. </param>
+        /// <param name="width">    [out] width of the non client area in Physical Pixels or device units. </param>
+        /// <param name="height">   [out] height of the non client area in Physical Pixels or device units. </param>
         ///
         /// <returns>   True if it succeeds, false if it fails. </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public static bool GetNonClientSize(this IntPtr hWnd, out Size nonClientSize)
+        public static bool GetNonClientSize(this IntPtr hWnd, out double width, out double height)
         {
             //A client rect sitting at 0,0 with calculated height and width.
-            nonClientSize = new Size();
+            width = 0;
+            height = 0;
+            
             if (!PI.GetClientRect(hWnd, out var clientRect))
             {
                 WriteGlobalErrorMsgIfSet();
@@ -66,8 +67,8 @@ namespace WinUI.Native
             var clientHeight = clientRect.GetHeight();
             var clientWidth = clientRect.GetWidth();
 
-            nonClientSize.Height = windowHeight - clientHeight;
-            nonClientSize.Width = windowWidth - clientWidth;
+            height = windowHeight - clientHeight;
+            width = windowWidth - clientWidth;
             return true;
         }
 

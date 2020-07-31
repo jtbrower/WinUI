@@ -32,7 +32,7 @@
     <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
     <DefaultLanguage>en-US</DefaultLanguage>
     <AppxPackageSigningEnabled>false</AppxPackageSigningEnabled>
-    <EntryPointProjectUniqueName>..\WinUI.DemoApp\Oceanside.WinUI.Sample.App.csproj</EntryPointProjectUniqueName>
+    <EntryPointProjectUniqueName>..\Oceanside.WinUI.Sample.App\Oceanside.WinUI.Sample.App.csproj</EntryPointProjectUniqueName>
   </PropertyGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -40,6 +40,7 @@
     </AppxManifest>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Directory.Build.targets" />
     <Content Include="Images\SplashScreen.scale-200.png" />
     <Content Include="Images\LockScreenLogo.scale-200.png" />
     <Content Include="Images\Square150x150Logo.scale-200.png" />
@@ -54,7 +55,7 @@
     <SDKReference Include="Microsoft.VCLibs, Version=14.0" Condition="'$(Configuration)' == 'Debug'" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\WinUI.DemoApp\Oceanside.WinUI.Sample.App.csproj">
+    <ProjectReference Include="..\Oceanside.WinUI.Sample.App\Oceanside.WinUI.Sample.App.csproj">
       <SkipGetTargetFrameworkProperties>True</SkipGetTargetFrameworkProperties>
     </ProjectReference>
   </ItemGroup>

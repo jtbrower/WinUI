@@ -3,18 +3,23 @@
     <TargetFramework>netcoreapp5.0</TargetFramework>
     <TargetPlatformVersion>10.0.18362.0</TargetPlatformVersion>
     <TargetPlatformMinVersion>10.0.17134.0</TargetPlatformMinVersion>
-    <RootNamespace>WinUI.Native</RootNamespace>
 
     <Platforms>x86;x64</Platforms>
     <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
-    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.VCRTForwarders.140" Version="1.0.6" />
     <PackageReference Include="Microsoft.WinUI" Version="3.0.0-preview2.200713.0" />
 
+    <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="8.0.0-preview2" />
     <PackageReference Include="PInvoke.User32" Version="0.6.49" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Oceanside.Win32.Native\Oceanside.Win32.Native.csproj" />
+    <ProjectReference Include="..\Oceanside.WinUI.Native\Oceanside.WinUI.Native.csproj" />
+    <ProjectReference Include="..\Oceanside.WinUI.Base.Vm\Oceanside.WinUI.Base.Vm.csproj" />
   </ItemGroup>
 
 </Project>

@@ -18,7 +18,7 @@
     Pull in a custom icon from a single source so all assemblies can use the same one.  That way
     you only have to change it in one place.
     -->
-    <Content Include="$(MSBuildThisFileDirectory)\icon.ico" Visible="true" Pack="true" PackagePath=""/>
+    <Content Condition=" '$(OutputType)' == 'WinExe' Or '$(OutputType)' == 'Exe' " Include="$(MSBuildThisFileDirectory)\icon.ico" Visible="true" Pack="true" PackagePath=""/>
   </ItemGroup>
 
 
@@ -26,12 +26,9 @@
     The following few sections will automatically pull in images as resources.
   -->
   <ItemGroup>
-    <Content Include="**\*.png" />
-    <Content Include="**\*.jpg" />
-    <Content Include="**\*.ico" />
-    <!-- The above wildcards will also pull in items from bin and obj, so this excludes those.  -->
-    <Content Remove="bin\**\*" />
-    <Content Remove="obj\**\*" />      
+    <Content Include="**\*.png" Exclude="bin\**\*.png;obj\**\*.png" />
+    <Content Include="**\*.jpg" Exclude="bin\**\*.png;obj\**\*.jpg"/>
+    <Content Include="**\*.ico" Exclude="bin\**\*.png;obj\**\*.ico"/>   
   </ItemGroup >
 
   <!-- 

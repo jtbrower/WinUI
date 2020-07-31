@@ -25,5 +25,3 @@ project.fragment.lock.json
 
 *.log
 *.tmp
-
-/src/Windows/packages

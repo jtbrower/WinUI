@@ -77,3 +77,7 @@ using the debugger.
 * You cannot create a DependencyProperty on the Window class because it is not a DependencyObject
 * Do not try to create a DependencyProperty with a IntPtr type.  It will throw exceptions.
 * Including a resource dictionary that has a backing C# file is included like ```<namespace:YouDictionaryName />``` and not how one is normally included. 
+
+# Notes to Self
+* Figure out or log a potential issue where custom controls that inherit from other controls such as a grid, only work in XAML, not code behind.  Code behind throws exceptions.  See the WindowRoot control.
+* Determine if I should open a discussion or issue regarding the infinite DPI change events firing.  If I do I need to create a small project that can most easily reproduce the problem.

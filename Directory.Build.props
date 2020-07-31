@@ -3,7 +3,7 @@
   later are unavailable to it. So, avoid referring to properties that are not yet defined (and
   will evaluate to empty). In those cases, use the .targets files.
 -->
-<Project>
+<Project InitialTargets="CheckEnvironment">
 
   <PropertyGroup>
     <RootNamespace>$(MSBuildProjectName)</RootNamespace>
@@ -22,21 +22,45 @@
     <!--
       Keep an eye on this one.  There was a warning coming from the WinUI Microsoft.UI.Xaml.Markup.Compiler.props that
       "GenerateLibraryLayout is not needed for including Xaml files when the Pack target is ran" because it results in access
-      file copies.  Upon further investigation I was not setting either of the bools GenerateLibraryLayout or 
+      file copies.  Upon further investigation I was not setting either of the bools GenerateLibraryLayout or
       IncludeXamlFilesInNugetPackage that needed to be true for the warning to show.  If you follow the directions and set
-      GenerateLibraryLayout to false, you will see errors regarding duplicate files.  If you set 
-      IncludeXamlFilesInNugetPackage to false it builds as expected without the warnings.  I don't think the 
+      GenerateLibraryLayout to false, you will see errors regarding duplicate files.  If you set
+      IncludeXamlFilesInNugetPackage to false it builds as expected without the warnings.  I don't think the
       IncludeXamlFilesInNugetPackage is needed unless we begin packaging the libs into NuGets, but this long comment
       will remain in any file that sets this to false.
     -->
     <IncludeXamlFilesInNugetPackage>false</IncludeXamlFilesInNugetPackage>
-  
+
   </PropertyGroup>
 
+  <!--
+    This will assure that all binary files are placed at the root of the repository in a directory called artifacts.  I like to 
+    have easy access to all of the binaries for times when I need to assure everything is clobbered.
+    -->
   <PropertyGroup>
+    
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AppendRuntimeIdentifierToOutputPath>false</AppendRuntimeIdentifierToOutputPath>
     <RepoRoot>$(MSBuildThisFileDirectory)\</RepoRoot>
-  </PropertyGroup>
 
+    <ArtifactsRoot>$([MSBuild]::NormalizeDirectory('$(RepoRoot)', 'artifacts'))</ArtifactsRoot>
+    <ArtifactsObjDir>$([MSBuild]::NormalizeDirectory('$(ArtifactsRoot)', 'obj'))</ArtifactsObjDir>
+    <ArtifactsBinDir>$([MSBuild]::NormalizeDirectory('$(ArtifactsRoot)', 'bin'))</ArtifactsBinDir>
+
+    <Platform Condition="'$(Platform)' == ''">x86</Platform>
+    <PlatformName Condition="'$(PlatformName)' == ''">$(Platform)</PlatformName>
+
+    <OutDirName Condition="'$(OutDirName)' == ''">$(MSBuildProjectName)</OutDirName>
+
+    <BaseOutputPath Condition="'$(BaseOutputPath)' == ''">$([System.IO.Path]::GetFullPath('$(ArtifactsBinDir)$(OutDirName)\'))</BaseOutputPath>
+    <OutputPath Condition="'$(PlatformName)' == 'AnyCPU'">$(BaseOutputPath)$(Configuration)\</OutputPath>
+    <OutputPath Condition="'$(PlatformName)' != 'AnyCPU'">$(BaseOutputPath)$(PlatformName)\$(Configuration)\</OutputPath>
+
+    <BaseIntermediateOutputPath Condition="'$(BaseIntermediateOutputPath)' == ''">$([System.IO.Path]::GetFullPath('$(ArtifactsObjDir)$(OutDirName)\'))</BaseIntermediateOutputPath>
+    <IntermediateOutputPath Condition="'$(PlatformName)' == 'AnyCPU'">$(BaseIntermediateOutputPath)$(Configuration)\</IntermediateOutputPath>
+    <IntermediateOutputPath Condition="'$(PlatformName)' != 'AnyCPU'">$(BaseIntermediateOutputPath)$(PlatformName)\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  
   <PropertyGroup>
     <!--
       Keep the binary files out of the solution view
@@ -76,4 +100,15 @@
     <NoWarn>$(NoWarn);CS8632</NoWarn>
   </PropertyGroup>
 
+  <!--
+    Both the Configuration and the ArtifactsRoot must be defined.
+    ArtifactsRoot is defined in the Directory.Build.props at the root of every
+    repo.  However some projects in each repo may skip including that props file.
+    If they skip including the root props file but still include this one, they
+    will see errors unless they or another props file defines the ArtifactsRoot
+    and Configuration properties.
+  -->
+  <Target Name="CheckEnvironment">
+    <Error Text="Configuration is not defined.  Use dotnet build '-c Debug' or '-c Release'." Condition=" '$(Configuration)' == '' " />
+  </Target>
 </Project>

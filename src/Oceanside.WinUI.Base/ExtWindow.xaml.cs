@@ -476,13 +476,13 @@ namespace WinUI.CustomControls
             //Now we need to calculate the non-client area of the Window.  This is only important when a Window has a border and or a
             // TitleBar (or menu).  In other words, if the HideNonClientArea method has been called on the Window then the nonClientSize
             // should be zero.
-            if (!Handle.GetNonClientSize(out var nonClientSize))
+            if (!Handle.GetNonClientSize(out var nonClientWidth, out var nonClientHeight))
             {
                 Debug.WriteLine($"Unable to determine the non-client size needed in {nameof(SizeToContent)}");
                 return;
             }
 
-            Handle.ResizeWindow((int)(clientWidthInDevicePixels + nonClientSize.Width), (int)(clientHeightInDevicePixels + nonClientSize.Height));
+            Handle.ResizeWindow((int)(clientWidthInDevicePixels + nonClientWidth), (int)(clientHeightInDevicePixels + nonClientHeight));
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -517,7 +517,10 @@ namespace WinUI.CustomControls
 
         public void ShowWin32NonClientArea()
         {
-            this.ShowWin32NonClientArea(Handle);
+            //If you do not call this then the window won't have any content showing and it will not be
+            // usable.
+            Handle.ShowWin32NonClientArea();
+            Activate();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
