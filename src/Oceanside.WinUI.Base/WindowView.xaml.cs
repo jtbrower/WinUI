@@ -248,6 +248,19 @@ namespace WinUI.CustomControls
 
         protected override Size MeasureOverride(Size availableSize)
         {
+            //Needed to support the SizeToContent feature.
+            UpdateRequiredSize();
+
+            //Now allow everything to determine what they actually want to ask for.
+            return base.MeasureOverride(availableSize);
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Updates the required size. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void UpdateRequiredSize()
+        {
             //Use infinity to assure it returns the real space needs.  We then set our custom dependency 
             // property values so we know how much space to allocate when we resize the window to fit 
             // the content.  Note that using the DesiredSize property will not tell you the correct 
@@ -255,9 +268,6 @@ namespace WinUI.CustomControls
             var trueDesiredSize = base.MeasureOverride(_infiniteSize);
             SetValue(RequiredHeightProperty, trueDesiredSize.Height);
             SetValue(RequiredWidthProperty, trueDesiredSize.Width);
-
-            //Now allow everything to determine what they actually want to ask for.
-            return base.MeasureOverride(availableSize);
         }
     }
 }
