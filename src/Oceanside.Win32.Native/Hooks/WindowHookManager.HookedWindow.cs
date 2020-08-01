@@ -241,6 +241,15 @@ namespace WinUI.Native.Hooks
                 // and calling back into unknown code that could (but hopefully not) be lengthy.  In rare race
                 // conditions this could cause a slight delay in the amount of time it takes to "UnRegister"
                 // a callback if code desired to do so.
+                //
+                // TODO Window Procedure Performance Evaluation
+                // Note that the performance of this design should be considered carefully.  Although it makes
+                // it flexible to be able to add callbacks to a Window throughout the application, the fact
+                // that I am locking inside of a hot function is cause for careful thought.  Atop of locking,
+                // I am copying the current callbacks into another local variable.  Since Window procedures
+                // can cause recursion by design, that could lead to a stack overflow if the Size of 
+                // the RegisteredWndProcCallbacks grew.  If an application only intended to attach one
+                // callback at any given time, this could be simplified greatly.
                 WndProcCallback[]? callbacksCopy = null;
                 lock (_callbacksLocker)
                 {
