@@ -21,24 +21,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using Oceanside.WinUI.Base.Vm;
-
 namespace WinUI.CustomControls
 {
     using Microsoft.UI.Xaml;
-    using System;
-    using WinUI.Native;
-    using WinUI.Native.Hooks;
-    using System.Diagnostics;
-    using Windows.Graphics.Display;
-    using static PInvoke.User32;
+    using Microsoft.UI.Xaml.Controls.Primitives;
     using Microsoft.UI.Xaml.Input;
     using Microsoft.UI.Xaml.Media;
-    using System.Linq;
-    using Microsoft.UI.Xaml.Controls.Primitives;
-    using System.ComponentModel;
-    using System.Runtime.CompilerServices;
+    using Oceanside.WinUI.Base.Vm;
     using PInvoke;
+    using System;
+    using System.ComponentModel;
+    using System.Diagnostics;
+    using System.Linq;
+    using System.Runtime.CompilerServices;
+    using WinUI.Native;
+    using WinUI.Native.Hooks;
+    using static PInvoke.User32;
+    using Oceanside.CsWinRT.Native;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>
@@ -113,7 +112,7 @@ namespace WinUI.CustomControls
         public ExtWindow()
         {
             //Grab the handle and remove the built-in Win32 TitleBar and border
-            Handle = this.GetHandle();
+            Handle = ThisPtr.GetHandle();
 
             //This is how you hook WndProc using the helper classes.  The helper classes will unhook
             // when you close the Window.  Note that since the Window is already created, you are not

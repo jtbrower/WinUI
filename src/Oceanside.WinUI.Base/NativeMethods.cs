@@ -21,11 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace WinUI.Native
+namespace Oceanside.CsWinRT.Native
 {
-    using Microsoft.UI.Xaml;
     using System;
-    using System.Diagnostics;
     using System.Runtime.InteropServices;
     using WinRT;
 
@@ -33,33 +31,20 @@ namespace WinUI.Native
     /// <content>   Logic required to obtain the Window Handle. </content>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public static partial class NativeMethods
+    internal static class NativeMethods
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   A Window extension method that gets a handle. </summary>
+        /// <summary>   An IntPtr extension method that gets a handle. </summary>
         ///
-        /// <param name="window">   The window to act on. </param>
+        /// <param name="windowThisPtr">    The Window.ThisPtr to act on. </param>
         ///
         /// <returns>   The handle. </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public static IntPtr GetHandle(this Window window)
+        public static IntPtr GetHandle(this IntPtr windowThisPtr)
         {
-            WindowWrapper windowWrapper = WindowWrapper.FromAbi(window.ThisPtr);
+            WindowWrapper windowWrapper = WindowWrapper.FromAbi(windowThisPtr);
             return windowWrapper.WindowHandle;
-        }
-
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Gets current procedure main window handle. </summary>
-        ///
-        /// <returns>   The current procedure main window handle. </returns>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public static IntPtr GetCurrentProcMainWindowHandle()
-        {
-            using var process = Process.GetCurrentProcess();
-            return process.MainWindowHandle;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -80,6 +65,9 @@ namespace WinUI.Native
             IntPtr WindowHandle { get; }
         }
 
+#pragma warning disable CRRSP09 // A misspelled word has been found
+#pragma warning disable CRRSP04 // A misspelled word has been found
+#pragma warning disable CRRSP08 // A misspelled word has been found
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// See https://github.com/microsoft/microsoft-ui-xaml/issues/2564#issuecomment-638420195 for
@@ -87,7 +75,7 @@ namespace WinUI.Native
         /// code was located https://github.com/microsoft/WinUI-3-Demos/blob/master/LICENSE.
         /// </summary>
         ///
-        /// <seealso cref="WinUI.Native.NativeMethods.IWindowNative"/>
+        /// <seealso cref="IWindowNative"/>
         /// <seealso cref="Oceanside.Views.WinUI.WindowInterop.IWindowNative"/>
         /// <seealso cref="Oceanside.Views.WinUI.Interop.IWindowNative"/>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -98,7 +86,7 @@ namespace WinUI.Native
             ////////////////////////////////////////////////////////////////////////////////////////////////////
             /// <summary>   A vftbl. </summary>
             ///
-            /// <seealso cref="WinUI.Native.NativeMethods.IWindowNative"/>
+            /// <seealso cref="IWindowNative"/>
             /// <seealso cref="Oceanside.Views.WinUI.Interop.IWindowNative"/>
             ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -131,6 +119,7 @@ namespace WinUI.Native
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 /// <summary>   The abi to projection vftable. </summary>
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
 
                 public static readonly Vftbl AbiToProjectionVftable;
 
@@ -205,7 +194,7 @@ namespace WinUI.Native
             public static implicit operator WindowWrapper(IObjectReference obj)
             {
 #pragma warning disable CS8603 // Possible null reference return.
-                return (obj != null) ? new WindowWrapper(obj) : null;
+                return obj != null ? new WindowWrapper(obj) : null;
 #pragma warning restore CS8603 // Possible null reference return.
             }
 
@@ -298,5 +287,8 @@ namespace WinUI.Native
                 }
             }
         }
+#pragma warning restore CRRSP08 // A misspelled word has been found
+#pragma warning restore CRRSP04 // A misspelled word has been found
+#pragma warning restore CRRSP09 // A misspelled word has been found
     }
 }

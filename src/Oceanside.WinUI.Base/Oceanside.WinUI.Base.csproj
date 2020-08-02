@@ -18,7 +18,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Oceanside.Win32.Native\Oceanside.Win32.Native.csproj" />
-    <ProjectReference Include="..\Oceanside.WinUI.Native\Oceanside.WinUI.Native.csproj" />
     <ProjectReference Include="..\Oceanside.WinUI.Base.Vm\Oceanside.WinUI.Base.Vm.csproj" />
   </ItemGroup>
 

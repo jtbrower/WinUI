@@ -72,7 +72,10 @@ namespace Oceanside.WinUI.Base.Vm
                 }
                 ExceptionDispatchInfo.Capture(e.InnerException ?? e).Throw();
             }
-            else OnExceptionAction.Invoke(e);
+            else
+            {
+                OnExceptionAction.Invoke(e);
+            }
         }
     }
 }
