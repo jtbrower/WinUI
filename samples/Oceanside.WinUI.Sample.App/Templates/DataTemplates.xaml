@@ -1,9 +1,9 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    x:Class="WinUI.DemoApp.Templates.DataTemplates"    
-    xmlns:view="using:WinUI.DemoApp.View"
-    xmlns:vm="using:WinUI.DemoApp.Vm">
+    x:Class="Oceanside.WinUI.Sample.App.Templates.DataTemplates"    
+    xmlns:view="using:Oceanside.WinUI.Sample.App.View"
+    xmlns:vm="using:Oceanside.WinUI.Sample.App.Vm">
 
     <!-- 
       NOTICE HOW TO INCLUDE THIS DICTIONARY 

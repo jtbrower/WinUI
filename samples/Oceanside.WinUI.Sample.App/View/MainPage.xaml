@@ -1,5 +1,5 @@
 ﻿<Page
-    x:Class="WinUI.DemoApp.View.MainPage"
+    x:Class="Oceanside.WinUI.Sample.App.View.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:behave="using:Oceanside.WinUI.Base.Behaviors"

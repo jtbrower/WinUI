@@ -21,14 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace WinUI.DemoApp
+namespace Oceanside.WinUI.Sample.App
 {
     using Oceanside.WinUI.Base.Vm;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.UI.Threading;
     using Microsoft.UI.Xaml;
     using System;
-    using WinUI.DemoApp.Vm;
+    using Oceanside.WinUI.Sample.App.Vm;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>   An application. </content>
@@ -43,7 +43,7 @@ namespace WinUI.DemoApp
         private readonly IServiceProvider _serviceProvider;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Initializes a new instance of the WinUI.DemoApp.App class. </summary>
+        /// <summary>   Initializes a new instance of the Oceanside.WinUI.Sample.App.App class. </summary>
         ///
         /// <param name="paramters">    A variable-length parameters list containing parameters. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////

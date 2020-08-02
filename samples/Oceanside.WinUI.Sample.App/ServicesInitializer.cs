@@ -21,14 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace WinUI.DemoApp
+namespace Oceanside.WinUI.Sample.App
 {
     using Oceanside.WinUI.Base;
     using Oceanside.WinUI.Base.Services;
     using Microsoft.Extensions.DependencyInjection;
     using Oceanside.WinUI.Base.Vm;
-    using WinUI.DemoApp.View;
-    using WinUI.DemoApp.Vm;
+    using Oceanside.WinUI.Sample.App.View;
+    using Oceanside.WinUI.Sample.App.Vm;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>   The services initializer. </summary>

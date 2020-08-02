@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace WinUI.DemoApp.Templates
+namespace Oceanside.WinUI.Sample.App.Templates
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>   A data templates. This class cannot be inherited. </content>

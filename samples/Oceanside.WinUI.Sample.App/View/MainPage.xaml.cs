@@ -21,12 +21,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace WinUI.DemoApp.View
+namespace Oceanside.WinUI.Sample.App.View
 {
     using Microsoft.UI.Xaml;
     using Microsoft.UI.Xaml.Controls;
-    using WinUI.DemoApp.Vm;
- 
+    using Oceanside.WinUI.Sample.App.Vm;
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>   A main page. This class cannot be inherited. </content>
     ////////////////////////////////////////////////////////////////////////////////////////////////////

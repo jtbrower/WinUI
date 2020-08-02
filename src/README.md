@@ -12,10 +12,10 @@ If you add more features to what I have done and you come upon something that do
 * I have Nullable enabled on all projects to enforce clean coding practices.  See Directory.Build.props, this is where it is enabled for all projects.
 
 # Running the code in Visual Studio
-* Set the WinUI.DemoApp.Package as the startup project.
+* Set the Oceanside.WinUI.Sample.App.Package as the startup project.
 * Select either x64 or x86 as the platform
-* Right Click the WinUI.DemoApp.Package and select Deploy.  You shouldn't need to do this more than once.
-* Run the WinUI.DemoApp.Package using the green play button in Visual Studio, you should now be running.
+* Right Click the Oceanside.WinUI.Sample.App.Package and select Deploy.  You shouldn't need to do this more than once.
+* Run the Oceanside.WinUI.Sample.App.Package using the green play button in Visual Studio, you should now be running.
 * Once the project is running, experiment by making your own changes.
 * Sometimes Visual Studio puts an AnyCPU platform back into the solution.  Don't use it.
 
@@ -37,7 +37,7 @@ I will try to take more time in the future to document why some of these feature
 
 # Known Issues
 * `<PackageReference Include=\"Microsoft.Windows.CsWinRT Version=\"0.1.0-prerelease.200629.3\" />` was added to the DemoApp to avoid a compatibility issue between .Net5 preview 6 and WinUI
-* "Warning	WMC9999	Type universe cannot resolve assembly: WinRT.Runtime, Version=0.1.0.2153, Culture=neutral, PublicKeyToken=null.	WinUI.DemoApp"
+* "Warning	WMC9999	Type universe cannot resolve assembly: WinRT.Runtime, Version=0.1.0.2153, Culture=neutral, PublicKeyToken=null.	Oceanside.WinUI.Sample.App"
 * The Debug window shows 5 'WinRT transform error' exceptions that are swallowed on app start
 * Debug Window shows a 'mincore\com\oleaut32\dispatch\ups.cpp(2122)\OLEAUT32.dll' library not registered error.
 * The Debug Window warns that ActualWidthProperty is not found on Canvas.  I thought that maybe creating a property path, I should switch to just "ActualWidth"; even though the error goes away, it breaks the drop shadow and can't be correct.

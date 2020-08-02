@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace WinUI.DemoApp.Vm
+namespace Oceanside.WinUI.Sample.App.Vm
 {
     using System.Threading.Tasks;
 
