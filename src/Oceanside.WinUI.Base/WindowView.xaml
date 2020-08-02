@@ -12,7 +12,7 @@
     xmlns:templates="using:WinUI.CustomControls.Templates"    
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:media="using:Microsoft.UI.Xaml.Media"
-    xmlns:vm="using:WinUI.Vm"
+    xmlns:vm="using:Oceanside.WinUI.Base.Vm"
     RenderTransformOrigin=".5,.5"
     mc:Ignorable="d">
     <controls:LayoutTransformControl.Resources>

@@ -6,7 +6,7 @@
     xmlns:converters="using:Microsoft.Toolkit.Uwp.UI.Converters"
     xmlns:customControls="using:WinUI.CustomControls"
     xmlns:local="using:WinUI.CustomControls.Templates"
-    xmlns:vm="using:WinUI.Vm">
+    xmlns:vm="using:Oceanside.WinUI.Base.Vm">
 
     <!-- 
       NOTICE HOW TO INCLUDE THIS DICTIONARY 

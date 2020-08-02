@@ -23,7 +23,7 @@
 
 using System;
 
-namespace WinUI.Vm
+namespace Oceanside.WinUI.Base.Vm
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>   A ViewModel for the button. </summary>

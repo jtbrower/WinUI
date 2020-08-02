@@ -23,7 +23,7 @@
 
 using System.Threading.Tasks;
 
-namespace WinUI.Vm
+namespace Oceanside.WinUI.Base.Vm
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>   Interface for dialog service. </summary>

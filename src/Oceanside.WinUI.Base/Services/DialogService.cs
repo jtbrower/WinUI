@@ -21,13 +21,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Oceanside.WinUI.Base.Vm;
+
 namespace WinUI.CustomControls
 {
     using Microsoft.UI.Xaml;
     using Microsoft.UI.Xaml.Controls;
     using System;
     using System.Threading.Tasks;
-    using WinUI.Vm;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>   A service for accessing dialogs information. </summary>

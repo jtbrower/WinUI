@@ -21,12 +21,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Oceanside.WinUI.Base.Vm;
+
 namespace WinUI.CustomControls
 {
     using Microsoft.UI.Xaml;
     using Microsoft.Toolkit.Uwp.UI.Controls;
     using Windows.Foundation;
-    using WinUI.Vm;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>   Container for window contents. This class cannot be inherited. </content>

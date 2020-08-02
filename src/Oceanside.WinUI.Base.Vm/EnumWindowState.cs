@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace WinUI.Vm
+namespace Oceanside.WinUI.Base.Vm
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>   Values that represent enum window states. </summary>

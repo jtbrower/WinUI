@@ -21,6 +21,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using Oceanside.WinUI.Base.Vm;
+
 namespace WinUI.CustomControls
 {
     using Microsoft.UI.Xaml;
@@ -29,7 +31,6 @@ namespace WinUI.CustomControls
     using WinUI.Native.Hooks;
     using System.Diagnostics;
     using Windows.Graphics.Display;
-    using WinUI.Vm;
     using static PInvoke.User32;
     using Microsoft.UI.Xaml.Input;
     using Microsoft.UI.Xaml.Media;
