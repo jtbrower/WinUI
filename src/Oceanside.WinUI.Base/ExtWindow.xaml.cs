@@ -37,7 +37,8 @@ namespace WinUI.CustomControls
     using WinUI.Native;
     using WinUI.Native.Hooks;
     using static PInvoke.User32;
-    using Oceanside.CsWinRT.Native;
+    using WinRT;
+    using System.Runtime.InteropServices;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>
@@ -50,6 +51,24 @@ namespace WinUI.CustomControls
 
     public sealed partial class ExtWindow : IExtWindow, IPlatform, INotifyPropertyChanged
     {
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Interface for window native. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        [ComImport]
+        [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+        [Guid("EECDBF0E-BAE9-4CB6-A68E-9598E1CB57BB")]
+        internal interface IWindowNative
+        {
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+            /// <summary>   Gets the handle of the window. </summary>
+            ///
+            /// <value> The window handle. </value>
+            ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+            IntPtr WindowHandle { get; }
+        }
+        
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The window procedure callback. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -112,7 +131,7 @@ namespace WinUI.CustomControls
         public ExtWindow()
         {
             //Grab the handle and remove the built-in Win32 TitleBar and border
-            Handle = ThisPtr.GetHandle();
+            Handle = this.As<IWindowNative>().WindowHandle;
 
             //This is how you hook WndProc using the helper classes.  The helper classes will unhook
             // when you close the Window.  Note that since the Window is already created, you are not

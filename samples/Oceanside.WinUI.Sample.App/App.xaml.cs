@@ -21,13 +21,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using Oceanside.WinUI.Base.Vm;
-
 namespace WinUI.DemoApp
 {
+    using Oceanside.WinUI.Base.Vm;
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.UI.Threading;
     using Microsoft.UI.Xaml;
-    using Microsoft.Extensions.DependencyInjection;
     using System;
     using WinUI.DemoApp.Vm;
 
@@ -71,6 +70,7 @@ namespace WinUI.DemoApp
             //At the moment I do not know why or if this is required but I noticed it
             // in example code somewhere and decided to add it.  
             DispatcherQueueSyncContext.SetForCurrentThread();
+
             //I am not sure if calling the default is a noop.  The WinUI template did not
             // call the base but the same example code that I spoke about above did.
             base.OnLaunched(args);
@@ -79,7 +79,7 @@ namespace WinUI.DemoApp
             var window = _serviceProvider.GetRequiredService<IExtWindow>();
 
             //Set the initial page to display by grabbing the View Model which will cause
-            // the DataTemplating system to display the content with a template that we
+            // the DataTemplate system to display the content with a template that we
             // provided through the App.xaml resources.
             var windowVm = _serviceProvider.GetRequiredService<WindowVm>();
             windowVm.ClientsContent = _serviceProvider.GetRequiredService<MainPageVm>();

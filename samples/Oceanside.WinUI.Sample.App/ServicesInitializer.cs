@@ -21,11 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using Oceanside.WinUI.Base.Vm;
-
 namespace WinUI.Vm
 {
     using Microsoft.Extensions.DependencyInjection;
+    using Oceanside.WinUI.Base.Vm;
     using WinUI.CustomControls;
     using WinUI.DemoApp;
     using WinUI.DemoApp.View;

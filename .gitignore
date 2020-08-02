@@ -25,3 +25,4 @@ project.fragment.lock.json
 
 *.log
 *.tmp
+/.cr/personal
