@@ -26,7 +26,6 @@ namespace WinUI.DemoApp
     using Microsoft.Extensions.DependencyInjection;
     using System;
     using System.Diagnostics;
-    using WinUI.Vm;
 
 #if !DEBUG
     using System.Runtime.ExceptionServices;
@@ -48,17 +47,6 @@ namespace WinUI.DemoApp
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         internal static ServiceProvider? ServiceProvider { get; private set; }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   The application. </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#pragma warning disable CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-#pragma warning disable IDE0052 // Remove unread private members
-        private static App _application;
-#pragma warning restore IDE0052 // Remove unread private members
-#pragma warning restore CS8618 // Non-nullable field is uninitialized. Consider declaring as nullable.
-
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets the current. </summary>
@@ -153,7 +141,7 @@ namespace WinUI.DemoApp
                 //Yes, this is actually how this callback works.  You really don't even need to
                 // save the application instance, you just instantiate it.  I am saving it here
                 // out of clarity.  Declaring an object in space just feels different.
-                _application = ServiceProvider.GetRequiredService<App>();
+                Current = ServiceProvider.GetRequiredService<App>();
             }
             catch (Exception e)
             {
