@@ -79,6 +79,10 @@ using the debugger.
 * Do not try to create a DependencyProperty with a IntPtr type.  It will throw exceptions.
 * Including a resource dictionary that has a backing C# file is included like ```<namespace:YouDictionaryName />``` and not how one is normally included. 
 
+## If you Rename App.xaml
+If you ever rename App.xaml then make sure that you assign the new XAML file name to a ApplicationDefinition project node or you will lose quite a bit of
+time as I did [here](https://github.com/dotnet/wpf/issues/3245#issuecomment-667634709).
+
 # Notes to Self
 * Figure out or log a potential issue where custom controls that inherit from other controls such as a grid, only work in XAML, not code behind.  Code behind throws exceptions.  See the WindowRoot control.
 * Determine if I should open a discussion or issue regarding the infinite DPI change events firing.  If I do I need to create a small project that can most easily reproduce the problem.

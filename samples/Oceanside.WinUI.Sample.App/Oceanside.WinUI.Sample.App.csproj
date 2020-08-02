@@ -12,11 +12,9 @@
     <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
     <RuntimeIdentifier>win-$(Platform)</RuntimeIdentifier>
     <Nullable>enable</Nullable>
-
     <!-- This is the trick needed to be able to create your own Main. -->
     <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
   </PropertyGroup>
-
   <ItemGroup>
     <!--
     Direct reference is a required workaround that I got from Scott Jones.  Once the COM API changes
