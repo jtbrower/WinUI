@@ -131,7 +131,7 @@ namespace WinUI.CustomControls
             // So I will just leave it at this for now.
             TypeNameDataTemplateSelector.FallbackResourceDictionary = Application.Current?.Resources;
 
-            //Get rid of the built-in titlebar and Window border
+            //Get rid of the built-in TitleBar and Window border
             Handle.HideWin32NonClientArea();
 
             //A custom handler we fire when minimized/maximized and other states are entered.
@@ -193,7 +193,7 @@ namespace WinUI.CustomControls
         {
             //Notice that our Window's view model cannot be a DependencyProperty because a WinUI Window is
             // not a DependencyObject.  For  that reason we must using INotifyPropertyChanged.
-            get { return _vm; }
+            get => _vm;
             set
             {
                 if (_vm == value) return;
@@ -278,11 +278,16 @@ namespace WinUI.CustomControls
                 if (showStyle == WindowShowStyle.SW_MINIMIZE ||
                     showStyle == WindowShowStyle.SW_FORCEMINIMIZE ||
                     showStyle == WindowShowStyle.SW_SHOWMINIMIZED ||
-                    showStyle == WindowShowStyle.SW_SHOWMINNOACTIVE) return EnumWindowState.Minimized;
-
+                    showStyle == WindowShowStyle.SW_SHOWMINNOACTIVE)
+                {
+                    return EnumWindowState.Minimized;
+                }
 
                 if (showStyle == WindowShowStyle.SW_MAXIMIZE ||
-                    showStyle == WindowShowStyle.SW_SHOWMAXIMIZED) return EnumWindowState.Maximized;
+                    showStyle == WindowShowStyle.SW_SHOWMAXIMIZED)
+                {
+                    return EnumWindowState.Maximized;
+                }
             }
             catch (Exception e)
             {
@@ -333,7 +338,7 @@ namespace WinUI.CustomControls
             // instead of the built-in Win32 Window TitleBar and Border.  Trying to properly handle DPI
             // changed events while also using the Win32 TitleBar, brings on more corner case risk than
             // what it is worth.  The primary problem is the fact that when you have an application that
-            // is DPI Aware and the framework automatically scales the TitelBar for you, it will shrink 
+            // is DPI Aware and the framework automatically scales the TitleBar for you, it will shrink 
             // and expand, causing your client area to either not have enough space (when you are using
             // our SizeToContent feature its most noticeable) or you will have slightly too much space.
             //
@@ -368,22 +373,6 @@ namespace WinUI.CustomControls
 
         //It's annoying when this warning is applied to event handler parameters.
 #pragma warning disable IDE0060 // Remove unused parameter
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Displays an information DPI changed. </summary>
-        ///
-        /// <param name="sender">   Source of the event. </param>
-        /// <param name="args">     The arguments. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private void DisplayInfo_DpiChanged(DisplayInformation sender, object args)
-        {
-
-            if (!_autoDpiContentScaling) return;
-            ScaleContentForDpiIfEnabled();
-
-
-        }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Event handler. Called by RootContainer for double tapped events. </summary>
@@ -703,7 +692,7 @@ namespace WinUI.CustomControls
 
         public void ShowCursor(bool makeVisible)
         {
-            User32.ShowCursor(makeVisible);
+            _ = User32.ShowCursor(makeVisible);
         }
     }
 }

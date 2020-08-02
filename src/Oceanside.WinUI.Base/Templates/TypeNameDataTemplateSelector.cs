@@ -40,7 +40,7 @@ namespace WinUI.CustomControls.Templates
         /// Gets or sets a dictionary of fallback resources to use as a search path when all other
         /// locations have been exhausted.  Typically Application.Current.Resources should be used.  This
         /// property helps avoid coupling the DataTemplateSelector to the static Application.Current
-        /// property and makes it easy to test as a result.  Statics are bad, mmmkay.
+        /// property and makes it easy to test as a result.
         /// </summary>
         ///
         /// <value> A dictionary of fallback resources. </value>
@@ -60,9 +60,9 @@ namespace WinUI.CustomControls.Templates
         protected override DataTemplate? SelectTemplateCore(object item, DependencyObject container)
         {
             //Application.Current could be null in testing, that's why I am checking it here.
-            if (item == null || !(container is FrameworkElement frameworkElement)) return default;
-
-            return FindDataTemplate(item.GetType().Name, frameworkElement, FallbackResourceDictionary);
+            return item == null || !(container is FrameworkElement frameworkElement)
+                ? default
+                : FindDataTemplate(item.GetType().Name, frameworkElement, FallbackResourceDictionary);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////

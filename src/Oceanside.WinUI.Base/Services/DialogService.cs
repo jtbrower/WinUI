@@ -100,7 +100,7 @@ namespace WinUI.CustomControls
                 CloseButtonText = "Close"
             };
             cd.XamlRoot = _xamlRoot;
-            await cd.ShowAsync();
+            _ = await cd.ShowAsync();
         }
     }
 }

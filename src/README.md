@@ -61,6 +61,7 @@ like I am seeing infrequently.  Maybe I need to capture and release?  I have a f
 using the debugger.  
 
 # TODO
+* NAMESPACES, a recent refactor left a mismatch between namespaces and assembly/folder names and Analyzers are not catching this.  CodeRush can't fix it either.'
 * Change Cursor on DragMove operation
 * When you set the Window transparency all of the Window content becomes transparent too.  I need to figure out how to handle this.
 * Modify Window and related Views/View Models to make it mimic an Adorner

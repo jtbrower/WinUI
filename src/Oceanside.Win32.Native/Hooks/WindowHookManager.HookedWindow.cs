@@ -68,7 +68,7 @@ namespace WinUI.Native.Hooks
             ////////////////////////////////////////////////////////////////////////////////////////////////////
             /// <summary>
             /// When IsDestroyed is true, the window handle associated with the custom wndproc is either
-            /// closed or is closing.  At this point we mark IsDeactived to true but also re-install the
+            /// closed or is closing.  At this point we mark IsDeActivated to true but also re-install the
             /// original hook as the window is going down.
             /// </summary>
             ///

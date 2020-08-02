@@ -154,7 +154,7 @@ namespace WinUI.CustomControls
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Size ofwindowViewite. </summary>
+        /// <summary>   Infinity Size. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         private static readonly Size _infiniteSize = new Size(double.PositiveInfinity, double.PositiveInfinity);
@@ -206,8 +206,8 @@ namespace WinUI.CustomControls
 
         public double RequiredWidth
         {
-            get { return (double)GetValue(RequiredWidthProperty); }
-            set { SetValue(RequiredWidthProperty, value); }
+            get => (double)GetValue(RequiredWidthProperty);
+            set => SetValue(RequiredWidthProperty, value);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
