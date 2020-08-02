@@ -21,10 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using Oceanside.WinUI.Base.Vm;
-
 namespace WinUI.DemoApp.Vm
 {
+    using Oceanside.WinUI.Base.Vm;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>   A ViewModel for the main page. </summary>

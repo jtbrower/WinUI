@@ -21,10 +21,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.Threading.Tasks;
-
 namespace WinUI.DemoApp.Vm
 {
+    using System.Threading.Tasks;
+
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>   A ViewModel for the main page. This class cannot be inherited. </content>
     ////////////////////////////////////////////////////////////////////////////////////////////////////

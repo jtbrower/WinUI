@@ -21,10 +21,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using Oceanside.WinUI.Base.Vm;
-
 namespace Oceanside.WinUI.Base.Services
 {
+    using Oceanside.WinUI.Base.Vm;
     using Microsoft.UI.Xaml;
     using Microsoft.UI.Xaml.Controls;
     using System;
