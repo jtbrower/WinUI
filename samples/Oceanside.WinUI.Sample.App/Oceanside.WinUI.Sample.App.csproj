@@ -11,23 +11,19 @@
     <SelfContained>true</SelfContained>
     <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
     <RuntimeIdentifier>win-$(Platform)</RuntimeIdentifier>
-    <Nullable>enable</Nullable>
     <!-- This is the trick needed to be able to create your own Main. -->
     <DefineConstants>DISABLE_XAML_GENERATED_MAIN</DefineConstants>
   </PropertyGroup>
+  
   <ItemGroup>
-    <!--
-    Direct reference is a required workaround that I got from Scott Jones.  Once the COM API changes
-    have been accounted for in related WinUI packages, you can probably remove this.
-    -->
+    <Manifest Include="$(ApplicationManifest)" />
+  </ItemGroup>
+  
+    <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.0-preview.7.20364.11" />
     <PackageReference Include="Microsoft.WinUI" Version="3.0.0-preview2.200713.0" />
     <PackageReference Include="Microsoft.VCRTForwarders.140" Version="1.0.6" />
-    <PackageReference Include="Microsoft.WinUI" Version="3.0.0-preview2.200713.0" />
     <PackageReference Include="Microsoft.Toolkit.Uwp.UI.Controls" Version="8.0.0-preview2" />
-    <PackageReference Include="Microsoft.Windows.CsWinRT" Version="0.1.0-prerelease.200629.3" />
-
-    <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
   <ItemGroup>
