@@ -16,7 +16,7 @@
       <templates:DataTemplates />
       
       NOTE THAT THE FOLLOWING LINE IS WRONG
-      <ResourceDictionary Source="ms-appx:///WinUI.CustomControls/Templates/DataTemplates.xaml" /> 
+      <ResourceDictionary Source="ms-appx:///Oceanside.WinUI.Base/Templates/DataTemplates.xaml" /> 
     -->
     
     <!-- The application's main page is DataTemplated here. -->

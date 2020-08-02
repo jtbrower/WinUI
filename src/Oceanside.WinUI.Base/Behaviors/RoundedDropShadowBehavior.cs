@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace WinUI.CustomControls.Behaviors
+namespace Oceanside.WinUI.Base.Behaviors
 {
     using Microsoft.UI;
     using Microsoft.UI.Composition;
@@ -316,7 +316,7 @@ namespace WinUI.CustomControls.Behaviors
             ////////////////////////////////////////////////////////////////////////////////////////////////////
             /// <summary>
             /// Initializes a new instance of the
-            /// WinUI.CustomControls.RoundedDropShadowBehavior.DropShadowLogic class.
+            /// Oceanside.WinUI.Base.RoundedDropShadowBehavior.DropShadowLogic class.
             /// </summary>
             ///
             /// <param name="parent">           The parent. </param>

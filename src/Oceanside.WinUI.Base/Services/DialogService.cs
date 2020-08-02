@@ -23,7 +23,7 @@
 
 using Oceanside.WinUI.Base.Vm;
 
-namespace WinUI.CustomControls
+namespace Oceanside.WinUI.Base.Services
 {
     using Microsoft.UI.Xaml;
     using Microsoft.UI.Xaml.Controls;
@@ -40,7 +40,7 @@ namespace WinUI.CustomControls
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// Initializes a new instance of the WinUI.CustomControls.DialogService class.
+        /// Initializes a new instance of the Oceanside.WinUI.Base.DialogService class.
         /// </summary>
         ///
         /// <param name="iPlatform">    Zero-based index of the platform. </param>

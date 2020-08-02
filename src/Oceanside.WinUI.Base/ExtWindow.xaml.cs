@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace WinUI.CustomControls
+namespace Oceanside.WinUI.Base
 {
     using Microsoft.UI.Xaml;
     using Microsoft.UI.Xaml.Controls.Primitives;
@@ -34,8 +34,8 @@ namespace WinUI.CustomControls
     using System.Diagnostics;
     using System.Linq;
     using System.Runtime.CompilerServices;
-    using WinUI.Native;
-    using WinUI.Native.Hooks;
+    using Oceanside.Win32.Native;
+    using Oceanside.Win32.Native.Hooks;
     using static PInvoke.User32;
     using WinRT;
     using System.Runtime.InteropServices;
@@ -45,8 +45,8 @@ namespace WinUI.CustomControls
     /// A window that attempts to mimic some of the features found in a WPF Window.
     /// </content>
     /// <seealso cref="Microsoft.UI.Xaml.Window"/>
-    /// <seealso cref="WinUI.CustomControls.IExtWindow"/>
-    /// <seealso cref="WinUI.CustomControls.IPlatform"/>
+    /// <seealso cref="Oceanside.WinUI.Base.IExtWindow"/>
+    /// <seealso cref="Oceanside.WinUI.Base.IPlatform"/>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     public sealed partial class ExtWindow : IExtWindow, IPlatform, INotifyPropertyChanged
@@ -115,14 +115,14 @@ namespace WinUI.CustomControls
         ///
         /// <value> The handle. </value>
         ///
-        /// <seealso cref="WinUI.CustomControls.IExtWindow.Handle"/>
+        /// <seealso cref="Oceanside.WinUI.Base.IExtWindow.Handle"/>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public IntPtr Handle { get; }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// Initializes a new instance of the WinUI.CustomControls.ExtWindow class.
+        /// Initializes a new instance of the Oceanside.WinUI.Base.ExtWindow class.
         /// </summary>
         ///
         /// <param name="windowView">   The window root. </param>
@@ -429,7 +429,7 @@ namespace WinUI.CustomControls
         ///
         /// <value> The XAML root. </value>
         ///
-        /// <seealso cref="WinUI.CustomControls.IExtWindow.XamlRoot"/>
+        /// <seealso cref="Oceanside.WinUI.Base.IExtWindow.XamlRoot"/>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public XamlRoot XamlRoot => RootContainer.XamlRoot;

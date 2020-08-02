@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace WinUI.CustomControls.Behaviors
+namespace Oceanside.WinUI.Base.Behaviors
 {
     using Microsoft.UI.Xaml;
     using Microsoft.UI.Xaml.Controls;
@@ -29,7 +29,7 @@ namespace WinUI.CustomControls.Behaviors
     using Microsoft.UI.Xaml.Input;
     using PInvoke;
     using System;
-    using WinUI.Native;
+    using Oceanside.Win32.Native;
     using static PInvoke.User32;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -295,7 +295,7 @@ namespace WinUI.CustomControls.Behaviors
             ////////////////////////////////////////////////////////////////////////////////////////////////////
             /// <summary>
             /// Initializes a new instance of the
-            /// WinUI.CustomControls.Behaviors.DragMoveBehavior.DragMoveLogic class.
+            /// Oceanside.WinUI.Base.Behaviors.DragMoveBehavior.DragMoveLogic class.
             /// </summary>
             ///
             /// <param name="windowHandle">                 Handle of the window. </param>

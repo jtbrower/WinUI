@@ -55,7 +55,7 @@ namespace WinUI.DemoApp.View
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Initializes a new instance of the WinUI.CustomControls.MainPage class. </summary>
+        /// <summary>   Initializes a new instance of the Oceanside.WinUI.Base.MainPage class. </summary>
         ///
         /// <param name="vm">   The view model. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////

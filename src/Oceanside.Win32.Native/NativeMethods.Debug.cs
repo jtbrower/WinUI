@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace WinUI.Native
+namespace Oceanside.Win32.Native
 {
     using System.Diagnostics;
     using System.Runtime.InteropServices;

@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace WinUI.Native.Hooks
+namespace Oceanside.Win32.Native.Hooks
 {
     using System;
     using System.Runtime.InteropServices;
@@ -40,7 +40,7 @@ namespace WinUI.Native.Hooks
         {
             ////////////////////////////////////////////////////////////////////////////////////////////////////
             /// <summary>
-            /// Initializes a new instance of the WinUI.Native.WindowHookManager.Message class.
+            /// Initializes a new instance of the Oceanside.Win32.Native.WindowHookManager.Message class.
             /// </summary>
             ///
             /// <param name="hWnd">     The h window. </param>

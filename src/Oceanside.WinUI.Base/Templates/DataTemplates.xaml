@@ -1,11 +1,11 @@
 ﻿<ResourceDictionary
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    x:Class="WinUI.CustomControls.Templates.DataTemplates"    
+    x:Class="Oceanside.WinUI.Base.Templates.DataTemplates"    
     xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:converters="using:Microsoft.Toolkit.Uwp.UI.Converters"
-    xmlns:customControls="using:WinUI.CustomControls"
-    xmlns:local="using:WinUI.CustomControls.Templates"
+    xmlns:customControls="using:Oceanside.WinUI.Base"
+    xmlns:local="using:Oceanside.WinUI.Base.Templates"
     xmlns:vm="using:Oceanside.WinUI.Base.Vm">
 
     <!-- 
@@ -19,7 +19,7 @@
       <templates:DataTemplates />
       
       NOTE THAT THE FOLLOWING LINE IS WRONG
-      <ResourceDictionary Source="ms-appx:///WinUI.CustomControls/Templates/DataTemplates.xaml" /> 
+      <ResourceDictionary Source="ms-appx:///Oceanside.WinUI.Base/Templates/DataTemplates.xaml" /> 
     -->
     
     

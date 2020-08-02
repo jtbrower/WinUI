@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace WinUI.Native.Hooks
+namespace Oceanside.Win32.Native.Hooks
 {
     using System;
     using System.Collections.Generic;
@@ -127,7 +127,7 @@ namespace WinUI.Native.Hooks
             private readonly object _callbacksLocker = new object();
 
             ////////////////////////////////////////////////////////////////////////////////////////////////////
-            /// <summary>   Initializes a new instance of the WinUI.Native.HookedWindow class. </summary>
+            /// <summary>   Initializes a new instance of the Oceanside.Win32.Native.HookedWindow class. </summary>
             ///
             /// <param name="handle">   The handle. </param>
             /// <param name="callback"> The callback. </param>

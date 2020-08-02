@@ -31,7 +31,7 @@ namespace WinUI.DemoApp.Templates
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// Initializes a new instance of the WinUI.CustomControls.Templates.DataTemplates class.
+        /// Initializes a new instance of the Oceanside.WinUI.Base.Templates.DataTemplates class.
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 

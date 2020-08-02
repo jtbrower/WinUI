@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace WinUI.CustomControls
+namespace Oceanside.WinUI.Base
 {
     using Oceanside.WinUI.Base.Vm;
     using Microsoft.UI.Xaml;

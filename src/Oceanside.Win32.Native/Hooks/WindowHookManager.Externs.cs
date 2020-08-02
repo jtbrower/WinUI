@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace WinUI.Native.Hooks
+namespace Oceanside.Win32.Native.Hooks
 {
     using System;
     using System.Runtime.InteropServices;

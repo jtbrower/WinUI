@@ -21,7 +21,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace WinUI.CustomControls.Templates
+namespace Oceanside.WinUI.Base.Templates
 {
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>   A data templates. This class cannot be inherited. </content>
@@ -31,7 +31,7 @@ namespace WinUI.CustomControls.Templates
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// Initializes a new instance of the WinUI.CustomControls.Templates.DataTemplates class.
+        /// Initializes a new instance of the Oceanside.WinUI.Base.Templates.DataTemplates class.
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
