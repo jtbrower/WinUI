@@ -44,14 +44,14 @@ namespace Oceanside.WinUI.Base.Behaviors
         /// <summary>
         /// A Normal CLR Property that must be set before the behaviors associated object is loaded. Note
         /// that this is a plain CLR property because IntPtr cannot be a dependency property.  Note that
-        /// once the assoicated object is loaded, changing this value will have no effect and you
+        /// once the associated object is loaded, changing this value will have no effect and you
         /// wouldn't need or want to do that anyway.
         /// </summary>
         ///
         /// <value> The window handle. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public IntPtr WindowHandle { get;set;}
+        public IntPtr WindowHandle { get; set; }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets or sets a value indicating whether we allow drag on maximized window. </summary>
@@ -419,10 +419,10 @@ namespace Oceanside.WinUI.Base.Behaviors
                     _captureState.HasMetTimeThresholdToBeginDragMove = true;
                 }
 
-                if(!_captureState.UpdateState(e))return;
+                if (!_captureState.UpdateState(e)) return;
 
                 //Move the window.
-                _windowHandle.MoveBy(_captureState._dX, _captureState._dY);
+                _windowHandle.MoveBy(_captureState.Dx, _captureState.Dy);
             }
 
             #endregion
@@ -470,9 +470,9 @@ namespace Oceanside.WinUI.Base.Behaviors
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
                 internal static CaptureState? StartCapture(
-                    IntPtr handle, 
-                    UIElement capturedContent, 
-                    PointerRoutedEventArgs args, 
+                    IntPtr handle,
+                    UIElement capturedContent,
+                    PointerRoutedEventArgs args,
                     int pixelMoveThreshold)
                 {
                     //If the content won't let us capture the pointer then we have to return null.
@@ -536,31 +536,31 @@ namespace Oceanside.WinUI.Base.Behaviors
                 /// <summary>   The prior contact x coordinate. </summary>
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                internal int? _lastMoveToX;
+                private int? _lastMoveToX;
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 /// <summary>   The prior contact y coordinate. </summary>
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                internal int? _lastMoveToY;
+                private int? _lastMoveToY;
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 /// <summary>   Distance moved on X axis. </summary>
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                internal int _dX;
+                internal int Dx { get; private set; }
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 /// <summary>   Distance moved on Y axis. </summary>
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                internal int _dY;
+                internal int Dy { get; private set; }
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 /// <summary>   The distance between the last mouse down point and the current one. </summary>
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-                internal int _distance;
+                private int _distance;
 
                 ////////////////////////////////////////////////////////////////////////////////////////////////////
                 /// <summary>   Updates the current contact position. </summary>
@@ -622,13 +622,13 @@ namespace Oceanside.WinUI.Base.Behaviors
                     }
 
                     //Determine how much the pointer changed
-                    _dX = currentScreenX - _lastMoveToX.Value;
-                    _dY = currentScreenY - _lastMoveToY.Value;
+                    Dx = currentScreenX - _lastMoveToX.Value;
+                    Dy = currentScreenY - _lastMoveToY.Value;
 
-                    if (_dX == 0 && _dY == 0) return false;
+                    if (Dx == 0 && Dy == 0) return false;
                     //See if the distance between the last point we recorded and the current point have surpassed the
                     // distance threshold.  If not, wait until it has.
-                    _distance = (int)Math.Sqrt(_dX * _dX + _dY * _dY);
+                    _distance = (int)Math.Sqrt(Dx * Dx + Dy * Dy);
                     if (_distance < _pixelMoveThreshold) return false;
 
                     _lastMoveToX = currentScreenX;
