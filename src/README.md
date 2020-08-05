@@ -65,14 +65,7 @@ using the debugger.
 * When you set the Window transparency all of the Window content becomes transparent too.  I need to figure out how to handle this.
 * Modify Window and related Views/View Models to make it mimic an Adorner
 * When I resize the Window on startup, it is not a smooth transition because I currently have to call Window.Activate and then resize directly after.
-## Maybe Do
-In the AssociatedObject_Loaded handler of the DragMoveBehavior, I obtain a handle to the Window that is likely associated with
-the DragMove behavior by calling User32.GetActiveWindow().  I would prefer to do this by using a dependency property because
-you never know what Window is considered Active when the DragMove behavior is loaded for the first time.  Logic tells me that
-this should work fine, but I have a feeling that in multiple Window environments this opens the door to edge cases.
 
-I didn't make it a dependency property because IntPtr causes exceptions if you try to use it as a DependencyProperty.  Or at
-least it did when I tried it out in WinUI Preview 1.
 ## Known Visual Studio or Project Issues
 * MSB4181 regarding CompileXaml task returned false but did not log and error warning keeps showing up.
 * I often see WMV1006, WMC1007 about not being able to resolve assemblies.

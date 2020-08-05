@@ -68,7 +68,7 @@ namespace Oceanside.WinUI.Base
 
             IntPtr WindowHandle { get; }
         }
-        
+
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The window procedure callback. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -143,6 +143,11 @@ namespace Oceanside.WinUI.Base
             // hook receives all messages possible.  Under the covers, I don't know if this call causes
             // any WndProc messages, but we don't want to miss them if it does.
             InitializeComponent();
+
+            //Note that the WindowHandle is not a dependency property.  IntPtr cannot be one and the
+            // Window itself isn't a dependency object.  So we just set the CLR property here.  It
+            // just has to be done before the behavior's associated object is loaded.
+            DragMoveBehavior.WindowHandle = Handle;
 
             //I don't like binding to statics like this so I pulled it out of the DataTemplate Selector
             // and brought it up close to the top where it could more easily be injected.  I started by

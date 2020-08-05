@@ -41,6 +41,19 @@ namespace Oceanside.WinUI.Base.Behaviors
     public class DragMoveBehavior : Behavior<Panel>
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// A Normal CLR Property that must be set before the behaviors associated object is loaded. Note
+        /// that this is a plain CLR property because IntPtr cannot be a dependency property.  Note that
+        /// once the assoicated object is loaded, changing this value will have no effect and you
+        /// wouldn't need or want to do that anyway.
+        /// </summary>
+        ///
+        /// <value> The window handle. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public IntPtr WindowHandle { get;set;}
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets or sets a value indicating whether we allow drag on maximized window. </summary>
         ///
         /// <value> True if allow drag on maximized window, false if not. </value>
@@ -183,14 +196,8 @@ namespace Oceanside.WinUI.Base.Behaviors
         {
             AssociatedObject.Loaded -= AssociatedObject_Loaded;
 
-            //TODO find a better way to get the Window handle via DependencyProperty maybe?
-            //Note how I obtain the Window.  I would prefer to locate the Window by grabbing the Window
-            // that this behavior's AssociatedObject is attached to, but at this time I do not know
-            // how to do that.
-            var windowHandle = GetActiveWindow();
-
             //The logic is what truly provides the DragMove feature.
-            DragLogic = new DragMoveLogic(windowHandle)
+            DragLogic = new DragMoveLogic(WindowHandle)
             {
                 //Properties in the logic mirror properties in the behavior.  When behavior properties are
                 // updated, we update these properties.
