@@ -25,6 +25,7 @@ namespace Oceanside.Win32.Native.Hooks
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.Concurrent;
     using System.Linq;
 
     public sealed partial class WindowHookManager : IDisposable
@@ -47,8 +48,8 @@ namespace Oceanside.Win32.Native.Hooks
         /// </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private static readonly Dictionary<IntPtr, HookedWindow> ApplicationsHookedWindows
-            = new Dictionary<IntPtr, HookedWindow>();
+        private static readonly ConcurrentDictionary<IntPtr, HookedWindow> ApplicationsHookedWindows
+            = new ConcurrentDictionary<IntPtr, HookedWindow>();
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Adds a window procedure callback to 'callback'. </summary>
@@ -84,7 +85,7 @@ namespace Oceanside.Win32.Native.Hooks
         {
             if (!(sender is HookedWindow hookedWindow)) return;
             if (ApplicationsHookedWindows.ContainsKey(hookedWindow.WindowHandle))
-                _ = ApplicationsHookedWindows.Remove(hookedWindow.WindowHandle);
+                _ = ApplicationsHookedWindows.TryRemove(hookedWindow.WindowHandle, out var _);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -123,7 +124,7 @@ namespace Oceanside.Win32.Native.Hooks
                 //Remove the event handler so we are not notified of a disposal we already know about.
                 hook.OnClosed -= HookedWindow_OnDestroyed;
                 hook.ClearAllCallbacks();
-                _ = ApplicationsHookedWindows.Remove(hook.WindowHandle);
+                _ = ApplicationsHookedWindows.TryRemove(hook.WindowHandle, out var _);
             }
         }
         #endregion

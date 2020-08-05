@@ -61,12 +61,10 @@ like I am seeing infrequently.  Maybe I need to capture and release?  I have a f
 using the debugger.  
 
 # TODO
-* NAMESPACES, a recent refactor left a mismatch between namespaces and assembly/folder names and Analyzers are not catching this.  CodeRush can't fix it either.'
 * Change Cursor on DragMove operation
 * When you set the Window transparency all of the Window content becomes transparent too.  I need to figure out how to handle this.
 * Modify Window and related Views/View Models to make it mimic an Adorner
 * When I resize the Window on startup, it is not a smooth transition because I currently have to call Window.Activate and then resize directly after.
-* The WindowHookManager has a static dictionary ApplicationsHookedWindows that needs to be converted to a thread safe concurrent type.
 ## Maybe Do
 In the AssociatedObject_Loaded handler of the DragMoveBehavior, I obtain a handle to the Window that is likely associated with
 the DragMove behavior by calling User32.GetActiveWindow().  I would prefer to do this by using a dependency property because
