@@ -132,5 +132,37 @@ namespace Oceanside.Win32.Native
 
         [DllImport(User32, SetLastError = true)]
         private static extern bool ShowWindow(IntPtr hWnd, int nCmdShow);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Loads a cursor. </summary>
+        ///
+        /// <param name="hInstance">    The instance. </param>
+        /// <param name="lpCursorName"> Name of the cursor. </param>
+        ///
+        /// <returns>   The cursor. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        [DllImport(User32, SetLastError = true)]
+        public static extern IntPtr LoadCursor(IntPtr hInstance, int lpCursorName);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Sets a cursor. </summary>
+        ///
+        /// <param name="hCursor">  The cursor. </param>
+        ///
+        /// <returns>   An IntPtr. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        [DllImport(User32, SetLastError = true)]
+        public static extern IntPtr SetCursor(IntPtr hCursor);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets the cursor. </summary>
+        ///
+        /// <returns>   The cursor. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        [DllImport(User32, SetLastError = true)]
+        public static extern IntPtr GetCursor();
     }
 }
