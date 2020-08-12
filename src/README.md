@@ -1,3 +1,10 @@
+# Status of this Project
+I am updating this section in hindsight.  I am finding that migrating to WinUI in its current preview state is requiring much more work than I anticipated.  Primarily because I am constantly trying various experiments for work-arounds to address missing features.
+
+This is causing me to lose focus on my primary internal project.  That is, a now 4 year long effort re-writing a large POS application from the ground up in now .Net 5+.  I will do what I can to circle back around to this repo when I can, but at a minimum, I hope the examples help you with your own work-arounds.
+
+This should not be viewed as a final, error free example of perfection, but rather a way to spark ideas.
+
 # Requirements
 Note that the WinUI team has indicated a version of the .Net 5.0 prelease that is lower than what I use in these projects.  Right now I am at preview 7 and that's why the global.json tries to use that version.
 
@@ -60,10 +67,25 @@ I would remove it so that there would be zero risk that somehow it would remain 
 like I am seeing infrequently.  Maybe I need to capture and release?  I have a feeling that it is related to 
 using the debugger.  
 
+## WinUI 3 does not support Transparent Windows
+Note that when you try to provide a non-rectangular Window that may have rounded corners, we do not have the ability to make the areas near the rounded corners transparent.
+
+The following is a snippet from a Microsoft Employee dated 8/8/2020/ in response to me asking if it was possible to achieve transparency near those rounded corners.
+
+> The short answer is that there is no way to do general transparency today.
+> 
+> In general, WinUI today currently forces the area it owns to be opaque, so an app can't define general transparency via the XAML element tree.  We might remove this restriction, but we don't currently have a planned timeline for that.
+> 
+> There is a partial workaround to that restriction in WinUI in the form of SwapChainPanel.  SwapChainPanel "punches a hole" in whatever content was rendered from elements underneath the SwapChainPanel, so having an SwapChainPanel with a 1x1 transparent swapchain will cause the rectangle of the SwapChainPanel to be transparent.  Since the DesktopWindowXamlSource HWND is WS_EX_NOREDIRECTIONBITMAP, this will cause the window behind it to be visible (unless it is also transparent, of course).
+> 
+> In WinUI Desktop today, that parent window is not WS_EX_NOREDIRECTIONBITMAP, so it is visible and the SwapChainPanel hack doesn't really help.
+> 
+> The SwapChainPanel hack is also only rectangular, so this doesn't really help to round the corners of the overall window.
+> 
+> In theory, a Win32 HRGN could be used to round the corners, but the rounding would not be anti-aliased.
+
+
 # TODO
-* Change Cursor on DragMove operation
-* When you set the Window transparency all of the Window content becomes transparent too.  I need to figure out how to handle this.
-* Modify Window and related Views/View Models to make it mimic an Adorner
 * When I resize the Window on startup, it is not a smooth transition because I currently have to call Window.Activate and then resize directly after.
 
 ## Known Visual Studio or Project Issues
@@ -82,5 +104,4 @@ If you ever rename App.xaml then make sure that you assign the new XAML file nam
 time as I did [here](https://github.com/dotnet/wpf/issues/3245#issuecomment-667634709).
 
 # Notes to Self
-* Figure out or log a potential issue where custom controls that inherit from other controls such as a grid, only work in XAML, not code behind.  Code behind throws exceptions.  See the WindowRoot control.
 * Determine if I should open a discussion or issue regarding the infinite DPI change events firing.  If I do I need to create a small project that can most easily reproduce the problem.
