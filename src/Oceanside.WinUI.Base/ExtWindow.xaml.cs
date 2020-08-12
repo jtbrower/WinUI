@@ -49,7 +49,7 @@ namespace Oceanside.WinUI.Base
     /// <seealso cref="Oceanside.WinUI.Base.IPlatform"/>
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    public sealed partial class ExtWindow : IExtWindow, IPlatform, INotifyPropertyChanged
+    public partial class ExtWindow : IExtWindow, IPlatform, INotifyPropertyChanged
     {
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Interface for window native. </summary>
@@ -132,7 +132,7 @@ namespace Oceanside.WinUI.Base
         {
             //Grab the handle and remove the built-in Win32 TitleBar and border
             Handle = this.As<IWindowNative>().WindowHandle;
-
+            
             //This is how you hook WndProc using the helper classes.  The helper classes will unhook
             // when you close the Window.  Note that since the Window is already created, you are not
             // going to receive the WM_CREATE or WM_NCCREATE messages.
