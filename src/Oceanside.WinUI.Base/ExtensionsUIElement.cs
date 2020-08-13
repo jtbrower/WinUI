@@ -170,7 +170,22 @@ namespace Oceanside.WinUI.Base
 
         public static FrameworkElement? GetRootElement(this Window window)
         {
-            var parent = window.Content as FrameworkElement;
+            return window.Content is not FrameworkElement fe ? null : fe.GetRootElement();
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>
+        /// Keep walking up the XAML tree using the FrameworkElement.Parent property until null is hit.
+        /// </summary>
+        ///
+        /// <param name="element">  The operation. </param>
+        ///
+        /// <returns>   The root element. </returns>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static FrameworkElement? GetRootElement(this FrameworkElement element)
+        {
+            var parent = element;
             while (parent != null)
             {
                 if (!(parent.Parent is FrameworkElement fe)) return parent;
