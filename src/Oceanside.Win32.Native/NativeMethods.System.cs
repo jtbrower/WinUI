@@ -47,18 +47,21 @@ namespace Oceanside.Win32.Native
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        // Retrieves the keyboard repeat-speed setting, which is a value in the range from 0
-        // (approximately 2.5 repetitions per second) through 31 (approximately 30 repetitions per
-        // second). The actual repeat rates are hardware-dependent and may vary from a linear scale by
-        // as much as 20%. The pvParam parameter must point to a DWORD variable that receives the
-        // setting. 
-        // See https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfoa
+        /// Retrieves the keyboard repeat-speed setting, which is a value in the range from 0
+        /// (approximately 2.5 repetitions per second) through 31 (approximately 30 repetitions per
+        /// second). The actual repeat rates are hardware-dependent and may vary from a linear scale by
+        /// as much as 20%. The pvParam parameter must point to a DWORD variable that receives the
+        /// setting. 
+        /// 
+        /// Note that this function was suffixed with NonCached to indicate a potentially expensive
+        /// operation that should probably be cached by the caller.
+        /// See https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfoa
         /// </summary>
         ///
         /// <returns>   The keyboard speed as repetitions per second. </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public static int GetKeyboardSpeed()
+        public static int GetKeyboardSpeedNonCached()
         {
             const int SPI_GETKEYBOARDSPEED = 0xA;
             var speed = 0;
@@ -77,13 +80,16 @@ namespace Oceanside.Win32.Native
         /// (approximately 250 ms delay) through 3 (approximately 1 second delay). The actual delay
         /// associated with each value may vary depending on the hardware. The pvParam parameter must
         /// point to an integer variable that receives the setting.
-        //  See https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfoa
+        ///  See https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-systemparametersinfoa
+        ///  
+        /// Note that this function was suffixed with NonCached to indicate a potentially expensive
+        /// operation that should probably be cached by the caller.
         /// </summary>
         ///
         /// <returns>   The keyboard delay. </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public static int GetKeyboardDelay()
+        public static int GetKeyboardDelayNonCached()
         {
             const int SPI_GETKEYBOARDDELAY = 0x16;
             var delay = 0;
