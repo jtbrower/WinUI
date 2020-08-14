@@ -99,6 +99,24 @@ namespace Oceanside.WinUI.Base
         public event EventHandler<EnumWindowState>? WindowStateChanged;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Occurs when Location Changed. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public event EventHandler? LocationChanged;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Occurs when DPI Changed. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public event EventHandler? DpiChanged;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   This is a generic version of Window.SizeChanged. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public event EventHandler? Resized;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// Note that I am going to make a best attempt at trying to keep this in sync with the actual
         /// Win32 windows Show State but I am cautious in that this could be a tough challenge to meet in
@@ -132,7 +150,7 @@ namespace Oceanside.WinUI.Base
         {
             //Grab the handle and remove the built-in Win32 TitleBar and border
             Handle = this.As<IWindowNative>().WindowHandle;
-            
+
             //This is how you hook WndProc using the helper classes.  The helper classes will unhook
             // when you close the Window.  Note that since the Window is already created, you are not
             // going to receive the WM_CREATE or WM_NCCREATE messages.
@@ -187,6 +205,10 @@ namespace Oceanside.WinUI.Base
                     // any issue related to returning false and allowing other listeners to be 
                     // notified.
                     _ = ScaleContentForDpiIfEnabled();
+                    DpiChanged?.Invoke(this,EventArgs.Empty);
+                    break;
+                case WindowHookManager.HookMsgType.WINDOWPOSCHANGED:
+                    LocationChanged?.Invoke(this, EventArgs.Empty);
                     break;
             }
 
@@ -274,6 +296,7 @@ namespace Oceanside.WinUI.Base
             if (_cachedWindowState == currentWindowState) return;
             _cachedWindowState = currentWindowState;
             WindowStateChanged?.Invoke(this, _cachedWindowState);
+            Resized?.Invoke(this,EventArgs.Empty);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////

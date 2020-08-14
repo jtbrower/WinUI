@@ -100,6 +100,5 @@ namespace Oceanside.WinUI.Sample.App
             //Make the window fully visible by removing the transparency.
             window.SetTransparency(0);
         }
-
     }
 }
