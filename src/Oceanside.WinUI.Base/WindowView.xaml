@@ -14,6 +14,8 @@
     xmlns:media="using:Microsoft.UI.Xaml.Media"
     xmlns:vm="using:Oceanside.WinUI.Base.Vm"
     RenderTransformOrigin=".5,.5"
+    HorizontalContentAlignment="Stretch"
+    VerticalContentAlignment="Stretch"
     mc:Ignorable="d">
     <controls:LayoutTransformControl.Resources>
         <converters:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter" FalseValue="Collapsed" />

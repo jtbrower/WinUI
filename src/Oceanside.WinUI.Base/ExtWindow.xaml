@@ -2,18 +2,17 @@
     x:Class="Oceanside.WinUI.Base.ExtWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:app="using:Microsoft.UI.Xaml"
     xmlns:behave="using:Oceanside.WinUI.Base.Behaviors"
+    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
-    xmlns:media="using:Microsoft.UI.Xaml.Media"    
-    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"    
     xmlns:local="using:Oceanside.WinUI.Base"
-    xmlns:templates="using:Oceanside.WinUI.Base.Templates"
-    xmlns:app="using:Microsoft.UI.Xaml"    
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:media="using:Microsoft.UI.Xaml.Media"
+    xmlns:templates="using:Oceanside.WinUI.Base.Templates"
     mc:Ignorable="d">
     <!--
-    
         Warning : When using the drag move feature, it attaches to the Window's Content.  If the content does not
         have a color assigned, it will not register pointer down events.
         
@@ -25,9 +24,12 @@
         VerticalAlignment="Stretch"
         Background="Transparent">
         <Grid.Resources>
-            <templates:TypeNameDataTemplateSelector
-            x:Key="TypeNameDataTemplateSelector"                
-            x:Name="TypeNameDataTemplateSelector" />
+            <templates:TypeNameDataTemplateSelector x:Key="TypeNameDataTemplateSelector" x:Name="TypeNameDataTemplateSelector" />
+            <ControlTemplate x:Key="ContentControlTemplate" TargetType="ContentControl">
+                <ContentPresenter
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch" />
+            </ControlTemplate>            
         </Grid.Resources>
         <!--
             For those developers who come from a WPF background like myself, the reason that I attach the
@@ -36,15 +38,14 @@
             the generic type for a Behavior.
         -->
         <interactivity:Interaction.Behaviors>
-            <!-- Do not let the DragMove happen on a Maximized Window-->
-            <behave:DragMoveBehavior AllowDragOnMaximizedWindow="False" x:Name="DragMoveBehavior" />
+            <!--  Do not let the DragMove happen on a Maximized Window  -->
+            <behave:DragMoveBehavior x:Name="DragMoveBehavior" AllowDragOnMaximizedWindow="False" />
         </interactivity:Interaction.Behaviors>
 
         <ContentControl
-                    x:Name="ClientContentControl"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Content="{x:Bind Path=Vm, Mode=OneWay}"
-                    ContentTemplateSelector="{StaticResource TypeNameDataTemplateSelector}" />
+            x:Name="ClientContentControl"
+            Template="{StaticResource ContentControlTemplate}"
+            Content="{x:Bind Path=Vm, Mode=OneWay}"
+            ContentTemplateSelector="{StaticResource TypeNameDataTemplateSelector}" />
     </Grid>
 </Window>
