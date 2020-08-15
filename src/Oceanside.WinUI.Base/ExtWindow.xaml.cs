@@ -487,10 +487,12 @@ namespace Oceanside.WinUI.Base
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
-        /// Mimic WPF's SizeToContent feature.  Note that I have a current limitation where I do not account
-        /// for the non-client space requirements of a Window so it only works if the Window Border and 
-        /// TitleBar have already been removed.  
+        /// Mimic WPF's SizeToContent feature.  Note that I have a current limitation where I do not
+        /// account for the non-client space requirements of a Window so it only works if the Window
+        /// Border and TitleBar have already been removed.  
         /// </summary>
+        ///
+        /// <param name="isReInvoke">   True if is re invoke, false if not. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public void SizeToContent()
@@ -501,15 +503,15 @@ namespace Oceanside.WinUI.Base
                 return;
             }
 
-            if (Vm.RequiredHeight <= 0 || Vm.RequiredHeight == double.PositiveInfinity || Vm.RequiredWidth <= 0 || Vm.RequiredWidth == double.PositiveInfinity)
+            if (Vm.ContentsDesiredSize == null || !Vm.ContentsDesiredSize.IsValid)
             {
-                Debug.WriteLine($"{nameof(SizeToContent)} found {nameof(Vm.RequiredWidth)}x{nameof(Vm.RequiredHeight)} = {Vm.RequiredWidth}x{Vm.RequiredHeight}.  Unable to resize.");
+                Debug.WriteLine($"{nameof(SizeToContent)} found invalid {nameof(Vm.ContentsDesiredSize)}.  Unable to perform {nameof(SizeToContent)}");
                 return;
             }
 
             //Convert to device units
-            var clientHeightInDevicePixels = ClientContentControl.DipToDevice(Vm.RequiredHeight);
-            var clientWidthInDevicePixels = ClientContentControl.DipToDevice(Vm.RequiredWidth);
+            var clientHeightInDevicePixels = ClientContentControl.DipToDevice(Vm.ContentsDesiredSize.Height);
+            var clientWidthInDevicePixels = ClientContentControl.DipToDevice(Vm.ContentsDesiredSize.Width);
 
             //Now we need to calculate the non-client area of the Window.  This is only important when a Window has a border and or a
             // TitleBar (or menu).  In other words, if the HideNonClientArea method has been called on the Window then the nonClientSize

@@ -49,13 +49,13 @@ namespace Oceanside.WinUI.Base.Vm
         /// <summary>   The title bar view model. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private TitleBarVm? _titleBarVm;
+        private TitleBarVm _titleBarVm;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The window that owns this item. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private IExtWindow _ownerWindow;
+        private readonly IExtWindow _ownerWindow;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The clients content. </summary>
@@ -64,16 +64,10 @@ namespace Oceanside.WinUI.Base.Vm
         private object? _clientsContent;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Height of the required. </summary>
+        /// <summary>   Size of the contents desire. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private double _requiredHeight;
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Width of the required. </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private double _requiredWidth;
+        private PortableSize? _contentsDesireSize;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Initializes a new instance of the WinUI.Vm.WindowVm class. </summary>
@@ -114,24 +108,16 @@ namespace Oceanside.WinUI.Base.Vm
         public TitleBarVm TitleBarVm { get => _titleBarVm; set => SetProperty(ref _titleBarVm, value); }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Gets or sets the height of the required. </summary>
+        /// <summary>   Gets or sets the size of the contents desired. </summary>
         ///
-        /// <value> The height of the required. </value>
+        /// <value> The size of the contents desired. </value>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public double RequiredHeight
+        public PortableSize? ContentsDesiredSize
         {
-            get => _requiredHeight;
-            set => SetProperty(ref _requiredHeight, value);
+            get => _contentsDesireSize;
+            set => SetProperty(ref _contentsDesireSize, value);
         }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Gets or sets the width of the required. </summary>
-        ///
-        /// <value> The width of the required. </value>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public double RequiredWidth { get => _requiredWidth; set => SetProperty(ref _requiredWidth, value); }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Shows the cursor. </summary>
@@ -152,7 +138,7 @@ namespace Oceanside.WinUI.Base.Vm
 
         public void ShowDropShadow(bool shouldShow)
         {
-            DropShadowVisibilityChangeRequested?.Invoke(this,shouldShow);
+            DropShadowVisibilityChangeRequested?.Invoke(this, shouldShow);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -163,7 +149,7 @@ namespace Oceanside.WinUI.Base.Vm
 
         public void ScaleContent(double scaleAt)
         {
-            ScaleContentRequested?.Invoke(this,scaleAt);
+            ScaleContentRequested?.Invoke(this, scaleAt);
         }
     }
 }

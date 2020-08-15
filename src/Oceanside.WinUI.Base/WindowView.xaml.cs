@@ -27,6 +27,7 @@ namespace Oceanside.WinUI.Base
     using Microsoft.UI.Xaml;
     using Microsoft.Toolkit.Uwp.UI.Controls;
     using Windows.Foundation;
+    using Microsoft.Toolkit.Uwp.Helpers;
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <content>   Container for window contents. This class cannot be inherited. </content>
@@ -45,9 +46,33 @@ namespace Oceanside.WinUI.Base
             {
                 if (!(sender is WindowView windowView)) return;
 
-                AttachViewModelEventHandlers(windowView,args);
+                AttachViewModelEventHandlers(windowView, args);
 
             }));
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The required height property. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public static readonly DependencyProperty RequiredSizeProperty =
+            DependencyProperty.Register(nameof(RequiredSize),
+                typeof(PortableSize),
+                typeof(WindowView),
+                new PropertyMetadata(null, (sender, args) =>
+                {
+                    if (!(sender is WindowView windowView)) return;
+                    if (windowView.Vm == null) return;
+                    windowView.Vm.ContentsDesiredSize = args.NewValue as PortableSize;
+                }));
+
+
+
+
+        public PortableSize? RequiredSize
+        {
+            get => (PortableSize?)GetValue(RequiredSizeProperty);
+            set => SetValue(RequiredSizeProperty, value);
+        }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Attach view model event handlers. </summary>
@@ -68,6 +93,7 @@ namespace Oceanside.WinUI.Base
             }
             if (args.NewValue is WindowVm newWindowVm)
             {
+                newWindowVm.ContentsDesiredSize = windowView.RequiredSize;
                 //Just in case we somehow have handlers attached, remove them first.  No exceptions are thrown 
                 // if we were not attached.
                 newWindowVm.DropShadowVisibilityChangeRequested -= windowView.WindowVm_DropShadowVisibilityChangeRequested;
@@ -102,7 +128,7 @@ namespace Oceanside.WinUI.Base
         {
             if (isVisible)
                 ChildGridDropShadow.ShowDropShadow();
-            else 
+            else
                 ChildGridDropShadow.HideDropShadow();
         }
 
@@ -172,61 +198,6 @@ namespace Oceanside.WinUI.Base
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   The required height property. </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public static readonly DependencyProperty RequiredHeightProperty =
-            DependencyProperty.Register(nameof(RequiredHeight),
-                typeof(double),
-                typeof(WindowView),
-                new PropertyMetadata(0, (sender, args) =>
-                {
-                    if (!(sender is WindowView windowView)) return;
-                    if (windowView.Vm == null) return;
-                    windowView.Vm.RequiredHeight = args.NewValue == null ? 0 : (double)args.NewValue;
-                }));
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Gets or sets the height of the required. </summary>
-        ///
-        /// <value> The height of the required. </value>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public double RequiredHeight
-        {
-            get => (double)GetValue(RequiredHeightProperty);
-            set => SetValue(RequiredHeightProperty, value);
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Gets or sets the width of the required. </summary>
-        ///
-        /// <value> The width of the required. </value>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public double RequiredWidth
-        {
-            get => (double)GetValue(RequiredWidthProperty);
-            set => SetValue(RequiredWidthProperty, value);
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   The required width property. </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public static readonly DependencyProperty RequiredWidthProperty =
-            DependencyProperty.Register(
-                nameof(RequiredWidth),
-                typeof(double),
-                typeof(WindowView),
-                new PropertyMetadata(0, (sender, args) =>
-                {
-                    if (!(sender is WindowView windowView)) return;
-                    if (windowView.Vm == null) return;
-                    windowView.Vm.RequiredWidth = args.NewValue == null ? 0 : (double)args.NewValue;
-                }));
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// Provides the behavior for the "Measure" pass of the layout cycle. We override this so that we
         /// can determine how much space all of the controls truly needed.  This information is useful
@@ -248,8 +219,10 @@ namespace Oceanside.WinUI.Base
 
         protected override Size MeasureOverride(Size availableSize)
         {
-            //Needed to support the SizeToContent feature.
-            UpdateRequiredSize();
+            //Needed to support the SizeToContent feature.  I am invoking back onto the Queue to
+            // let this Measure operation complete first.
+            if (Vm != null)
+                _ = DispatcherQueue.ExecuteOnUIThreadAsync(() => UpdateRequiredSize(), Microsoft.System.DispatcherQueuePriority.Low);
 
             //Now allow everything to determine what they actually want to ask for.
             return base.MeasureOverride(availableSize);
@@ -261,13 +234,14 @@ namespace Oceanside.WinUI.Base
 
         public void UpdateRequiredSize()
         {
+            if (Vm == null) return;
             //Use infinity to assure it returns the real space needs.  We then set our custom dependency 
             // property values so we know how much space to allocate when we resize the window to fit 
             // the content.  Note that using the DesiredSize property will not tell you the correct 
             // answer.
             var trueDesiredSize = base.MeasureOverride(_infiniteSize);
-            SetValue(RequiredHeightProperty, trueDesiredSize.Height);
-            SetValue(RequiredWidthProperty, trueDesiredSize.Width);
+            if (RequiredSize == null || RequiredSize.Width != trueDesiredSize.Width || RequiredSize.Height != trueDesiredSize.Height)
+                RequiredSize = new PortableSize { Height = trueDesiredSize.Height, Width = trueDesiredSize.Width };
         }
     }
 }
