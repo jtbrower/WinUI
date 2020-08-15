@@ -49,7 +49,7 @@ namespace Oceanside.WinUI.Base.Vm
         /// <summary>   The title bar view model. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private TitleBarVm _titleBarVm;
+        private TitleBarVm? _titleBarVm;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The window that owns this item. </summary>
@@ -92,14 +92,6 @@ namespace Oceanside.WinUI.Base.Vm
             _titleBarVm.MaximizeWindowCmd = new DelegateCmd(_ownerWindow.Maximize);
             _titleBarVm.RestoreWindowCmd = new DelegateCmd(_ownerWindow.Restore);
         }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Gets or sets the window that owns this item. </summary>
-        ///
-        /// <value> The owner window. </value>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public IExtWindow OwnerWindow { get => _ownerWindow; set => SetProperty(ref _ownerWindow, value); }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Gets or sets the clients content. </summary>
