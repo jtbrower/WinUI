@@ -40,7 +40,6 @@
   <ItemGroup>
     <Page Update="**\*.xaml">
       <Generator>MSBuild:Compile</Generator>
-      <Generator>XamlIntelliSenseFileGenerator</Generator>
       <CopyToOutputDirectory>Never</CopyToOutputDirectory>      
     </Page>
   </ItemGroup>
