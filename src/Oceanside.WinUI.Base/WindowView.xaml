@@ -82,7 +82,7 @@
                   knows how to template your content.
                 -->
                 <ContentControl
-                    x:Name="ClientContentControl"
+                    x:Name="WindowViewInstance"
                     Grid.Row="1"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"

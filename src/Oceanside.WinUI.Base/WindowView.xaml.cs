@@ -46,7 +46,9 @@ namespace Oceanside.WinUI.Base
             {
                 if (!(sender is WindowView windowView)) return;
 
-                AttachViewModelEventHandlers(windowView, args);
+                if (args.NewValue is not WindowVm newWindowVm) return;
+
+                newWindowVm.ContentsDesiredSize = windowView.RequiredSize;
 
             }));
 
@@ -65,71 +67,16 @@ namespace Oceanside.WinUI.Base
                     windowView.Vm.ContentsDesiredSize = args.NewValue as PortableSize;
                 }));
 
-
-
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Gets or sets the required size. </summary>
+        ///
+        /// <value> The size of the required. </value>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
 
         public PortableSize? RequiredSize
         {
             get => (PortableSize?)GetValue(RequiredSizeProperty);
             set => SetValue(RequiredSizeProperty, value);
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Attach view model event handlers. </summary>
-        ///
-        /// <param name="windowView">   The window view. </param>
-        /// <param name="args">         Dependency property changed event information. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private static void AttachViewModelEventHandlers(WindowView windowView, DependencyPropertyChangedEventArgs args)
-        {
-            //We listen to a couple event handlers on the view model that fire when this WindowView class
-            // needs to perform an action such as Showing/Hiding the DropShadow or scaling content.
-            if (args.OldValue is WindowVm oldWindowVm)
-            {
-                //We need to remove the handlers or else we could cause a memory leak.
-                oldWindowVm.DropShadowVisibilityChangeRequested -= windowView.WindowVm_DropShadowVisibilityChangeRequested;
-                oldWindowVm.ScaleContentRequested -= windowView.WindowVm_ScaleContentRequested;
-            }
-            if (args.NewValue is WindowVm newWindowVm)
-            {
-                newWindowVm.ContentsDesiredSize = windowView.RequiredSize;
-                //Just in case we somehow have handlers attached, remove them first.  No exceptions are thrown 
-                // if we were not attached.
-                newWindowVm.DropShadowVisibilityChangeRequested -= windowView.WindowVm_DropShadowVisibilityChangeRequested;
-                newWindowVm.ScaleContentRequested -= windowView.WindowVm_ScaleContentRequested;
-
-                //Attach
-                newWindowVm.DropShadowVisibilityChangeRequested += windowView.WindowVm_DropShadowVisibilityChangeRequested;
-                newWindowVm.ScaleContentRequested += windowView.WindowVm_ScaleContentRequested;
-            }
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Window view model scale content requested. </summary>
-        ///
-        /// <param name="sender">   The sender. </param>
-        /// <param name="scaleAt">  The scale at. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private void WindowVm_ScaleContentRequested(object? _, double scaleAt)
-        {
-            ScaleContent(scaleAt);
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Window view model drop shadow visibility change requested. </summary>
-        ///
-        /// <param name="sender">       The sender. </param>
-        /// <param name="isVisible">    True if is visible, false if not. </param>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        private void WindowVm_DropShadowVisibilityChangeRequested(object? _, bool isVisible)
-        {
-            if (isVisible)
-                ChildGridDropShadow.ShowDropShadow();
-            else
-                ChildGridDropShadow.HideDropShadow();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -165,7 +112,7 @@ namespace Oceanside.WinUI.Base
         /// <summary>   Hides the drop shadow. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public void HideDropShadow()
+        internal void HideDropShadow()
         {
             ChildGridDropShadow.HideDropShadow();
         }
@@ -174,7 +121,7 @@ namespace Oceanside.WinUI.Base
         /// <summary>   Shows the drop shadow. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public void ShowDropShadow()
+        internal void ShowDropShadow()
         {
             ChildGridDropShadow.ShowDropShadow();
         }

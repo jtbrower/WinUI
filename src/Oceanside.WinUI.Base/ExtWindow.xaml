@@ -2,14 +2,11 @@
     x:Class="Oceanside.WinUI.Base.ExtWindow"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:app="using:Microsoft.UI.Xaml"
     xmlns:behave="using:Oceanside.WinUI.Base.Behaviors"
-    xmlns:controls="using:Microsoft.Toolkit.Uwp.UI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:interactivity="using:Microsoft.Xaml.Interactivity"
     xmlns:local="using:Oceanside.WinUI.Base"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:media="using:Microsoft.UI.Xaml.Media"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"   
     xmlns:templates="using:Oceanside.WinUI.Base.Templates"
     mc:Ignorable="d">
     <!--
@@ -25,11 +22,6 @@
         Background="Transparent">
         <Grid.Resources>
             <templates:TypeNameDataTemplateSelector x:Key="TypeNameDataTemplateSelector" x:Name="TypeNameDataTemplateSelector" />
-            <ControlTemplate x:Key="ContentControlTemplate" TargetType="ContentControl">
-                <ContentPresenter
-                    HorizontalAlignment="Stretch"
-                    VerticalAlignment="Stretch" />
-            </ControlTemplate>            
         </Grid.Resources>
         <!--
             For those developers who come from a WPF background like myself, the reason that I attach the
@@ -42,10 +34,10 @@
             <behave:DragMoveBehavior x:Name="DragMoveBehavior" AllowDragOnMaximizedWindow="False" />
         </interactivity:Interaction.Behaviors>
 
-        <ContentControl
-            x:Name="ClientContentControl"
-            Template="{StaticResource ContentControlTemplate}"
-            Content="{x:Bind Path=Vm, Mode=OneWay}"
-            ContentTemplateSelector="{StaticResource TypeNameDataTemplateSelector}" />
+        <local:WindowView
+            x:Name="WindowViewInstance"
+            HorizontalAlignment="Stretch"
+            VerticalAlignment="Stretch"
+            Vm="{x:Bind Path=Vm, Mode=OneWay}" />
     </Grid>
 </Window>

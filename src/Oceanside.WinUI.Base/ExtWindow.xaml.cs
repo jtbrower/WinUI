@@ -82,6 +82,12 @@ namespace Oceanside.WinUI.Base
         private bool _autoDpiContentScaling = true;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   The transparency of the window as a percentage. </summary>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        private int _transparency = 0;
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>
         /// When the Window's content is first loaded, we save the DPI scale and attempt to make the
         /// content look like it does on the first monitor it is loaded on.  Anytime the end user moves
@@ -205,7 +211,7 @@ namespace Oceanside.WinUI.Base
                     // any issue related to returning false and allowing other listeners to be 
                     // notified.
                     _ = ScaleContentForDpiIfEnabled();
-                    DpiChanged?.Invoke(this,EventArgs.Empty);
+                    DpiChanged?.Invoke(this, EventArgs.Empty);
                     break;
                 case WindowHookManager.HookMsgType.WINDOWPOSCHANGED:
                     LocationChanged?.Invoke(this, EventArgs.Empty);
@@ -296,7 +302,7 @@ namespace Oceanside.WinUI.Base
             if (_cachedWindowState == currentWindowState) return;
             _cachedWindowState = currentWindowState;
             WindowStateChanged?.Invoke(this, _cachedWindowState);
-            Resized?.Invoke(this,EventArgs.Empty);
+            Resized?.Invoke(this, EventArgs.Empty);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -364,12 +370,12 @@ namespace Oceanside.WinUI.Base
 
         private double? GetDpiScale()
         {
-            if (ClientContentControl.XamlRoot == null)
+            if (WindowViewInstance.XamlRoot == null)
             {
                 Debug.WriteLine($"{nameof(GetDpiScale)} called before {nameof(WindowView)}.XamlRoot was available.");
                 return null;
             }
-            return (ClientContentControl.XamlRoot.RasterizationScale * 96.0) / GetDpiForWindow(Handle);
+            return (WindowViewInstance.XamlRoot.RasterizationScale * 96.0) / GetDpiForWindow(Handle);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -413,7 +419,7 @@ namespace Oceanside.WinUI.Base
             {
                 scale = 1.0;
             }
-            ScaleWindowContent(scale.Value);
+            ScaleContent(scale.Value);
 
             return true;
         }
@@ -436,7 +442,7 @@ namespace Oceanside.WinUI.Base
             var doubleTapPosition = args.GetPosition(RootContainer);
 
             //This method already checks for IsHitTestVisible by default.
-            var uiElementsUnderPosition = VisualTreeHelper.FindElementsInHostCoordinates(doubleTapPosition, ClientContentControl);
+            var uiElementsUnderPosition = VisualTreeHelper.FindElementsInHostCoordinates(doubleTapPosition, WindowViewInstance);
             if (uiElementsUnderPosition.Any(e => e.GetType().IsSubclassOf(typeof(ButtonBase)))) return;
 
             if (Handle.IsMaximized())
@@ -475,14 +481,9 @@ namespace Oceanside.WinUI.Base
         /// <returns>   True if it succeeds, false if it fails. </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private void ScaleWindowContent(double scaleAt)
+        public void ScaleContent(double scaleAt)
         {
-            if (Vm == null)
-            {
-                Debug.WriteLine($"{nameof(ScaleWindowContent)} found {nameof(ExtWindow)}.{nameof(Vm)} is null.  Unable to scale.");
-                return;
-            }
-            Vm.ScaleContent(scaleAt);
+            WindowViewInstance.ScaleContent(scaleAt);
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -510,8 +511,8 @@ namespace Oceanside.WinUI.Base
             }
 
             //Convert to device units
-            var clientHeightInDevicePixels = ClientContentControl.DipToDevice(Vm.ContentsDesiredSize.Height);
-            var clientWidthInDevicePixels = ClientContentControl.DipToDevice(Vm.ContentsDesiredSize.Width);
+            var clientHeightInDevicePixels = WindowViewInstance.DipToDevice(Vm.ContentsDesiredSize.Height);
+            var clientWidthInDevicePixels = WindowViewInstance.DipToDevice(Vm.ContentsDesiredSize.Width);
 
             //Now we need to calculate the non-client area of the Window.  This is only important when a Window has a border and or a
             // TitleBar (or menu).  In other words, if the HideNonClientArea method has been called on the Window then the nonClientSize
@@ -614,7 +615,14 @@ namespace Oceanside.WinUI.Base
 
         public void SetTransparency(int percentTransparent)
         {
-            Handle.SetWindowTransparency(percentTransparent);
+            if (_transparency == percentTransparent) return;
+
+            if (percentTransparent > 100 || percentTransparent < 0)
+                throw new ArgumentOutOfRangeException(nameof(percentTransparent));
+
+            if (!Handle.SetWindowTransparency(percentTransparent)) return;
+
+            _transparency = percentTransparent;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -623,7 +631,9 @@ namespace Oceanside.WinUI.Base
 
         public void RemoveTransparency()
         {
-            Handle.RemoveWindowTransparency();
+            if (_transparency == 0) return;
+            if (!Handle.RemoveWindowTransparency()) return;
+            _transparency = 0;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -669,7 +679,7 @@ namespace Oceanside.WinUI.Base
             if (!(_autoDpiContentScaling && _dpiScaleOnLoaded.HasValue))
             {
                 //This will remove any transform that has been added.
-                ScaleWindowContent(1.0);
+                ScaleContent(1.0);
             }
             else
             {
@@ -677,7 +687,7 @@ namespace Oceanside.WinUI.Base
                 // then we need to apply a transform.
                 var currentScale = GetDpiScale();
                 if (!currentScale.HasValue) return;
-                ScaleWindowContent(currentScale.Value);
+                ScaleContent(currentScale.Value);
             }
         }
 
@@ -718,9 +728,13 @@ namespace Oceanside.WinUI.Base
 
             //Removing or showing the DropShadow is somewhat similar to removing or showing the Win32 
             // Window border
-            Vm.ShowDropShadow(isVisible);
+            WindowViewInstance.HideDropShadow();
 
             Vm.TitleBarVm.IsVisible = isVisible;
+
+            //If the content hasn't loaded yet, we do not need to force a layout update and cannot call
+            // SizeToContent
+            if (!RootContainer.IsLoaded) return;
 
             //Force the content to recompute its space requirements
             Content?.UpdateLayout();
@@ -743,5 +757,21 @@ namespace Oceanside.WinUI.Base
         {
             _ = User32.ShowCursor(makeVisible);
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Hides the drop shadow. </summary>
+        ///
+        /// <seealso cref="IExtWindow.HideDropShadow()"/>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void HideDropShadow() => WindowViewInstance.HideDropShadow();
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+        /// <summary>   Shows the drop shadow. </summary>
+        ///
+        /// <seealso cref="IExtWindow.ShowDropShadow()"/>
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        public void ShowDropShadow() => WindowViewInstance.ShowDropShadow();
     }
 }

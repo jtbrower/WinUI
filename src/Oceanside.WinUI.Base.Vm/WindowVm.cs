@@ -23,8 +23,6 @@
 
 namespace Oceanside.WinUI.Base.Vm
 {
-    using System;
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////
     /// <summary>   A ViewModel for the window. </summary>
     ///
@@ -33,18 +31,6 @@ namespace Oceanside.WinUI.Base.Vm
 
     public class WindowVm : PropChangeBase
     {
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Wired into the View to request a change in the drop shadow's visibility. </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public event EventHandler<bool>? DropShadowVisibilityChangeRequested;
-
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-        /// <summary>   Wired into the View to request that the views content be scaled. </summary>
-        ////////////////////////////////////////////////////////////////////////////////////////////////////
-
-        public event EventHandler<double>? ScaleContentRequested;
-
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The title bar view model. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,7 +124,9 @@ namespace Oceanside.WinUI.Base.Vm
 
         public void ShowDropShadow(bool shouldShow)
         {
-            DropShadowVisibilityChangeRequested?.Invoke(this, shouldShow);
+            if(shouldShow)
+                _ownerWindow.ShowDropShadow();
+            else _ownerWindow.HideDropShadow();
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -149,7 +137,7 @@ namespace Oceanside.WinUI.Base.Vm
 
         public void ScaleContent(double scaleAt)
         {
-            ScaleContentRequested?.Invoke(this, scaleAt);
+            _ownerWindow.ScaleContent(scaleAt);
         }
     }
 }
