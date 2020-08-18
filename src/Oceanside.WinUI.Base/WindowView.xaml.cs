@@ -181,7 +181,6 @@ namespace Oceanside.WinUI.Base
 
         public void UpdateRequiredSize()
         {
-            if (Vm == null) return;
             //Use infinity to assure it returns the real space needs.  We then set our custom dependency 
             // property values so we know how much space to allocate when we resize the window to fit 
             // the content.  Note that using the DesiredSize property will not tell you the correct 
