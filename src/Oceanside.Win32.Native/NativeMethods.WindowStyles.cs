@@ -90,9 +90,11 @@ namespace Oceanside.Win32.Native
         /// <param name="windowHandle"> Handle of the window. </param>
         /// <param name="index">        Zero-based index of the. </param>
         /// <param name="styles">       The styles. </param>
+        ///
+        /// <returns>   True if it succeeds, false if it fails. </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        internal static void ClearWindowStyles(IntPtr windowHandle, int index, WindowStyles styles)
+        internal static bool ClearWindowStyles(IntPtr windowHandle, int index, WindowStyles styles)
         {
             var desiredStyle = PlatformSafe.GetWindow(windowHandle, index);
             WriteLineIf(GetLastWin32ErrorMessage(out var msg), msg);
@@ -103,6 +105,7 @@ namespace Oceanside.Win32.Native
 
             var success = IntPtr.Zero != PlatformSafe.SetWindow(windowHandle, index, desiredStyle);
             WriteLineIf(!success, LastWin32ErrorMessage);
+            return success;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////

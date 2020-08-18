@@ -39,9 +39,11 @@ namespace Oceanside.Win32.Native
         ///
         /// <param name="windowHandle">         Handle of the window. </param>
         /// <param name="percentTransparent">   The percent transparent. </param>
+        ///
+        /// <returns>   True if it succeeds, false if it fails. </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public static void SetWindowTransparency(this IntPtr windowHandle, int percentTransparent)
+        public static bool SetWindowTransparency(this IntPtr windowHandle, int percentTransparent)
         {
             //Sanity Check
             if (percentTransparent > 100 || percentTransparent < 0)
@@ -53,21 +55,24 @@ namespace Oceanside.Win32.Native
 
             //Calculate and set alpha attribute
             var alpha = (byte)(0xFF * (100 - percentTransparent) / 100);
-            var failed = !SetLayeredWindowAttributes(windowHandle, 0, alpha, LWA_ALPHA);
+            var success = SetLayeredWindowAttributes(windowHandle, 0, alpha, LWA_ALPHA);
 
             string? msg = null;
-            WriteLineIf(failed && GetLastWin32ErrorMessage(out msg), msg);
+            WriteLineIf(!success && GetLastWin32ErrorMessage(out msg), msg);
+            return success;
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Removes the window transparency described by windowHandle. </summary>
         ///
         /// <param name="windowHandle"> Handle of the window. </param>
+        ///
+        /// <returns>   True if it succeeds, false if it fails. </returns>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public static void RemoveWindowTransparency(this IntPtr windowHandle)
+        public static bool RemoveWindowTransparency(this IntPtr windowHandle)
         {
-            ClearWindowStyles(windowHandle, GWL_EXSTYLE, WindowStyles.WS_EX_LAYERED);
+            return ClearWindowStyles(windowHandle, GWL_EXSTYLE, WindowStyles.WS_EX_LAYERED);
         }
     }
 }
