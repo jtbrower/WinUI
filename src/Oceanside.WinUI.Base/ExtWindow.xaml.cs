@@ -152,7 +152,7 @@ namespace Oceanside.WinUI.Base
         /// <param name="windowView">   The window root. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public ExtWindow()
+        public ExtWindow(bool enableDoubleClickMaximize = true)
         {
             //Grab the handle and remove the built-in Win32 TitleBar and border
             Handle = this.As<IWindowNative>().WindowHandle;
@@ -185,11 +185,14 @@ namespace Oceanside.WinUI.Base
             //A custom handler we fire when minimized/maximized and other states are entered.
             WindowStateChanged += ExtWindow_WindowStateChanged;
 
-            RootContainer.DoubleTapped += RootContainer_DoubleTapped;
+            if (enableDoubleClickMaximize)
+                RootContainer.DoubleTapped += RootContainer_DoubleTapped;
+            
             RootContainer.Loaded += RootContainer_Loaded;
 
             SizeChanged += ExtWindow_SizeChanged;
         }
+
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   Callback, called when the window procedure. </summary>
@@ -721,7 +724,7 @@ namespace Oceanside.WinUI.Base
 
         private void ChangeCustomNonClientAreaVisibility(bool isVisible)
         {
-            if (Vm == null) return;
+            if (Vm?.TitleBarVm == null) return;
 
             //If the current state matches the requested leave.
             if (Vm.TitleBarVm.IsVisible == isVisible) return;

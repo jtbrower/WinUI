@@ -74,7 +74,7 @@
                     VerticalContentAlignment="Stretch"
                     Content="{x:Bind Path=Vm.TitleBarVm, Mode=OneWay}"
                     ContentTemplateSelector="{StaticResource TypeNameDataTemplateSelector}"
-                    Visibility="{x:Bind Path=Vm.TitleBarVm.IsVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}}" />
+                    Visibility="{x:Bind Path=Vm.TitleBarVm.IsVisible, Mode=OneWay, Converter={StaticResource BoolToVisibilityConverter}, FallbackValue=Collapsed}" />
 
                 <!-- 
                   This will display the content that the caller wants to show.  If you create a new view and a view model, you just

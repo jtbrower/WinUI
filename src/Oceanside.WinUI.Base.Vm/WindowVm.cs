@@ -35,7 +35,7 @@ namespace Oceanside.WinUI.Base.Vm
         /// <summary>   The title bar view model. </summary>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        private TitleBarVm _titleBarVm;
+        private TitleBarVm? _titleBarVm;
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////
         /// <summary>   The window that owns this item. </summary>
@@ -62,11 +62,14 @@ namespace Oceanside.WinUI.Base.Vm
         /// <param name="ownerWindow">  The window that owns this item. </param>
         ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        public WindowVm(TitleBarVm titleBarVm, IExtWindow ownerWindow)
+        public WindowVm(IExtWindow ownerWindow, TitleBarVm? titleBarVm=null)
         {
             _ownerWindow = ownerWindow;
-            _titleBarVm = titleBarVm;
 
+            //If null then this is a lookless window.
+            if(titleBarVm == null)return;
+
+            _titleBarVm = titleBarVm;
             _titleBarVm.CloseWindowCmd = new DelegateCmd(_ownerWindow.Close);
             _titleBarVm.MinimizeWindowCmd = new DelegateCmd(_ownerWindow.Minimize);
             _titleBarVm.MaximizeWindowCmd = new DelegateCmd(_ownerWindow.Maximize);
