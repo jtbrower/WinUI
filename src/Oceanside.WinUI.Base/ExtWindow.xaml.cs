@@ -173,12 +173,6 @@ namespace Oceanside.WinUI.Base
             // just has to be done before the behavior's associated object is loaded.
             DragMoveBehavior.WindowHandle = Handle;
 
-            //I don't like binding to statics like this so I pulled it out of the DataTemplate Selector
-            // and brought it up close to the top where it could more easily be injected.  I started by
-            // creating an interface called IApplicationStatics but I learned that it actually exists!
-            // So I will just leave it at this for now.
-            TypeNameDataTemplateSelector.FallbackResourceDictionary = Application.Current?.Resources;
-
             //Get rid of the built-in TitleBar and Window border
             Handle.HideWin32NonClientArea();
 

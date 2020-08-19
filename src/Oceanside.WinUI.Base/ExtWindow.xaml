@@ -20,9 +20,6 @@
         HorizontalAlignment="Stretch"
         VerticalAlignment="Stretch"
         Background="Transparent">
-        <Grid.Resources>
-            <templates:TypeNameDataTemplateSelector x:Key="TypeNameDataTemplateSelector" x:Name="TypeNameDataTemplateSelector" />
-        </Grid.Resources>
         <!--
             For those developers who come from a WPF background like myself, the reason that I attach the
             DragMoveBehavior to a class that is some sort of "Panel" rather than the Window itself is due
