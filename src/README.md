@@ -1,9 +1,16 @@
 # Status of this Project
-I am updating this section in hindsight.  I am finding that migrating to WinUI in its current preview state is requiring much more work than I anticipated.  Primarily because I am constantly trying various experiments for work-arounds to address missing features.
+We learned that the September pre-release for WinUI had been cancelled.  This
+followed an already pressing timeline where no commitment had been made to a
+specific production release date, no Visual Studio XAML support, no
+intellisense and a long list of other missing features where Microsoft provided
+no promise on whether they would be implemented.  Its just too early for WinUI
+and too risky to plan on using it in any production application in 2020 let
+alone 2021.
 
-This is causing me to lose focus on my primary internal project.  That is, a now 4 year long effort re-writing a large POS application from the ground up in now .Net 5+.  I will do what I can to circle back around to this repo when I can, but at a minimum, I hope the examples help you with your own work-arounds.
-
-This should not be viewed as a final, error free example of perfection, but rather a way to spark ideas.
+You will still find a lot of great tips and tricks in the libraries that I
+developed.  For now, it appears that WPF is still the most robust, hardened and
+predictable way to build Window's applications that operate outside of a
+Sandboxed environment.
 
 # Requirements
 Note that the WinUI team has indicated a version of the .Net 5.0 prelease that is lower than what I use in these projects.  Right now I am at preview 7 and that's why the global.json tries to use that version.
